@@ -1,16 +1,19 @@
-import {EIDBObjectStore} from "./EIDBObjectStore";
-import {EIDBIndex} from "./EIDBIndex";
 import {EIDBRequest} from "./EIDBRequest";
+import {EIDBValueMapper} from "./EIDBValueMapper";
 
 export class EIDBCursor implements IDBCursor {
     protected readonly _cursor: IDBCursor;
     readonly request: IDBRequest;
-    readonly source: IDBObjectStore | IDBIndex;
+    private readonly _mapper: EIDBValueMapper;
 
-    constructor(cursor: IDBCursor, source: EIDBObjectStore | EIDBIndex) {
+    constructor(cursor: IDBCursor, mapper: EIDBValueMapper) {
         this._cursor = cursor;
-        this.request = new EIDBRequest(cursor.request)
-        this.source = source;
+        this.request = new EIDBRequest(cursor.request, mapper);
+        this._mapper = mapper;
+    }
+
+    get source(): IDBObjectStore | IDBIndex {
+        return <IDBObjectStore | IDBIndex>this._mapper.mapSource(this._cursor.source);
     }
 
     get direction(): IDBCursorDirection {
@@ -25,7 +28,6 @@ export class EIDBCursor implements IDBCursor {
         return this._cursor.primaryKey;
     }
 
-
     advance(count: number): void {
         this._cursor.advance(count);
     }
@@ -35,15 +37,15 @@ export class EIDBCursor implements IDBCursor {
     }
 
     continuePrimaryKey(key: IDBValidKey, primaryKey: IDBValidKey): void {
-        this.continuePrimaryKey(key, primaryKey);
+        this._cursor.continuePrimaryKey(key, primaryKey);
     }
 
     delete(): IDBRequest<undefined> {
-        return new EIDBRequest(this._cursor.delete());
+        return new EIDBRequest(this._cursor.delete(), this._mapper);
 
     }
 
     update(value: any): IDBRequest<IDBValidKey> {
-        return new EIDBRequest(this._cursor.update(value));
+        return new EIDBRequest(this._cursor.update(value), this._mapper);
     }
 }

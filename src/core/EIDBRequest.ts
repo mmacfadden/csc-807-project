@@ -1,4 +1,4 @@
-import {ValueMapper} from "./IValueMapper";
+import {EIDBValueMapper, ValueMapper} from "./EIDBValueMapper";
 
 export class EIDBRequest<T = any, R = any> implements IDBRequest<T> {
     private readonly _request: IDBRequest<R>;
@@ -7,12 +7,17 @@ export class EIDBRequest<T = any, R = any> implements IDBRequest<T> {
     transaction: IDBTransaction | null = null;
     source: IDBObjectStore | IDBIndex | IDBCursor;
 
-    constructor(request: IDBRequest<R>, resultMapper?: ValueMapper<R, T>) {
+    constructor(request: IDBRequest<R>,
+                mapper: EIDBValueMapper,
+                resultMapper?: ValueMapper<R, T>) {
         this._request = request;
 
-        // TODO Map these values.
-        this.transaction = request.transaction;
-        this.source = request.source;
+        if (request.transaction) {
+            this.transaction = mapper.transactionMapper.map(request.transaction);
+        }
+
+        // FIXME this is broken inside.
+        this.source = mapper.mapSource(request.source);
 
         request.onerror = (event) => {
             this.onerror(event);

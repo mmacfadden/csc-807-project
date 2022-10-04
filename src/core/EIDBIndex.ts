@@ -1,16 +1,18 @@
 import {EIDBRequest} from "./EIDBRequest";
-import {EIDBObjectStore} from "./EIDBObjectStore";
-import {CursorWrapper} from "./IValueMapper";
+import {EIDBValueMapper} from "./EIDBValueMapper";
 
 export class EIDBIndex implements IDBIndex {
     private readonly _index: IDBIndex;
-    private readonly _cursorWrapper;
-    readonly objectStore: IDBObjectStore;
 
-    constructor(store: EIDBObjectStore, index: IDBIndex) {
+    private readonly _valueMapper: EIDBValueMapper;
+
+    constructor(index: IDBIndex, valueMapper: EIDBValueMapper) {
         this._index = index;
-        this.objectStore = store;
-        this._cursorWrapper = new CursorWrapper(this);
+        this._valueMapper = valueMapper;
+    }
+
+    get objectStore(): IDBObjectStore {
+        return this._valueMapper.objectStoreMapper.map(this._index.objectStore);
     }
 
     get keyPath(): string | string[] {
@@ -30,32 +32,32 @@ export class EIDBIndex implements IDBIndex {
     }
 
     count(query?: IDBValidKey | IDBKeyRange): IDBRequest<number> {
-        return new EIDBRequest(this._index.count(query));
+        return new EIDBRequest(this._index.count(query), this._valueMapper);
     }
 
     get(query: IDBValidKey | IDBKeyRange): IDBRequest {
-        return new EIDBRequest(this._index.get(query));
+        return new EIDBRequest(this._index.get(query), this._valueMapper);
     }
 
     getAll(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<any[]> {
-        return new EIDBRequest(this._index.getAll(query, count));
+        return new EIDBRequest(this._index.getAll(query, count), this._valueMapper);
     }
 
     getAllKeys(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<IDBValidKey[]> {
-        return new EIDBRequest(this._index.getAllKeys(query, count));
+        return new EIDBRequest(this._index.getAllKeys(query, count), this._valueMapper);
     }
 
     getKey(query: IDBValidKey | IDBKeyRange): IDBRequest<IDBValidKey | undefined> {
-        return new EIDBRequest(this._index.getKey(query));
+        return new EIDBRequest(this._index.getKey(query), this._valueMapper);
     }
 
     openCursor(query?: IDBValidKey | IDBKeyRange | null, direction?: IDBCursorDirection): IDBRequest<IDBCursorWithValue | null> {
         const request = this._index.openCursor(query, direction);
-        return new EIDBRequest(request, this._cursorWrapper.wrapCursorWithValue);
+        return new EIDBRequest(request, this._valueMapper, c => this._valueMapper.cursorWithValueMapper.mapNullable(c));
     }
 
     openKeyCursor(query?: IDBValidKey | IDBKeyRange | null, direction?: IDBCursorDirection): IDBRequest<IDBCursor | null> {
         const request = this._index.openKeyCursor(query, direction);
-        return new EIDBRequest(request, this._cursorWrapper.wrapCursor);
+        return new EIDBRequest(request, this._valueMapper, c => this._valueMapper.cursorMapper.mapNullable(c));
     }
 }

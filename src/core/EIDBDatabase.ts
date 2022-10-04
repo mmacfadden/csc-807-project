@@ -1,13 +1,16 @@
 import {AbstractEventTarget} from "./AbstractEventTarget";
 import {EIDBObjectStore} from "./EIDBObjectStore";
+import {EIDBValueMapper} from "./EIDBValueMapper";
 
 export class EIDBDatabase extends AbstractEventTarget implements IDBDatabase {
 
-    private readonly _db: IDBDatabase
+    private readonly _db: IDBDatabase;
+    private readonly _valueMapper: EIDBValueMapper;
 
-    constructor(db: IDBDatabase) {
+    constructor(db: IDBDatabase, valueMapper: EIDBValueMapper) {
         super();
         this._db = db;
+        this._valueMapper= valueMapper;
         this._bindEvents();
     }
 
@@ -47,16 +50,16 @@ export class EIDBDatabase extends AbstractEventTarget implements IDBDatabase {
         return this._db.version;
     }
 
-    onabort(ev: Event): any {
+    onabort(_: Event): any {
     }
 
-    onclose(ev: Event): any {
+    onclose(_: Event): any {
     }
 
-    onerror(ev: Event): any {
+    onerror(_: Event): any {
     }
 
-    onversionchange(ev: IDBVersionChangeEvent): any {
+    onversionchange(_: IDBVersionChangeEvent): any {
     }
 
     close(): void {
@@ -65,7 +68,7 @@ export class EIDBDatabase extends AbstractEventTarget implements IDBDatabase {
 
     createObjectStore(name: string, options?: IDBObjectStoreParameters): EIDBObjectStore {
         const store = this._db.createObjectStore(name, options);
-        return new EIDBObjectStore(store);
+        return this._valueMapper.objectStoreMapper.map(store);
     }
 
     deleteObjectStore(name: string): void {
@@ -73,6 +76,7 @@ export class EIDBDatabase extends AbstractEventTarget implements IDBDatabase {
     }
 
     transaction(storeNames: string | string[], mode?: IDBTransactionMode, options?: IDBTransactionOptions): IDBTransaction {
-        return <any>undefined;
+        const tx = this._db.transaction(storeNames, mode, options);
+        return this._valueMapper.transactionMapper.map(tx);
     }
 }

@@ -1,15 +1,14 @@
 import {EIDBCursor} from "./EIDBCursor";
-import {EIDBObjectStore} from "./EIDBObjectStore";
-import {EIDBIndex} from "./EIDBIndex";
+import {EIDBValueMapper} from "./EIDBValueMapper";
 
 export class EIDBCursorWithValue extends EIDBCursor implements IDBCursorWithValue {
 
-    constructor(cursor: IDBCursorWithValue, source: EIDBObjectStore | EIDBIndex) {
-        super(cursor, source);
+    constructor(cursor: IDBCursorWithValue, mapper: EIDBValueMapper) {
+        super(cursor, mapper);
     }
 
     get value(): any {
-        // TODO decrypt?
+        // FIXME decrypt?
         return (<IDBCursorWithValue>this._cursor).value;
     }
 
