@@ -1,4 +1,3 @@
-export * from "./AbstractEventTarget"
 export * from "./EIDBCursor"
 export * from "./EIDBCursorWithValue"
 export * from "./EIDBDatabase"

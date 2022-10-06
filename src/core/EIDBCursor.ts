@@ -42,7 +42,6 @@ export class EIDBCursor implements IDBCursor {
 
     delete(): IDBRequest<undefined> {
         return new EIDBRequest(this._cursor.delete(), this._mapper);
-
     }
 
     update(value: any): IDBRequest<IDBValidKey> {

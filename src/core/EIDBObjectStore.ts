@@ -3,14 +3,22 @@ import {EIDBIndex} from "./EIDBIndex";
 import {EIDBTransaction} from "./EIDBTransaction";
 import {EIDBValueMapper} from "./EIDBValueMapper";
 import {KeyPathUtil} from "../util/KeyPathUtil";
+import {EncryptionModule} from "../module";
+import {IEncryptedDocument} from "./IEncryptedDocument";
+import {MutableIDBRequest} from "./MutableIDBRequest";
+import {RequestUtils} from "../util/RequestUtils";
 
 export class EIDBObjectStore implements IDBObjectStore {
     private readonly _store: IDBObjectStore;
     private readonly _valueMapper: EIDBValueMapper;
+    private readonly _encryptionModule: EncryptionModule;
 
-    constructor(store: IDBObjectStore, valueMapper: EIDBValueMapper) {
+    constructor(store: IDBObjectStore,
+                encryptionModule: EncryptionModule,
+                valueMapper: EIDBValueMapper) {
         this._store = store;
         this._valueMapper = valueMapper;
+        this._encryptionModule = encryptionModule;
     }
 
     get autoIncrement(): boolean {
@@ -33,9 +41,19 @@ export class EIDBObjectStore implements IDBObjectStore {
         return this._valueMapper.transactionMapper.map(this._store.transaction);
     }
 
-    add(value: any, key?: IDBValidKey): EIDBRequest<IDBValidKey> {
-        const encrypted = this._encrypt(value);
-        return new EIDBRequest(this._store.add(encrypted, key), this._valueMapper);
+    add(value: any, key?: IDBValidKey): IDBRequest<IDBValidKey> {
+        const result = new MutableIDBRequest<IDBValidKey>(this, this.transaction);
+        this._encrypt(value)
+            .then((v) => {
+                return RequestUtils.requestToPromise(this._store.add(v, key));
+            }).then(v => {
+                result.succeed(v);
+            })
+            .catch(err => {
+                result.fail(err);
+            });
+
+        return result;
     }
 
     put(value: any, key?: IDBValidKey): IDBRequest<IDBValidKey> {
@@ -65,8 +83,20 @@ export class EIDBObjectStore implements IDBObjectStore {
     }
 
     get(query: IDBValidKey | IDBKeyRange): IDBRequest {
-        const decrypt = (value: any): any => this._decrypt(value);
-        return new EIDBRequest(this._store.get(query), this._valueMapper, decrypt);
+        const result = new MutableIDBRequest(this, this.transaction);
+
+        const getReq = this._store.get(query);
+        getReq.onsuccess = () => {
+            const encryptedDoc = <IEncryptedDocument>getReq.result;
+            console.log(encryptedDoc);
+            this._encryptionModule.decrypt(encryptedDoc.value).then(v => {
+                result.succeed(JSON.parse(v));
+            }).catch(e => {
+                result.fail(e);
+            })
+        }
+
+        return result;
     }
 
     getAll(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<any[]> {
@@ -105,25 +135,25 @@ export class EIDBObjectStore implements IDBObjectStore {
         );
     }
 
-    private _encrypt(value: any): any {
+    private async _encrypt(value: any): Promise<IEncryptedDocument> {
         const key = {};
-        console.log("Encrypt");
+
         this.copyValueAtPath(value, key, this.keyPath);
 
-        const doc = {
+        const encryptedValue = await this._encryptionModule.encrypt(JSON.stringify(value));
+
+        const doc: IEncryptedDocument = {
             key,
             indices: [],
-            value: JSON.stringify(value)
+            value: encryptedValue
         }
-
-        console.log(doc);
 
         return doc;
     }
 
-    private _decrypt(value: any): any {
-        console.log("Decrypt");
-        return JSON.parse(value.value);
+    private async _decrypt(value: IEncryptedDocument): Promise<any> {
+        const decryptedValue = await this._encryptionModule.encrypt(value.value)
+        return decryptedValue;
     }
 
     private copyValueAtPath(source: any, target: any, path: string | string[]): void {

@@ -1,7 +1,12 @@
-import {EIDBFactory} from "../src/";
+import {EIDBFactory, IEncryptionConfig, ModuleClearText} from "../src/";
 import "fake-indexeddb/auto";
 
-const dbFactory = new EIDBFactory();
+const config: IEncryptionConfig = {
+    moduleId: ModuleClearText.MODULE_ID,
+    secret: "encryption_secret"
+};
+
+const dbFactory = EIDBFactory.create(indexedDB, config);
 
 const dbName = "test";
 
@@ -10,14 +15,14 @@ const request = dbFactory.open(dbName);
 request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
     console.log("Upgrade Needed");
     console.log(request.source);
-    const db:IDBDatabase = request.result;
+    const db: IDBDatabase = request.result;
     if (!db.objectStoreNames.contains('employees')) {
         db.createObjectStore('employees', {keyPath: 'id'});
     }
 }
 
 request.onsuccess = (response) => {
-    const db:IDBDatabase = request.result;
+    const db: IDBDatabase = request.result;
 
     printdbs();
 
@@ -48,7 +53,7 @@ request.onsuccess = (response) => {
     };
 
     let addReq = employees.add(employee);
-    addReq.onsuccess = function() { // (4)
+    addReq.onsuccess = function () { // (4)
         console.log("employee added to the store", addReq.result);
         const getReq = employees.get(employee.id);
         getReq.onsuccess = (ev: Event) => {
@@ -56,10 +61,9 @@ request.onsuccess = (response) => {
         }
     };
 
-    addReq.onerror = function() {
+    addReq.onerror = function () {
         console.log("Error", request.error);
     };
-
 
 
     db.close();

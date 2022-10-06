@@ -1,10 +1,10 @@
-import {AbstractEventTarget} from "./AbstractEventTarget";
+// import {EventTarget} from "event-target-shim";
 import {EIDBObjectStore} from "./EIDBObjectStore";
 import {EIDBValueMapper} from "./EIDBValueMapper";
 import {wrapEventWithTarget} from "./EventWrapper";
 import {KeyPathUtil} from "../util/KeyPathUtil";
 
-export class EIDBDatabase extends AbstractEventTarget implements IDBDatabase {
+export class EIDBDatabase extends EventTarget implements IDBDatabase {
 
     private readonly _db: IDBDatabase;
     private readonly _valueMapper: EIDBValueMapper;

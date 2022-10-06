@@ -5,6 +5,7 @@ import {EIDBDatabase} from "./EIDBDatabase";
 import {EIDBCursor} from "./EIDBCursor";
 import {EIDBTransaction} from "./EIDBTransaction";
 import {IDBCursorWithValue} from "fake-indexeddb";
+import {EncryptionModule} from "../module";
 
 export type ValueMapper<S, D> = (source: S) => D;
 
@@ -16,13 +17,15 @@ export class EIDBValueMapper {
     public readonly cursorWithValueMapper: CursorWithValueMapper;
     public readonly indexMapper: IndexMapper;
 
-    constructor() {
-        this.dbMapper = new DatabaseMapper(this);
-        this.objectStoreMapper = new ObjectStoreMapper(this);
-        this.transactionMapper = new TransactionMapper(this);
-        this.cursorMapper = new CursorMapper(this);
-        this.cursorWithValueMapper = new CursorWithValueMapper(this);
-        this.indexMapper = new IndexMapper(this);
+    // TODO might want to move this to a subclass or intermediate class.
+    //  the encryption module is not needed in all of these.
+    constructor(encryptionModule: EncryptionModule) {
+        this.dbMapper = new DatabaseMapper(this, encryptionModule);
+        this.objectStoreMapper = new ObjectStoreMapper(this, encryptionModule);
+        this.transactionMapper = new TransactionMapper(this, encryptionModule);
+        this.cursorMapper = new CursorMapper(this, encryptionModule);
+        this.cursorWithValueMapper = new CursorWithValueMapper(this, encryptionModule);
+        this.indexMapper = new IndexMapper(this, encryptionModule);
     }
 
     public mapSource(source: IDBObjectStore | IDBIndex | IDBCursor): EIDBObjectStore | EIDBIndex | EIDBCursor {
@@ -44,9 +47,11 @@ export abstract class CachedValueMapper<From extends object, To> {
 
     private readonly _map: WeakMap<From, To>;
     protected readonly _mapper: EIDBValueMapper;
+    protected readonly _encryptionModule: EncryptionModule;
 
-    constructor(mapper: EIDBValueMapper) {
+    constructor(mapper: EIDBValueMapper, encryptionModule: EncryptionModule) {
         this._mapper = mapper;
+        this._encryptionModule = encryptionModule;
         this._map = new WeakMap<From, To>()
     }
 
@@ -83,7 +88,7 @@ export class DatabaseMapper extends CachedValueMapper<IDBDatabase, EIDBDatabase>
 
 export class ObjectStoreMapper extends CachedValueMapper<IDBObjectStore, EIDBObjectStore>{
     protected _createValue(source: IDBObjectStore): EIDBObjectStore {
-        return new EIDBObjectStore(source, this._mapper);
+        return new EIDBObjectStore(source, this._encryptionModule, this._mapper);
     }
 }
 

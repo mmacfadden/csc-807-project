@@ -1,8 +1,8 @@
-import {AbstractEventTarget} from "./AbstractEventTarget";
+// import {EventTarget} from "event-target-shim";
 import {EIDBValueMapper} from "./EIDBValueMapper";
 import {IDBTransaction} from "fake-indexeddb";
 
-export class EIDBTransaction extends AbstractEventTarget implements IDBTransaction {
+export class EIDBTransaction extends EventTarget implements IDBTransaction {
     private readonly _tx: IDBTransaction;
     private readonly _valueMapper: EIDBValueMapper;
 
