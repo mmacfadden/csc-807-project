@@ -1,5 +1,6 @@
 import {AbstractEventTarget} from "./AbstractEventTarget";
 import {EIDBValueMapper} from "./EIDBValueMapper";
+import {IDBTransaction} from "fake-indexeddb";
 
 export class EIDBTransaction extends AbstractEventTarget implements IDBTransaction {
     private readonly _tx: IDBTransaction;
@@ -14,6 +15,7 @@ export class EIDBTransaction extends AbstractEventTarget implements IDBTransacti
     get db(): IDBDatabase {
         return this._valueMapper.dbMapper.map(this._tx.db);
     }
+
     get durability(): IDBTransactionDurability {
         return this._tx.durability;
     }
@@ -30,19 +32,9 @@ export class EIDBTransaction extends AbstractEventTarget implements IDBTransacti
         return this._tx.objectStoreNames;
     }
 
-    onabort(_: Event): any {
-    }
-
-    oncomplete(_: Event): any {
-    }
-
-    onerror(_: Event): any {
-    }
-
     abort(): void {
         this._tx.abort();
     }
-
 
     commit(): void {
         this._tx.commit();
@@ -51,6 +43,15 @@ export class EIDBTransaction extends AbstractEventTarget implements IDBTransacti
     objectStore(name: string): IDBObjectStore {
         const store = this._tx.objectStore(name);
         return this._valueMapper.objectStoreMapper.map(store);
+    }
+
+    onabort(_: Event): any {
+    }
+
+    oncomplete(_: Event): any {
+    }
+
+    onerror(_: Event): any {
     }
 
 }

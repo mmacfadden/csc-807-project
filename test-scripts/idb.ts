@@ -7,8 +7,18 @@ const dbName = "test";
 
 const request = dbFactory.open(dbName);
 
+request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
+    console.log("Upgrade Needed");
+    console.log(request.source);
+    const db:IDBDatabase = request.result;
+    if (!db.objectStoreNames.contains('employees')) {
+        db.createObjectStore('employees', {keyPath: 'id'});
+    }
+}
+
 request.onsuccess = (response) => {
     const db:IDBDatabase = request.result;
+
     printdbs();
 
     db.onclose = () => {
@@ -27,9 +37,34 @@ request.onsuccess = (response) => {
         console.log("db abort");
     }
 
+    let transaction = db.transaction("employees", "readwrite");
+    let employees = transaction.objectStore("employees");
+
+    let employee = {
+        id: '23404',
+        firstName: "Michael",
+        lastName: "MacFadden",
+        ssn: "838-23-23434"
+    };
+
+    let addReq = employees.add(employee);
+    addReq.onsuccess = function() { // (4)
+        console.log("employee added to the store", addReq.result);
+        const getReq = employees.get(employee.id);
+        getReq.onsuccess = (ev: Event) => {
+            console.log(getReq.result);
+        }
+    };
+
+    addReq.onerror = function() {
+        console.log("Error", request.error);
+    };
+
+
+
     db.close();
 
-    setTimeout(deleteDatabase, 1000);
+    setTimeout(deleteDatabase, 0);
 }
 
 function deleteDatabase() {

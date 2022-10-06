@@ -2,6 +2,7 @@ import {EIDBRequest} from "./EIDBRequest";
 import {EIDBIndex} from "./EIDBIndex";
 import {EIDBTransaction} from "./EIDBTransaction";
 import {EIDBValueMapper} from "./EIDBValueMapper";
+import {KeyPathUtil} from "../util/KeyPathUtil";
 
 export class EIDBObjectStore implements IDBObjectStore {
     private readonly _store: IDBObjectStore;
@@ -21,7 +22,7 @@ export class EIDBObjectStore implements IDBObjectStore {
     }
 
     get keyPath(): string | string[] {
-        return this._store.keyPath;
+        return KeyPathUtil.unwrapKeyPath(this._store.keyPath);
     }
 
     get name(): string {
@@ -33,7 +34,13 @@ export class EIDBObjectStore implements IDBObjectStore {
     }
 
     add(value: any, key?: IDBValidKey): EIDBRequest<IDBValidKey> {
-        return new EIDBRequest(this._store.add(value, key), this._valueMapper);
+        const encrypted = this._encrypt(value);
+        return new EIDBRequest(this._store.add(encrypted, key), this._valueMapper);
+    }
+
+    put(value: any, key?: IDBValidKey): IDBRequest<IDBValidKey> {
+        const encrypted = this._encrypt(value);
+        return new EIDBRequest(this._store.put(encrypted, key), this._valueMapper);
     }
 
     clear(): IDBRequest<undefined> {
@@ -58,11 +65,15 @@ export class EIDBObjectStore implements IDBObjectStore {
     }
 
     get(query: IDBValidKey | IDBKeyRange): IDBRequest {
-        return new EIDBRequest(this._store.get(query), this._valueMapper);
+        const decrypt = (value: any): any => this._decrypt(value);
+        return new EIDBRequest(this._store.get(query), this._valueMapper, decrypt);
     }
 
     getAll(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<any[]> {
-        return new EIDBRequest(this._store.getAll(query, count), this._valueMapper);
+        const decrypt = (value: any[]): any => {
+            return value.map(v => this._decrypt(v));
+        }
+        return new EIDBRequest(this._store.getAll(query, count), this._valueMapper, decrypt);
     }
 
     getAllKeys(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<IDBValidKey[]> {
@@ -74,7 +85,7 @@ export class EIDBObjectStore implements IDBObjectStore {
     }
 
     index(name: string): EIDBIndex {
-        const idx =  this._store.index(name);
+        const idx = this._store.index(name);
         return this._valueMapper.indexMapper.map(idx);
     }
 
@@ -82,7 +93,7 @@ export class EIDBObjectStore implements IDBObjectStore {
         return new EIDBRequest(
             this._store.openCursor(query, direction),
             this._valueMapper,
-                c => this._valueMapper.cursorWithValueMapper.mapNullable(c)
+            c => this._valueMapper.cursorWithValueMapper.mapNullable(c)
         );
     }
 
@@ -90,11 +101,60 @@ export class EIDBObjectStore implements IDBObjectStore {
         return new EIDBRequest(
             this._store.openKeyCursor(query, direction),
             this._valueMapper,
-                c => this._valueMapper.cursorMapper.mapNullable(c)
+            c => this._valueMapper.cursorMapper.mapNullable(c)
         );
     }
 
-    put(value: any, key?: IDBValidKey): IDBRequest<IDBValidKey> {
-        return new EIDBRequest(this._store.put(value, key), this._valueMapper);
+    private _encrypt(value: any): any {
+        const key = {};
+        console.log("Encrypt");
+        this.copyValueAtPath(value, key, this.keyPath);
+
+        const doc = {
+            key,
+            indices: [],
+            value: JSON.stringify(value)
+        }
+
+        console.log(doc);
+
+        return doc;
+    }
+
+    private _decrypt(value: any): any {
+        console.log("Decrypt");
+        return JSON.parse(value.value);
+    }
+
+    private copyValueAtPath(source: any, target: any, path: string | string[]): void {
+        if (!Array.isArray(path)) {
+            path = [path];
+        }
+
+        path.forEach(p => {
+           const pathComponents = p.split(".");
+
+            let curSourceVal = source;
+            let curTargetVal = target;
+            for (let i = 0; i < pathComponents.length; i++) {
+                const prop = pathComponents[i];
+                curSourceVal = source[prop];
+
+                if (i === pathComponents.length - 1) {
+                    target[prop] = curSourceVal;
+                } else if (target[prop] === undefined) {
+                    target[prop] = {};
+                }
+
+                curTargetVal = target[prop];
+
+                if (curSourceVal === undefined || curSourceVal === null) {
+                    break;
+                }
+            }
+        });
+
+
+
     }
 }

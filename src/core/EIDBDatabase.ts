@@ -1,6 +1,8 @@
 import {AbstractEventTarget} from "./AbstractEventTarget";
 import {EIDBObjectStore} from "./EIDBObjectStore";
 import {EIDBValueMapper} from "./EIDBValueMapper";
+import {wrapEventWithTarget} from "./EventWrapper";
+import {KeyPathUtil} from "../util/KeyPathUtil";
 
 export class EIDBDatabase extends AbstractEventTarget implements IDBDatabase {
 
@@ -15,24 +17,24 @@ export class EIDBDatabase extends AbstractEventTarget implements IDBDatabase {
     }
 
     private _bindEvents(): void {
-        // TODO wrap / update events to make sure that the
-        //  target references this object and not the original
-        //  indexed db.
-
         this._db.onversionchange = (ev: IDBVersionChangeEvent) => {
-            this.onversionchange(ev);
+            const proxy = wrapEventWithTarget(ev, this);
+            this.onversionchange(proxy);
         };
 
         this._db.onabort = (ev: Event) => {
-            this.onabort(ev);
+            const proxy = wrapEventWithTarget(ev, this);
+            this.onabort(proxy);
         };
 
         this._db.onclose = (ev: Event) => {
-            this.onclose(ev);
+            const proxy = wrapEventWithTarget(ev, this);
+            this.onclose(proxy);
         };
 
         this._db.onerror = (ev: Event) => {
-            this.onerror(ev);
+            const proxy = wrapEventWithTarget(ev, this);
+            this.onerror(proxy);
         };
 
         // TODO bind the general event listener stuff as well, we need to
@@ -67,6 +69,11 @@ export class EIDBDatabase extends AbstractEventTarget implements IDBDatabase {
     }
 
     createObjectStore(name: string, options?: IDBObjectStoreParameters): EIDBObjectStore {
+        // TODO deep clone
+        if (options?.keyPath) {
+            options.keyPath = KeyPathUtil.wrapKeyPath(options.keyPath);
+        }
+
         const store = this._db.createObjectStore(name, options);
         return this._valueMapper.objectStoreMapper.map(store);
     }
