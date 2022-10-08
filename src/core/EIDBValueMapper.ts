@@ -106,7 +106,7 @@ export class CursorMapper extends CachedValueMapper<IDBCursor, EIDBCursor>{
 
 export class CursorWithValueMapper extends CachedValueMapper<IDBCursorWithValue, EIDBCursorWithValue>{
     protected _createValue(source: IDBCursorWithValue): EIDBCursorWithValue {
-        return new EIDBCursorWithValue(source, this._mapper);
+        return new EIDBCursorWithValue(source, this._mapper, this._encryptionModule);
     }
 }
 

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+<body>
+<script type="module">
+    import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+
+    import Home from './Home.js'
+    import About from './About.js'
+    import NotFound from "./NotFound.js";
+
+    const routes = {
+        '/': Home,
+        '/about': About
+    }
+
+    const appDef =  {
+        data() {
+            return {
+                currentPath: window.location.hash
+            }
+        },
+        computed: {
+            currentView() {
+                return routes[this.currentPath.slice(1) || '/'] || NotFound
+            }
+        },
+        mounted() {
+            window.addEventListener('hashchange', () => {
+                this.currentPath = window.location.hash
+            })
+        },
+        template: `
+          <nav>
+          <div class="nav-wrapper">
+            <a href="#" class="brand-logo">Logo</a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+              <li><a href="sass.html">Sass</a></li>
+              <li><a href="badges.html">Components</a></li>
+              <li><a href="collapsible.html">JavaScript</a></li>
+            </ul>
+          </div>
+          </nav>
+            <a href="#/">Home</a> |
+            <a href="#/about">About</a> |
+            <a href="#/non-existent-path">Broken Link</a>
+            <component :is="currentView" />
+        `
+    }
+
+    createApp(appDef).mount('#app')
+</script>
+<div id="app"></div>
+
+</body>
+</html>

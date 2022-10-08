@@ -1,6 +1,6 @@
 import Blowfish from "egoroof-blowfish";
 import {SymmetricEncryptionBasedModule} from "./SymmetricEncryptionBasedModule";
-import {RandomStringGenerator} from "../core";
+import {RandomStringGenerator} from "../util";
 
 /**
  * Implements the Blowfish encryption algorithm using the 'egoroof-blowfish'

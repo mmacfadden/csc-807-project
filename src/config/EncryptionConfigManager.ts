@@ -28,7 +28,7 @@ export class EncryptionConfigManager {
    *
    * @returns True if the config is set, false otherwise.
    */
-  public isConfigSet(): boolean {
+  public configSet(): boolean {
     return this._storage.getItem(EncryptionConfigManager._CONFIG_PROPERTY) !== null;
   }
 
