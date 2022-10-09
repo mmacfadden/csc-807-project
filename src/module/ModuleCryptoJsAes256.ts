@@ -1,5 +1,5 @@
 import * as CryptoJS from "crypto-js";
-import {SymmetricEncryptionBasedModule} from "./SymmetricEncryptionBasedModule";
+import {ModuleCryptoJs} from "./ModuleCryptoJs";
 
 /**
  * This module uses the CryptoJS library to implement  AES 256 bit
@@ -9,7 +9,7 @@ import {SymmetricEncryptionBasedModule} from "./SymmetricEncryptionBasedModule";
  * Information about the AES Cypher can be found here:
  *    https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
  */
-export class ModuleCryptoJsAes256 extends SymmetricEncryptionBasedModule {
+export class ModuleCryptoJsAes256 extends ModuleCryptoJs {
   static readonly MODULE_ID = "AES 256 (Crypto JS)";
 
   /**
@@ -22,18 +22,11 @@ export class ModuleCryptoJsAes256 extends SymmetricEncryptionBasedModule {
     super(ModuleCryptoJsAes256.MODULE_ID, secret);
   }
 
-  /**
-   * @inheritDoc
-   */
-  public async encrypt(plainText: string): Promise<string> {
-    return CryptoJS.AES.encrypt(plainText, this._encryptionSecret).toString();
+  protected _decrypt(cypherText: string, secret: string): CryptoJS.lib.WordArray {
+    return CryptoJS.AES.decrypt(cypherText, secret);
   }
 
-  /**
-   * @inheritDoc
-   */
-  public async decrypt(cypherText: string): Promise<string> {
-    const bytes: CryptoJS.lib.WordArray = CryptoJS.AES.decrypt(cypherText, this._encryptionSecret);
-    return bytes.toString(CryptoJS.enc.Utf8);
+  protected _encrypt(plainText: string, secret: string): CryptoJS.lib.CipherParams {
+    return CryptoJS.AES.encrypt(plainText, secret);
   }
 }

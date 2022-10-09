@@ -3,6 +3,7 @@ import {EIDBValueMapper} from "./EIDBValueMapper";
 import {IDBDatabase} from "fake-indexeddb";
 import {IEncryptionConfig} from "../config";
 import {EncryptionModule, EncryptionModuleFactory} from "../module";
+import {OpeEncryptor} from "../ope/OpeEncryptor";
 
 export class EIDBFactory implements IDBFactory {
 
@@ -17,7 +18,8 @@ export class EIDBFactory implements IDBFactory {
     constructor(delegate: IDBFactory, config: IEncryptionConfig) {
         this._delegate = delegate;
         this._encryptionModule = EncryptionModuleFactory.createModule(config);
-        this._valueMapper = new EIDBValueMapper(this._encryptionModule);
+        const opeEncryptor = new OpeEncryptor(config.secret);
+        this._valueMapper = new EIDBValueMapper(this._encryptionModule, opeEncryptor);
     }
 
     public encryptionModuleId(): string {

@@ -8,8 +8,12 @@ export interface IEncryptionConfig {
    */
   moduleId: string;
 
+  moduleParams?: any;
+
   /**
    * The symmetric secret used for the encryption.
    */
   secret: string;
+
+  opeKey: string;
 }

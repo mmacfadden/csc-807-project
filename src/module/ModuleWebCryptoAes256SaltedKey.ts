@@ -11,6 +11,9 @@ import {WebCryptoUtil} from "./WebCryptoUtil";
  * Information about the AES Cypher can be found here:
  *    https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
  */
+// FIXME this whole class looks like it is out of date or something.
+//  It doesn't inherit from the abstract AES class and therefore it has
+//  duplicate code.
 export class ModuleWebCryptoAes256SaltedKey extends SymmetricEncryptionBasedModule {
   static readonly MODULE_ID = "AES 256 (WebCrypto API w/ Salted Key)";
 

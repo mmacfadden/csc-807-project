@@ -4,7 +4,11 @@ export default {
   props: [],
   data: () => {
     return {
-      db: null
+      employeeId: null,
+      db: null,
+      employee: {
+
+      }
     };
   },
   created() {
@@ -20,7 +24,9 @@ export default {
     EmployeeTable
   },
   template: `
-    <h1>Employees</h1>
-    <employee-table :db="this.db"></employee-table>
+    <h1>Edit Employee</h1>
+    <form>
+      <input v-model="employee.message" placeholder="edit me" />
+    </form>
   `
 };

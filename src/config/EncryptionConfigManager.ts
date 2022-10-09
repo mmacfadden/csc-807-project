@@ -1,5 +1,7 @@
 import * as CryptoJS from 'crypto-js';
 import {IEncryptionConfig} from "./IEncryptionConfig";
+import {RandomStringGenerator} from "../util";
+import {OpeEncryptor} from "../ope/OpeEncryptor";
 
 /**
  * Stores and retrieves the encryption configuration.  The encryption
@@ -10,6 +12,18 @@ import {IEncryptionConfig} from "./IEncryptionConfig";
  */
 export class EncryptionConfigManager {
   private static _CONFIG_PROPERTY = "__indexed_db_encryption_config__";
+
+  public static generateConfig(encryptionModuleId: string, params?: any): IEncryptionConfig {
+    const dataSecret = RandomStringGenerator.generate(32);
+    const opeKey = OpeEncryptor.generateKey();
+
+    return {
+      moduleId: encryptionModuleId,
+      moduleParams: params,
+      secret: dataSecret,
+      opeKey
+    }
+  }
 
   private readonly _storage: Storage;
 

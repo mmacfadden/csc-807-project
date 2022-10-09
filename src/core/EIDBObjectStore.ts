@@ -2,23 +2,26 @@ import {EIDBRequest} from "./EIDBRequest";
 import {EIDBIndex} from "./EIDBIndex";
 import {EIDBTransaction} from "./EIDBTransaction";
 import {EIDBValueMapper} from "./EIDBValueMapper";
-import {KeyPathUtil} from "../util/KeyPathUtil";
 import {EncryptionModule} from "../module";
 import {IEncryptedDocument} from "./IEncryptedDocument";
 import {MutableIDBRequest} from "./MutableIDBRequest";
-import {RequestUtils} from "../util/RequestUtils";
+import {KeyPathUtil, RequestUtils} from "../util/";
+import {OpeEncryptor} from "../ope/OpeEncryptor";
 
 export class EIDBObjectStore implements IDBObjectStore {
     private readonly _store: IDBObjectStore;
     private readonly _valueMapper: EIDBValueMapper;
     private readonly _encryptionModule: EncryptionModule;
+    private readonly _opeEncryptor: OpeEncryptor;
 
     constructor(store: IDBObjectStore,
                 encryptionModule: EncryptionModule,
+                opeEncryptor: OpeEncryptor,
                 valueMapper: EIDBValueMapper) {
         this._store = store;
         this._valueMapper = valueMapper;
         this._encryptionModule = encryptionModule;
+        this._opeEncryptor = opeEncryptor;
     }
 
     get autoIncrement(): boolean {
@@ -47,8 +50,8 @@ export class EIDBObjectStore implements IDBObjectStore {
             .then((v) => {
                 return RequestUtils.requestToPromise(this._store.add(v, key));
             }).then(v => {
-                result.succeed(v);
-            })
+            result.succeed(v);
+        })
             .catch(err => {
                 result.fail(err);
             });
@@ -85,10 +88,12 @@ export class EIDBObjectStore implements IDBObjectStore {
     get(query: IDBValidKey | IDBKeyRange): IDBRequest {
         const result = new MutableIDBRequest(this, this.transaction);
 
-        const getReq = this._store.get(query);
+        // FIXME hand range
+        const key = this._opeEncryptor.encryptString(query as string);
+
+        const getReq = this._store.get(key);
         getReq.onsuccess = () => {
             const encryptedDoc = <IEncryptedDocument>getReq.result;
-            console.log(encryptedDoc);
             this._encryptionModule.decrypt(encryptedDoc.value).then(v => {
                 result.succeed(JSON.parse(v));
             }).catch(e => {
@@ -100,10 +105,26 @@ export class EIDBObjectStore implements IDBObjectStore {
     }
 
     getAll(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<any[]> {
-        const decrypt = (value: any[]): any => {
-            return value.map(v => this._decrypt(v));
+        const result = new MutableIDBRequest<any[]>(this, this.transaction);
+
+        // FIXME handle query
+        // const key = this._opeEncryptor.encryptString(query as string);
+
+        const getReq = this._store.getAll();
+        getReq.onsuccess = () => {
+            const encryptedDocs = <IEncryptedDocument[]>getReq.result;
+            const promises = encryptedDocs.map(encryptedDoc => {
+                return this._decrypt(encryptedDoc);
+            });
+            Promise.all(promises)
+                .then(docs => {
+                    result.succeed(docs);
+                }).catch(e => {
+                    result.fail(e);
+                });
         }
-        return new EIDBRequest(this._store.getAll(query, count), this._valueMapper, decrypt);
+
+        return result;
     }
 
     getAllKeys(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<IDBValidKey[]> {
@@ -140,29 +161,31 @@ export class EIDBObjectStore implements IDBObjectStore {
 
         this.copyValueAtPath(value, key, this.keyPath);
 
+        // FIXME probably move the stringificaiton into the encryption modules.
         const encryptedValue = await this._encryptionModule.encrypt(JSON.stringify(value));
 
-        const doc: IEncryptedDocument = {
+        const encryptedDoc: IEncryptedDocument = {
             key,
             indices: [],
             value: encryptedValue
         }
 
-        return doc;
+        return encryptedDoc;
     }
 
     private async _decrypt(value: IEncryptedDocument): Promise<any> {
-        const decryptedValue = await this._encryptionModule.encrypt(value.value)
-        return decryptedValue;
+        const decryptedValue = await this._encryptionModule.decrypt(value.value);
+        return JSON.parse(decryptedValue);
     }
 
+    // TODO change name to mention more about extracting and encrypting.
     private copyValueAtPath(source: any, target: any, path: string | string[]): void {
         if (!Array.isArray(path)) {
             path = [path];
         }
 
         path.forEach(p => {
-           const pathComponents = p.split(".");
+            const pathComponents = p.split(".");
 
             let curSourceVal = source;
             let curTargetVal = target;
@@ -171,7 +194,10 @@ export class EIDBObjectStore implements IDBObjectStore {
                 curSourceVal = source[prop];
 
                 if (i === pathComponents.length - 1) {
-                    target[prop] = curSourceVal;
+                    // TODO might not be a string.
+                    const key = this._opeEncryptor.encryptString(curSourceVal);
+                    target[prop] = key;
+                    break;
                 } else if (target[prop] === undefined) {
                     target[prop] = {};
                 }
@@ -179,12 +205,11 @@ export class EIDBObjectStore implements IDBObjectStore {
                 curTargetVal = target[prop];
 
                 if (curSourceVal === undefined || curSourceVal === null) {
+                    // TODO this seems like an error case.
                     break;
                 }
             }
         });
-
-
 
     }
 }

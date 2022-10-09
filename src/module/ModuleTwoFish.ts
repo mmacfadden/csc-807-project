@@ -32,26 +32,31 @@ export class ModuleTwoFish extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-  public async encrypt(plainText: string): Promise<string> {
+  public async encrypt(plainText: string): Promise<Uint8Array> {
     const ptBytes = [...Buffer.from(plainText, "utf-8")];
     const ctBytes = this._twofish.encrypt(this._key, ptBytes);
+    const data = Uint8Array.from(ctBytes);
     // There seems to be an issue when decrypting that that decrypted
     // data gets put into an array of the same size as the encrypted
     // data, which leaves 0's at the end. So we push on the length
-    // of the pt data so we can truncated it later.
-    const b64 = Buffer.from(ctBytes).toString("base64");
-    return `${ptBytes.length}:${b64}`
+    // of the pt data so we can truncate it later.
+    const len32BitArray = Int32Array.of(ptBytes.length);
+    const result = new Uint8Array(len32BitArray.byteLength + data.length);
+    result.set(len32BitArray);
+    result.set(data, len32BitArray.byteLength);
+
+    return result;
   }
 
   /**
    * @inheritDoc
    */
-  public async decrypt(cypherText: string): Promise<string> {
-    const [ptLen, b64] = cypherText.split(":");
-    const ctBytes = [...Buffer.from(b64, "base64")];
-    const length = Number(ptLen);
-    const ptBytes = this._twofish.decrypt(this._key, ctBytes);
-    const truncated = ptBytes.slice(0, length);
+  public async decrypt(cypherText: Uint8Array): Promise<string> {
+    const ptLenBytes = cypherText.slice(0, 4);
+    const ptLen = (new Int32Array(ptLenBytes))[0];
+    const ctBytes = cypherText.slice(4, cypherText.length);
+    const ptBytes = this._twofish.decrypt(this._key, [...ctBytes]);
+    const truncated = ptBytes.slice(0, ptLen);
     return Buffer.from(truncated).toString("utf-8");
   }
 }

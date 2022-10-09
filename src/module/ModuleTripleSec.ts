@@ -27,7 +27,7 @@ export class ModuleTripleSec extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-  public async encrypt(plainText: string): Promise<string> {
+  public async encrypt(plainText: string): Promise<Uint8Array> {
     const data = Buffer.from(plainText, "utf-8");
 
     return new Promise((resolve, reject) => {
@@ -35,7 +35,7 @@ export class ModuleTripleSec extends SymmetricEncryptionBasedModule {
         if (err) {
           reject(err);
         } else {
-          resolve(res.toString("base64"));
+          resolve(new Uint8Array(res));
         }
       });
     });
@@ -44,17 +44,22 @@ export class ModuleTripleSec extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-  public async decrypt(cypherText: string): Promise<string> {
-    const data = Buffer.from(cypherText, "base64");
-
-    return new Promise((resolve, reject) => {
-      this._decryptor.run({data}, (err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(res.toString());
-        }
+  public async decrypt(cypherText: any): Promise<string> {
+    if (cypherText instanceof Uint8Array) {
+      const data = Buffer.from(cypherText);
+      return new Promise((resolve, reject) => {
+        this._decryptor.run({data}, (err, res) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(res.toString());
+          }
+        });
       });
-    });
+    } else {
+      // FIXME
+      throw new Error()
+    }
+
   }
 }

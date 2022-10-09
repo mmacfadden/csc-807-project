@@ -1,0 +1,21 @@
+.employee-table {
+    margin: 10px;
+}
+
+.employee-table svg {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.employee-table svg:hover {
+    color: cornflowerblue;
+}
+
+.brand-logo img{
+    width: 64px;
+    float: left;
+}
+
+nav.header ul {
+    float: right;
+}

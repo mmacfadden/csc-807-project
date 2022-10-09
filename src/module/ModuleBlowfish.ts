@@ -30,15 +30,19 @@ export class ModuleBlowfish extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-  public async encrypt(plainText: string): Promise<string> {
-    return Buffer.from(this._bf.encode(plainText)).toString("base64");
+  public async encrypt(plainText: string): Promise<Uint8Array> {
+    return this._bf.encode(plainText);
   }
 
   /**
    * @inheritDoc
    */
-  public async decrypt(cypherText: string): Promise<string> {
-    const data = Uint8Array.from(Buffer.from(cypherText, "base64"))
-    return this._bf.decode(data, Blowfish.TYPE.STRING);
+  public async decrypt(cypherText: any): Promise<string> {
+    if (cypherText instanceof Uint8Array) {
+      return this._bf.decode(cypherText, Blowfish.TYPE.STRING);
+    } else {
+      // FIXME we are doing this in all the modules.
+      throw new Error();
+    }
   }
 }

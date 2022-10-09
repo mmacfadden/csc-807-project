@@ -1,10 +1,7 @@
-import {EIDBFactory, IEncryptionConfig, ModuleClearText} from "../src/";
+import {EIDBFactory, EncryptionConfigManager, ModuleClearText} from "../src/";
 import "fake-indexeddb/auto";
 
-const config: IEncryptionConfig = {
-    moduleId: ModuleClearText.MODULE_ID,
-    secret: "encryption_secret"
-};
+const config = EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID);
 
 const dbFactory = EIDBFactory.create(indexedDB, config);
 
@@ -23,24 +20,6 @@ request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
 
 request.onsuccess = (response) => {
     const db: IDBDatabase = request.result;
-
-    printdbs();
-
-    db.onclose = () => {
-        console.log("db closed");
-    }
-
-    db.onerror = () => {
-        console.log("db error");
-    }
-
-    db.onversionchange = () => {
-        console.log("db version change");
-    }
-
-    db.onabort = () => {
-        console.log("db abort");
-    }
 
     let transaction = db.transaction("employees", "readwrite");
     let employees = transaction.objectStore("employees");

@@ -1,13 +1,13 @@
 export default {
   props: [],
   data: () => {
-
+    return {};
   },
   created: function () {
 
   },
   methods: {},
   template: `
-    <h1>Home</h1>
+    <h1>About</h1>
   `
 };

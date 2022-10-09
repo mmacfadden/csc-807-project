@@ -1,5 +1,5 @@
 import * as CryptoJS from "crypto-js";
-import {SymmetricEncryptionBasedModule} from "./SymmetricEncryptionBasedModule";
+import {ModuleCryptoJs} from "./ModuleCryptoJs";
 
 /**
  * This module uses the CryptoJS library to implement  AES 128 bit
@@ -9,7 +9,7 @@ import {SymmetricEncryptionBasedModule} from "./SymmetricEncryptionBasedModule";
  * Information about the AES Cypher can be found here:
  *    https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
  */
-export class ModuleCryptoJsAes128 extends SymmetricEncryptionBasedModule {
+export class ModuleCryptoJsAes128 extends ModuleCryptoJs {
   public static readonly MODULE_ID = "AES 128 (Crypto JS)";
 
   private readonly _derivedKey: CryptoJS.lib.WordArray;
@@ -28,18 +28,11 @@ export class ModuleCryptoJsAes128 extends SymmetricEncryptionBasedModule {
     this._derivedKey = CryptoJS.PBKDF2(secret, salt, {keySize: 128 / 32});
   }
 
-  /**
-   * @inheritDoc
-   */
-  public async encrypt(plainText: string): Promise<string> {
-    return CryptoJS.AES.encrypt(plainText, this._derivedKey, {iv: this._iv}).toString();
+  protected _decrypt(cypherText: string, secret: string): CryptoJS.lib.WordArray {
+    return CryptoJS.AES.decrypt(cypherText, this._derivedKey, {iv: this._iv})
   }
 
-  /**
-   * @inheritDoc
-   */
-  public async decrypt(cypherText: string): Promise<string> {
-    const bytes: CryptoJS.lib.WordArray = CryptoJS.AES.decrypt(cypherText, this._derivedKey, {iv: this._iv});
-    return bytes.toString(CryptoJS.enc.Utf8);
+  protected _encrypt(plainText: string, secret: string): CryptoJS.lib.CipherParams {
+    return CryptoJS.AES.encrypt(plainText, this._derivedKey, {iv: this._iv});
   }
 }
