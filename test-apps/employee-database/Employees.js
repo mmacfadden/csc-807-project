@@ -1,16 +1,11 @@
 import EmployeeTable from "./EmployeeTable.js";
 
 export default {
-  props: [],
+  props: ["db"],
   data: () => {
-    return {
-      db: null
-    };
+    return {};
   },
   created() {
-    this.db = this.$parent.$data.db;
-  },
-  mounted() {
 
   },
   methods: {
@@ -20,7 +15,7 @@ export default {
     EmployeeTable
   },
   template: `
-    <h1>Employees</h1>
-    <employee-table :db="this.db"></employee-table>
+    <div>Some description</div>
+    <employee-table :db="db"></employee-table>
   `
 };

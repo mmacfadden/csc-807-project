@@ -88,14 +88,15 @@ export class EIDBObjectStore implements IDBObjectStore {
     get(query: IDBValidKey | IDBKeyRange): IDBRequest {
         const result = new MutableIDBRequest(this, this.transaction);
 
-        // FIXME hand range
+        // FIXME handle range
         const key = this._opeEncryptor.encryptString(query as string);
 
         const getReq = this._store.get(key);
         getReq.onsuccess = () => {
             const encryptedDoc = <IEncryptedDocument>getReq.result;
             this._encryptionModule.decrypt(encryptedDoc.value).then(v => {
-                result.succeed(JSON.parse(v));
+                const decryptedDoc = JSON.parse(v);
+                result.succeed(decryptedDoc);
             }).catch(e => {
                 result.fail(e);
             })
@@ -186,7 +187,6 @@ export class EIDBObjectStore implements IDBObjectStore {
 
         path.forEach(p => {
             const pathComponents = p.split(".");
-
             let curSourceVal = source;
             let curTargetVal = target;
             for (let i = 0; i < pathComponents.length; i++) {

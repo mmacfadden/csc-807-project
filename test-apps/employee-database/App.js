@@ -1,9 +1,5 @@
-import Employees from './Employees.js'
-import About from './About.js'
-import NotFound from "./NotFound.js";
-import Loading from "./Loading.js";
-import EmployeeForm from "./EmployeeForm.js";
 import defaultData from "./default_data.js";
+import Loading from "./Loading.js";
 
 const {EIDBFactory, EncryptionConfigManager, ModuleCryptoJsAes256} = EncryptedIndexedDB;
 
@@ -20,32 +16,16 @@ const encryptionConfig = encryptionConfigManager.getConfig(password);
 
 const indexedDb = new EIDBFactory(window.indexedDB, encryptionConfig);
 
-const routes = {
-    '/': Employees,
-    '/about': About,
-    '/employee': EmployeeForm
-}
-
 export default  {
     data() {
         return {
-            currentPath: window.location.hash,
             user: null,
             indexedDb: indexedDb,
             db: null,
         }
     },
-    computed: {
-        currentView() {
-            if (!this.db) {
-                return Loading;
-            } else {
-                return routes[this.currentPath.slice(1) || '/'] || NotFound
-            }
-        }
-    },
     mounted() {
-        const req = this.$data.indexedDb.open("employees", 1);
+        const req = this.indexedDb.open("employees", 1);
         req.onupgradeneeded = () => {
             const db = req.result;
             const store =  db.createObjectStore("employees", {keyPath: "id"});
@@ -60,25 +40,29 @@ export default  {
             this.db = db;
             console.log("Database open");
         }
-
-        window.addEventListener('hashchange', () => {
-            this.currentPath = window.location.hash
-        })
+    },
+    components: {
+        Loading
     },
     template: `
       <nav class="navbar navbar-default header">
-        <div class="nav-wrapper">
-          <a href="#" class="brand-logo">
-            <img src="images/logo.png">
-            <span>Encrypted IndexedDB Demo</span>
-          </a>
-          <ul id="nav-mobile" class="nav nav-pills">
-            <li><a href="#/">Home</a></li>
-            <li><a href="#/about">About</a></li>
-            <li><a target="_blank" href="https://github.com/mmacfadden/csc-807-project">GitHub</a></li>
-          </ul>
-        </div>
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo">
+          <img src="images/logo.png">
+          <span>Encrypted IndexedDB Demo</span>
+        </a>
+        <ul id="nav-mobile" class="nav nav-pills">
+          <li>
+            <router-link to="/">Home</router-link>
+          </li>
+          <li>
+            <router-link to="/about">About</router-link>
+          </li>
+          <li><a target="_blank" href="https://github.com/mmacfadden/csc-807-project">GitHub</a></li>
+        </ul>
+      </div>
       </nav>
-      <component :is="currentView" />
+      <router-view v-if="db" :db="db"></router-view>
+      <loading v-if="!db"/>
     `
-}
+};

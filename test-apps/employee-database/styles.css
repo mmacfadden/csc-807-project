@@ -19,3 +19,15 @@
 nav.header ul {
     float: right;
 }
+
+.employee-form {
+    margin: 20px;
+    max-width: 500px;
+}
+.employee-form .buttons {
+    text-align: right;
+}
+
+.employee-form .buttons * {
+    margin-left: 10px;
+}
