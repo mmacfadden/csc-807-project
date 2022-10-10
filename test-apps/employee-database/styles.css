@@ -1,5 +1,68 @@
-.employee-table {
+
+.brand-logo svg {
+    font-size: 30px;
+    margin-left: 10px;
+}
+
+.brand-logo svg.fa-html5 {
+    position: relative;
+    top: 3px;
+    font-size: 36px;
+    margin-left: 10px;
+}
+
+.brand-logo span {
+    font-size: 28px;
+    margin-left: 20px;
+}
+
+nav.header ul {
+    float: right;
+}
+
+.employee-table-container {
+    max-width: 1300px;
     margin: 10px;
+}
+
+.employee-table-container nav {
+    border-style: solid;
+    border-color: #dddddd;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom: none;
+}
+
+.employee-table-container nav button {
+    margin-left: 10px;
+}
+
+.employee-table-container nav .input-group {
+    padding-left: 15px;
+    padding-right: 10px;
+}
+
+.employee-table-container nav .navbar-header .navbar-brand {
+    color: black;
+}
+
+.employee-table-container nav .navbar-header .navbar-brand svg {
+    margin-right: 10px;
+}
+
+
+.employee-table {
+    border-style: solid;
+    border-color: #dddddd;
+    border-radius: 4px;
+}
+
+.employee-table td.actions {
+    text-align: right;
+}
+
+.employee-table td.actions a {
+    color: black;
 }
 
 .employee-table svg {
@@ -11,19 +74,28 @@
     color: cornflowerblue;
 }
 
-.brand-logo img{
-    width: 64px;
-    float: left;
-}
-
-nav.header ul {
-    float: right;
-}
 
 .employee-form {
     margin: 20px;
     max-width: 500px;
+    border: 1px solid #ddd;
 }
+
+.employee-form .title {
+    background: #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.employee-form .title span {
+    margin-left: 10px;
+}
+
+.employee-form form {
+    padding: 10px;
+}
+
 .employee-form .buttons {
     text-align: right;
 }

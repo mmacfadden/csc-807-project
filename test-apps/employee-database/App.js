@@ -45,20 +45,24 @@ export default  {
         Loading
     },
     template: `
-      <nav class="navbar navbar-default header">
-      <div class="nav-wrapper">
-        <a href="#" class="brand-logo">
-          <img src="images/logo.png">
+      <nav class="navbar navbar-expand-lg bg-light">
+      <div class="container-fluid">
+        <span class="brand-logo">
+          <i class="fa-brands fa-html5"/>
+          <i class="fa-solid fa-database"/>
           <span>Encrypted IndexedDB Demo</span>
-        </a>
-        <ul id="nav-mobile" class="nav nav-pills">
-          <li>
-            <router-link to="/">Home</router-link>
+        </span>
+        <div class="flex-fill"></div>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <router-link class="nav-link" to="/">Home</router-link>
           </li>
-          <li>
-            <router-link to="/about">About</router-link>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/about">About</router-link>
           </li>
-          <li><a target="_blank" href="https://github.com/mmacfadden/csc-807-project">GitHub</a></li>
+          <li class="nav-item">
+            <a class="nav-link" target="_blank" href="https://github.com/mmacfadden/csc-807-project">GitHub</a>
+          </li>
         </ul>
       </div>
       </nav>

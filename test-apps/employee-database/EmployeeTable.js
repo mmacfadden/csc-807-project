@@ -33,61 +33,79 @@ export default {
     }
   },
   template: `
-    <nav class="navbar navbar-default">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <a class="navbar-brand"><i class="fa-solid fa-user"/>Employees</a>
-        </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <form class="navbar-form navbar-left">
-            <div class="form-group">
-              <input type="text" class="form-control" placeholder="Low Id">
+    <div class="employee-table-container">
+      <nav class="navbar navbar-expand-lg bg-light">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand"><i class="fa-solid fa-user"/>Employees</a>
+          </div>
+          <form class="d-flex">
+            <div class="input-group">
+              <span class="input-group-text" id="basic-addon1">Range Start</span>
+              <input type="text" class="form-control" placeholder="Low Id" aria-label="High Id" aria-describedby="basic-addon1">
             </div>
-            <div class="form-group">
-              <input type="text" class="form-control" placeholder="High Id">
+            <div class="input-group">
+              <span class="input-group-text" id="basic-addon1">Range End</span>
+              <input type="text" class="form-control" placeholder="Low Id" aria-label="High Id" aria-describedby="basic-addon1">
             </div>
-            <button type="submit" class="btn btn-default">Filter Employees</button>
+            <button class="btn btn btn-outline-secondary"><i class="fa-solid fa-search"/></button>
           </form>
-          <ul class="nav navbar-nav navbar-right">
-            <li>
-              <router-link to="/create-employee/"><button class="btn btn-default">Add Employee</button></router-link>
-            </li>
-            <li>
-              <button @click="loadEmployees" class="btn btn-default">Reload</button>
-            </li>
-          </ul>
+          <form class="d-flex">
+            <div class="form-group">
+              <router-link to="/create-employee/"><button class="btn btn btn-outline-secondary"><i class="fa-solid fa-plus"/></button></router-link>
+            </div>
+            <div class="form-group">
+              <button @click="loadEmployees" class="btn btn btn-outline-secondary"><i class="fa-solid fa-refresh"/></button>
+            </div>
+          </form>
+        </div>
+      </nav>
+      <table class="table table-striped employee-table">
+        <thead>
+        <tr>
+          <th scope="col">Employee Id</th>
+          <th scope="col">First Name </th>
+          <th scope="col">Last Name</th>
+          <th scope="col">Social Security</th>
+          <th scope="col">Email</th>
+          <th scope="col" style="text-align: right">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(employee) in employees">
+          <td><router-link :to="'/employees/' + employee.id">{{ employee.id }}</router-link></td>
+          <td>{{ employee.firstName }}</td>
+          <td>{{ employee.lastName }}</td>
+          <td>{{ employee.ssn }}</td>
+          <td>{{ employee.email }}</td>
+          <td class="actions">
+            <router-link :to="'/employees/' + employee.id">
+              <i class="fa-solid fa-user-edit"></i>
+            </router-link>
+            <a v-on:click="deleteEmployee(employee.id)">
+              <i class="fa-solid fa-trash" ></i>
+            </a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Modal body text goes here.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
         </div>
       </div>
-    </nav>
-    <table class="table employee-table">
-    <thead>
-    <tr>
-      <th>Employee Id</th>
-      <th>First Name </th>
-      <th>Last Name</th>
-      <th>Social Security</th>
-      <th>Email</th>
-      <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr v-for="(employee) in employees">
-      <td><router-link :to="'/employees/' + employee.id">{{ employee.id }}</router-link></td>
-      <td>{{ employee.firstName }}</td>
-      <td>{{ employee.lastName }}</td>
-      <td>{{ employee.ssn }}</td>
-      <td>{{ employee.email }}</td>
-      <td>
-        <router-link :to="'/employees/' + employee.id">
-          <i class="fa-solid fa-user-edit"></i>  
-        </router-link>
-        <a v-on:click="deleteEmployee(employee.id)">
-          <i class="fa-solid fa-trash" ></i>  
-        </a>
-        
-      </td>
-    </tr>
-    </tbody>
-    </table>
+    </div>
+    </div>
   `
 };
