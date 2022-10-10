@@ -7,12 +7,13 @@ import {IEncryptedDocument} from "./IEncryptedDocument";
 import {MutableIDBRequest} from "./MutableIDBRequest";
 import {KeyPathUtil, RequestUtils} from "../util/";
 import {OpeEncryptor} from "../ope/OpeEncryptor";
+import {EIDBKeyEncryptor} from "./EIDBKeyEncryptor";
 
 export class EIDBObjectStore implements IDBObjectStore {
     private readonly _store: IDBObjectStore;
     private readonly _valueMapper: EIDBValueMapper;
     private readonly _encryptionModule: EncryptionModule;
-    private readonly _opeEncryptor: OpeEncryptor;
+    private readonly _keyEncryptor: EIDBKeyEncryptor;
 
     constructor(store: IDBObjectStore,
                 encryptionModule: EncryptionModule,
@@ -21,7 +22,7 @@ export class EIDBObjectStore implements IDBObjectStore {
         this._store = store;
         this._valueMapper = valueMapper;
         this._encryptionModule = encryptionModule;
-        this._opeEncryptor = opeEncryptor;
+        this._keyEncryptor = new EIDBKeyEncryptor(opeEncryptor);
     }
 
     get autoIncrement(): boolean {
@@ -91,8 +92,7 @@ export class EIDBObjectStore implements IDBObjectStore {
     }
 
     delete(query: IDBValidKey | IDBKeyRange): IDBRequest<undefined> {
-        // FIXME handle range
-        const key = this._opeEncryptor.encryptString(query as string);
+        const key = this._keyEncryptor.encryptKeyOrRange(query)!;
         return new EIDBRequest(this._store.delete(key), this._valueMapper);
     }
 
@@ -102,11 +102,9 @@ export class EIDBObjectStore implements IDBObjectStore {
 
     get(query: IDBValidKey | IDBKeyRange): IDBRequest {
         const result = new MutableIDBRequest(this, this.transaction);
+        const encryptedQuery = this._keyEncryptor.encryptKeyOrRange(query)!;
+        const getReq = this._store.get(encryptedQuery);
 
-        // FIXME handle range
-        const key = this._opeEncryptor.encryptString(query as string);
-
-        const getReq = this._store.get(key);
         getReq.onsuccess = () => {
             const encryptedDoc = <IEncryptedDocument>getReq.result;
             this._encryptionModule.decrypt(encryptedDoc.value).then(v => {
@@ -123,10 +121,9 @@ export class EIDBObjectStore implements IDBObjectStore {
     getAll(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<any[]> {
         const result = new MutableIDBRequest<any[]>(this, this.transaction);
 
-        // FIXME handle query
-        // const key = this._opeEncryptor.encryptString(query as string);
+        const encryptedQuery = this._keyEncryptor.encryptKeyOrRange(query);
 
-        const getReq = this._store.getAll();
+        const getReq = this._store.getAll(encryptedQuery);
         getReq.onsuccess = () => {
             const encryptedDocs = <IEncryptedDocument[]>getReq.result;
             const promises = encryptedDocs.map(encryptedDoc => {
@@ -173,9 +170,8 @@ export class EIDBObjectStore implements IDBObjectStore {
     }
 
     private async _encrypt(value: any): Promise<IEncryptedDocument> {
-        const key = {};
 
-        this.copyValueAtPath(value, key, this.keyPath);
+        const key = this.copyAndEncryptKeys(value, this.keyPath);
 
         // FIXME probably move the stringificaiton into the encryption modules.
         const encryptedValue = await this._encryptionModule.encrypt(JSON.stringify(value));
@@ -195,10 +191,12 @@ export class EIDBObjectStore implements IDBObjectStore {
     }
 
     // TODO change name to mention more about extracting and encrypting.
-    private copyValueAtPath(source: any, target: any, path: string | string[]): void {
+    private copyAndEncryptKeys(source: any, path: string | string[]): any {
         if (!Array.isArray(path)) {
             path = [path];
         }
+
+        const target: any = {};
 
         path.forEach(p => {
             const pathComponents = p.split(".");
@@ -209,9 +207,8 @@ export class EIDBObjectStore implements IDBObjectStore {
                 curSourceVal = source[prop];
 
                 if (i === pathComponents.length - 1) {
-                    // TODO might not be a string.
-                    const key = this._opeEncryptor.encryptString(curSourceVal);
-                    target[prop] = key;
+                    const encryptedKey = this._keyEncryptor.encryptKey(curSourceVal);
+                    target[prop] = encryptedKey;
                     break;
                 } else if (target[prop] === undefined) {
                     target[prop] = {};
@@ -225,6 +222,8 @@ export class EIDBObjectStore implements IDBObjectStore {
                 }
             }
         });
+
+        return target;
 
     }
 }

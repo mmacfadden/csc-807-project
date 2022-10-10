@@ -2,7 +2,11 @@ export default {
   props: ["db"],
   data: () => {
     return {
-      employees: []
+      employees: [],
+      filter: {
+        lowerBound: "",
+        upperBound: ""
+      }
     };
   },
   mounted() {
@@ -10,10 +14,19 @@ export default {
   },
   methods: {
     loadEmployees() {
-      console.log("loading employees");
+
       const tx = this.db.transaction("employees");
       const objectStore = tx.objectStore("employees");
-      const getReq = objectStore.getAll();
+      let range = undefined;
+      if (this.filter.lowerBound !== "" && this.filter.upperBound === "") {
+        range = IDBKeyRange.lowerBound(this.filter.lowerBound);
+      } else if (this.filter.lowerBound === "" && this.filter.upperBound !== "") {
+        range = IDBKeyRange.upperBound(this.filter.upperBound);
+      } else if (this.filter.lowerBound !== "" && this.filter.upperBound !== "") {
+        range = IDBKeyRange.bound(this.filter.lowerBound, this.filter.upperBound);
+      }
+
+      const getReq = objectStore.getAll(range);
       getReq.onsuccess = () => {
         this.employees = getReq.result;
         console.log("employees loaded");
@@ -42,13 +55,17 @@ export default {
           <form class="d-flex">
             <div class="input-group">
               <span class="input-group-text" id="basic-addon1">Range Start</span>
-              <input type="text" class="form-control" placeholder="Low Id" aria-label="High Id" aria-describedby="basic-addon1">
+              <input type="text" class="form-control" v-model="this.filter.lowerBound"
+                     placeholder="Low Id" aria-label="High Id" aria-describedby="basic-addon1">
             </div>
             <div class="input-group">
               <span class="input-group-text" id="basic-addon1">Range End</span>
-              <input type="text" class="form-control" placeholder="Low Id" aria-label="High Id" aria-describedby="basic-addon1">
+              <input type="text" class="form-control" v-model="this.filter.upperBound"
+                     placeholder="Low Id" aria-label="High Id" aria-describedby="basic-addon1">
             </div>
-            <button class="btn btn btn-outline-secondary"><i class="fa-solid fa-search"/></button>
+            <button class="btn btn btn-outline-secondary" @click="loadEmployees">
+              <i class="fa-solid fa-search"/>
+            </button>
           </form>
           <form class="d-flex">
             <div class="form-group">

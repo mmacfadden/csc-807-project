@@ -14,6 +14,8 @@ if (!encryptionConfigManager.configSet()) {
 
 const encryptionConfig = encryptionConfigManager.getConfig(password);
 
+console.log(encryptionConfig);
+
 const indexedDb = new EIDBFactory(window.indexedDB, encryptionConfig);
 
 export default  {

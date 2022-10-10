@@ -18,7 +18,7 @@ export class EIDBFactory implements IDBFactory {
     constructor(delegate: IDBFactory, config: IEncryptionConfig) {
         this._delegate = delegate;
         this._encryptionModule = EncryptionModuleFactory.createModule(config);
-        const opeEncryptor = new OpeEncryptor(config.secret);
+        const opeEncryptor = new OpeEncryptor(config.opeKey);
         this._valueMapper = new EIDBValueMapper(this._encryptionModule, opeEncryptor);
     }
 
