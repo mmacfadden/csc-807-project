@@ -49,9 +49,10 @@ export class EIDBObjectStore implements IDBObjectStore {
         this._encrypt(value)
             .then((v) => {
                 return RequestUtils.requestToPromise(this._store.add(v, key));
-            }).then(v => {
-            result.succeed(v);
-        })
+            })
+            .then(v => {
+                result.succeed(v);
+            })
             .catch(err => {
                 result.fail(err);
             });
@@ -60,8 +61,20 @@ export class EIDBObjectStore implements IDBObjectStore {
     }
 
     put(value: any, key?: IDBValidKey): IDBRequest<IDBValidKey> {
-        const encrypted = this._encrypt(value);
-        return new EIDBRequest(this._store.put(encrypted, key), this._valueMapper);
+        // TODO refactor since its basically the same as add.
+        const result = new MutableIDBRequest<IDBValidKey>(this, this.transaction);
+        this._encrypt(value)
+            .then((v) => {
+                return RequestUtils.requestToPromise(this._store.put(v, key));
+            })
+            .then(v => {
+                result.succeed(v);
+            })
+            .catch(err => {
+                result.fail(err);
+            });
+
+        return result;
     }
 
     clear(): IDBRequest<undefined> {
@@ -78,7 +91,9 @@ export class EIDBObjectStore implements IDBObjectStore {
     }
 
     delete(query: IDBValidKey | IDBKeyRange): IDBRequest<undefined> {
-        return new EIDBRequest(this._store.delete(query), this._valueMapper);
+        // FIXME handle range
+        const key = this._opeEncryptor.encryptString(query as string);
+        return new EIDBRequest(this._store.delete(key), this._valueMapper);
     }
 
     deleteIndex(name: string): void {
@@ -121,8 +136,8 @@ export class EIDBObjectStore implements IDBObjectStore {
                 .then(docs => {
                     result.succeed(docs);
                 }).catch(e => {
-                    result.fail(e);
-                });
+                result.fail(e);
+            });
         }
 
         return result;

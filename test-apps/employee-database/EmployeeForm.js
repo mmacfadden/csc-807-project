@@ -23,6 +23,15 @@ export default {
     }
   },
   methods: {
+    save() {
+      const tx = this.db.transaction("employees", "readwrite");
+      const store = tx.objectStore("employees");
+      console.log(this.employee);
+      const req = store.put(this.employee);
+      req.onsuccess = () => {
+        console.log("employee saved");
+      };
+    }
 
   },
   components: {
@@ -34,27 +43,27 @@ export default {
       <form>
         <div class="form-group">
           <label for="employeeId">Employee Id</label>
-          <input type="text" class="form-control" id="employeeId" :value="this.employee.id" placeholder="Employee Id" :readonly="id !== undefined">
+          <input type="text" class="form-control" id="employeeId" v-model="this.employee.id" placeholder="Employee Id" :readonly="id !== undefined">
         </div>
         <div class="form-group">
           <label for="firstName">First Name</label>
-          <input type="text" class="form-control" id="firstName" :value="this.employee.firstName" placeholder=" First Name">
+          <input type="text" class="form-control" id="firstName" v-model="this.employee.firstName" placeholder=" First Name">
         </div>
         <div class="form-group">
           <label for="lastName">Last Name</label>
-          <input type="text" class="form-control" id="lastName" :value="this.employee.lastName" placeholder=" Last Name">
+          <input type="text" class="form-control" id="lastName" v-model="this.employee.lastName" placeholder=" Last Name">
         </div>
         <div class="form-group">
           <label for="emailAddress">Email address</label>
-          <input type="email" class="form-control" id="emailAddress" :value="this.employee.email" placeholder="Email">
+          <input type="email" class="form-control" id="emailAddress" v-model="this.employee.email" placeholder="Email">
         </div>
         <div class="form-group">
-          <label for="emailAddress">Social Security Number</label>
-          <input type="email" class="form-control" id="emailAddress" :value="this.employee.ssn" placeholder="Email">
+          <label for="ssn">Social Security Number</label>
+          <input type="text" class="form-control" id="ssn" v-model="this.employee.ssn" placeholder="Email">
         </div>
         <div class="buttons">
           <router-link to="/" class="btn btn-default">Cancel</router-link>
-          <button type="submit" class="btn btn-default">Submit</button>
+          <button type="submit" class="btn btn-default" @click="save">Save</button>
         </div>
       </form>
     </div>

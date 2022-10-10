@@ -5,23 +5,33 @@ export default {
       employees: []
     };
   },
-  created: function () {
-
-  },
   mounted() {
-    const tx = this.db.transaction("employees");
-    const objectStore = tx.objectStore("employees");
-    const getReq = objectStore.getAll();
-    getReq.onsuccess = () => {
-      this.employees = getReq.result;
-    }
-
-    getReq.onerror = (e) => {
-      console.log(getReq.error);
-    }
-
+    this.loadEmployees();
   },
-  methods: {},
+  methods: {
+    loadEmployees() {
+      console.log("loading employees");
+      const tx = this.db.transaction("employees");
+      const objectStore = tx.objectStore("employees");
+      const getReq = objectStore.getAll();
+      getReq.onsuccess = () => {
+        this.employees = getReq.result;
+        console.log("employees loaded");
+      }
+
+      getReq.onerror = () => {
+        console.log(getReq.error);
+      }
+    },
+    deleteEmployee(id) {
+      const tx = this.db.transaction("employees", "readwrite");
+      const store = tx.objectStore("employees");
+      const req = store.delete(id);
+      req.onsuccess = () => {
+        this.loadEmployees();
+      }
+    }
+  },
   template: `
     <nav class="navbar navbar-default">
       <div class="container-fluid">
@@ -39,9 +49,12 @@ export default {
             <button type="submit" class="btn btn-default">Filter Employees</button>
           </form>
           <ul class="nav navbar-nav navbar-right">
-           <li>
-             <router-link to="/create-employee/"><button>Add Employee</button></router-link>
-           </li>
+            <li>
+              <router-link to="/create-employee/"><button class="btn btn-default">Add Employee</button></router-link>
+            </li>
+            <li>
+              <button @click="loadEmployees" class="btn btn-default">Reload</button>
+            </li>
           </ul>
         </div>
       </div>
@@ -68,7 +81,10 @@ export default {
         <router-link :to="'/employees/' + employee.id">
           <i class="fa-solid fa-user-edit"></i>  
         </router-link>
-        <i class="fa-solid fa-trash"></i>
+        <a v-on:click="deleteEmployee(employee.id)">
+          <i class="fa-solid fa-trash" ></i>  
+        </a>
+        
       </td>
     </tr>
     </tbody>
