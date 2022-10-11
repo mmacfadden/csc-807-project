@@ -34,13 +34,12 @@ export default  {
             defaultData.forEach(e => {
                 store.add(e);
             })
-            console.log("Updated Schema");
+            console.log("Indexed Database schema installed.");
         }
 
         req.onsuccess = () => {
-            const db = req.result;
-            this.db = db;
-            console.log("Database open");
+            this.db = req.result;
+            console.log("Indexed Database open successfully");
         }
     },
     components: {

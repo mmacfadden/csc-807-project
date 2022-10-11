@@ -6,11 +6,14 @@ export default {
       filter: {
         lowerBound: "",
         upperBound: ""
-      }
+      },
+      deleteModal: null,
+      idToDelete: null
     };
   },
   mounted() {
     this.loadEmployees();
+    this.deleteModal = new bootstrap.Modal('#delete-modal');
   },
   methods: {
     loadEmployees() {
@@ -36,13 +39,22 @@ export default {
         console.log(getReq.error);
       }
     },
-    deleteEmployee(id) {
+    requestDelete(id) {
+      this.idToDelete = id;
+      this.deleteModal.show();
+    },
+    deleteConfirmed() {
+      this.deleteModal.hide();
+
       const tx = this.db.transaction("employees", "readwrite");
       const store = tx.objectStore("employees");
-      const req = store.delete(id);
+      const req = store.delete(this.idToDelete);
       req.onsuccess = () => {
+        this.idToDelete = null;
         this.loadEmployees();
       }
+
+      return true;
     }
   },
   template: `
@@ -52,7 +64,7 @@ export default {
           <div class="navbar-header">
             <a class="navbar-brand"><i class="fa-solid fa-user"/>Employees</a>
           </div>
-          <form class="d-flex">
+          <form class="d-flex" >
             <div class="input-group">
               <span class="input-group-text" id="basic-addon1">Range Start</span>
               <input type="text" class="form-control" v-model="this.filter.lowerBound"
@@ -61,7 +73,7 @@ export default {
             <div class="input-group">
               <span class="input-group-text" id="basic-addon1">Range End</span>
               <input type="text" class="form-control" v-model="this.filter.upperBound"
-                     placeholder="Low Id" aria-label="High Id" aria-describedby="basic-addon1">
+                     placeholder="High Id" aria-label="High Id" aria-describedby="basic-addon1">
             </div>
             <button class="btn btn btn-outline-secondary" @click="loadEmployees">
               <i class="fa-solid fa-search"/>
@@ -99,7 +111,7 @@ export default {
             <router-link :to="'/employees/' + employee.id">
               <i class="fa-solid fa-user-edit"></i>
             </router-link>
-            <a v-on:click="deleteEmployee(employee.id)">
+            <a v-on:click="requestDelete(employee.id)">
               <i class="fa-solid fa-trash" ></i>
             </a>
           </td>
@@ -107,7 +119,7 @@ export default {
         </tbody>
       </table>
     </div>
-    <div class="modal" tabindex="-1">
+    <div class="modal" tabindex="-1" id="delete-modal">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -115,11 +127,11 @@ export default {
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p>Modal body text goes here.</p>
+          <p>Are you sure you want to delete the user with id "{{this.idToDelete}}".</p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" @click="deleteConfirmed">Delete</button>
         </div>
       </div>
     </div>
