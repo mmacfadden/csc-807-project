@@ -5,7 +5,8 @@ export default {
   data: () => {
     return {
       employeeId: null,
-      employee: {}
+      employee: {},
+      toast: null
     };
   },
   mounted() {
@@ -21,18 +22,31 @@ export default {
         console.log(req.error);
       }
     }
+
+    this.toast = new bootstrap.Toast(document.getElementById('saveToast'))
   },
   methods: {
     save() {
       const tx = this.db.transaction("employees", "readwrite");
       const store = tx.objectStore("employees");
       console.log(this.employee);
-      const req = store.put(this.employee);
+      let req
+      if (this.id){
+        req = store.put(this.employee);
+      } else {
+        req = store.add(this.employee);
+      }
+
       req.onsuccess = () => {
         console.log("employee saved");
+        this.$router.replace({ path: '/' })
       };
 
-      this.$router.replace({ path: '/' })
+      req.onerror = () => {
+        if (req.error.name === "ConstraintError") {
+          this.toast.show();
+        }
+      };
     }
 
   },
@@ -71,6 +85,18 @@ export default {
           <button type="submit" class="btn btn-primary" @click="save">Save</button>
         </div>
       </form>
+    </div>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="saveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <strong class="me-auto">Error</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        An employee with the specified id already exists.
+      </div>
+    </div>
     </div>
   `
 };
