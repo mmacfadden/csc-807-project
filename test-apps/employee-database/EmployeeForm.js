@@ -82,8 +82,6 @@ export default {
         this.errors.push('Social Security Number must be of the format 123-45-6789.');
       }
 
-
-
       return this.errors.length === 0;
     }
 

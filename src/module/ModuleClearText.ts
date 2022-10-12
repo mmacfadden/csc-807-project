@@ -16,14 +16,14 @@ export class ModuleClearText extends EncryptionModule {
   /**
    * @inheritDoc
    */
-  public async encrypt(plainText: string): Promise<string> {
-    return plainText;
+  public async encrypt(document: any): Promise<any> {
+    return document;
   }
 
   /**
    * @inheritDoc
    */
-  public async decrypt(cypherText: string): Promise<string> {
-    return cypherText;
+  public async decrypt(cipherText: any): Promise<any> {
+    return cipherText;
   }
 }

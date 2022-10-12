@@ -27,9 +27,8 @@ export class ModuleTripleSec extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-  public async encrypt(plainText: string): Promise<Uint8Array> {
+   protected async _encryptSerializedDocument(plainText: string): Promise<Uint8Array> {
     const data = Buffer.from(plainText, "utf-8");
-
     return new Promise((resolve, reject) => {
       this._encryptor.run({data}, (err, res) => {
         if (err) {
@@ -44,22 +43,16 @@ export class ModuleTripleSec extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-  public async decrypt(cypherText: any): Promise<string> {
-    if (cypherText instanceof Uint8Array) {
-      const data = Buffer.from(cypherText);
-      return new Promise((resolve, reject) => {
-        this._decryptor.run({data}, (err, res) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(res.toString());
-          }
-        });
+  protected async _decryptSerializedDocumentString(cipherText: Uint8Array): Promise<string> {
+    const data = Buffer.from(cipherText);
+    return new Promise((resolve, reject) => {
+      this._decryptor.run({data}, (err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res.toString());
+        }
       });
-    } else {
-      // FIXME
-      throw new Error()
-    }
-
+    });
   }
 }

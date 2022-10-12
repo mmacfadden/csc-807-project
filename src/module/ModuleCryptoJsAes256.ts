@@ -22,8 +22,8 @@ export class ModuleCryptoJsAes256 extends ModuleCryptoJs {
     super(ModuleCryptoJsAes256.MODULE_ID, secret);
   }
 
-  protected _decrypt(cypherText: string, secret: string): CryptoJS.lib.WordArray {
-    return CryptoJS.AES.decrypt(cypherText, secret);
+  protected _decrypt(cipherText: string, secret: string): CryptoJS.lib.WordArray {
+    return CryptoJS.AES.decrypt(cipherText, secret);
   }
 
   protected _encrypt(plainText: string, secret: string): CryptoJS.lib.CipherParams {

@@ -3,7 +3,7 @@ import {OPE} from "./OPE";
 // TODO see if there is a more compact, yet order preserving encoding.
 export class OpeEncryptor {
     public static generateKey(block_size: number = 32): string {
-        const key = OPE.generate_key();
+        const key = OPE.generate_key(block_size);
         const textDecoder = new TextDecoder();
         return textDecoder.decode(key);
     }
@@ -24,19 +24,17 @@ export class OpeEncryptor {
         const bytes = this._textEncoder.encode(str);
         const encrypted: Int32Array = new Int32Array(bytes.length);
         bytes.forEach((b, i) => {
-            const e = this._ope.encrypt(b);
-            encrypted[i] = e;
+            encrypted[i] = this._ope.encrypt(b);
         });
         return encrypted;
     }
 
-    decryptString(cypherText: Int32Array): string {
-        const encryptedNumbers = new Int32Array(cypherText.buffer);
+    decryptString(cipherText: Int32Array): string {
+        const encryptedNumbers = new Int32Array(cipherText.buffer);
         const bytes = new Uint8Array(encryptedNumbers.length);
         for (let i = 0; i < encryptedNumbers.length; i++) {
             const encNum = encryptedNumbers[i];
-            const d = this._ope.decrypt(encNum);
-            bytes[i] = d;
+            bytes[i] = this._ope.decrypt(encNum);
         }
         return this._textDecoder.decode(bytes);
     }

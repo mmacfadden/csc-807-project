@@ -25,20 +25,20 @@ export abstract class EncryptionModule {
   }
 
   /**
-   * Asynchronously encrypts string data.
+   * Asynchronously encrypts a JavaScript object.
    *
-   * @param plainText
-   *   The unencrypted text to encrypt.
+   * @param document
+   *   The unencrypted data to encrypt.
    */
-  public abstract encrypt(plainText: string): Promise<any>;
+  public abstract encrypt(document: any): Promise<any>;
 
   /**
-   * Asynchronously decrypts string data.
+   * Asynchronously decrypts object data.
    *
-   * @param cypherText
+   * @param cipherText
    *   The encrypted text to decrypt.
    */
-  public abstract decrypt(cypherText: any): Promise<string>;
+  public abstract decrypt(cipherText: any): Promise<any>;
 
   /**
    * A helper method that subclasses can override if they need
@@ -49,4 +49,6 @@ export abstract class EncryptionModule {
     // no-op in this base class.
     return;
   }
+
+
 }

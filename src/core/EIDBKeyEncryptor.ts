@@ -58,6 +58,7 @@ export class EIDBKeyEncryptor {
             const bigEndianBuffer = EndianUtils.ensureBigEndian(encryptedKey.buffer);
             return new Uint8Array(bigEndianBuffer);
         } else {
+            // FIXME handle other key types.
             throw Error("Unhandled key type");
         }
 

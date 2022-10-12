@@ -28,8 +28,8 @@ export class ModuleCryptoJsAes128 extends ModuleCryptoJs {
     this._derivedKey = CryptoJS.PBKDF2(secret, salt, {keySize: 128 / 32});
   }
 
-  protected _decrypt(cypherText: string, secret: string): CryptoJS.lib.WordArray {
-    return CryptoJS.AES.decrypt(cypherText, this._derivedKey, {iv: this._iv})
+  protected _decrypt(cipherText: string, secret: string): CryptoJS.lib.WordArray {
+    return CryptoJS.AES.decrypt(cipherText, this._derivedKey, {iv: this._iv})
   }
 
   protected _encrypt(plainText: string, secret: string): CryptoJS.lib.CipherParams {
