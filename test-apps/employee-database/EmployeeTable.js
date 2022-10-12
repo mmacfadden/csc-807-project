@@ -67,13 +67,13 @@ export default {
           <form class="d-flex" >
             <div class="input-group">
               <span class="input-group-text" id="basic-addon1">Range Start</span>
-              <input type="text" class="form-control" v-model="this.filter.lowerBound"
-                     placeholder="Low Id" aria-label="High Id" aria-describedby="basic-addon1">
+              <input type="text" size="5" class="form-control" v-model="this.filter.lowerBound"
+                     placeholder="Id" aria-label="High Id" aria-describedby="basic-addon1">
             </div>
             <div class="input-group">
               <span class="input-group-text" id="basic-addon1">Range End</span>
-              <input type="text" class="form-control" v-model="this.filter.upperBound"
-                     placeholder="High Id" aria-label="High Id" aria-describedby="basic-addon1">
+              <input type="text" size="5" class="form-control" v-model="this.filter.upperBound"
+                     placeholder="Id" aria-label="High Id" aria-describedby="basic-addon1">
             </div>
             <button class="btn btn btn-outline-secondary" @click="loadEmployees">
               <i class="fa-solid fa-search"/>
@@ -102,7 +102,7 @@ export default {
         </thead>
         <tbody>
         <tr v-for="(employee) in employees">
-          <td><router-link :to="'/employees/' + employee.id">{{ employee.id }}</router-link></td>
+          <td class="employee-id"><router-link :to="'/employees/' + employee.id">{{ employee.id }}</router-link></td>
           <td>{{ employee.firstName }}</td>
           <td>{{ employee.lastName }}</td>
           <td>{{ employee.ssn }}</td>

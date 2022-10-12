@@ -1,3 +1,6 @@
+:root {
+    --app-max-width: 1100px;
+}
 .brand-logo svg {
     font-size: 30px;
     margin-left: 10px;
@@ -22,14 +25,19 @@ nav.header ul {
 .description-box {
     border: 1px solid #ddd;
     border-radius: 4px;
-    margin: 10px;
+    margin: 10px auto;
     padding: 10px;
-    max-width: 1300px;
+    max-width: var(--app-max-width);
+}
+
+.accordion {
+    max-width: var(--app-max-width);
+    margin: 10px auto;
 }
 
 .employee-table-container {
-    max-width: 1300px;
-    margin: 10px;
+    max-width: var(--app-max-width);
+    margin: 10px auto;
 }
 
 .employee-table-container nav {
@@ -71,6 +79,10 @@ nav.header ul {
     color: #424241;
 }
 
+.employee-table td.employee-id a {
+    color: #0070b9;
+}
+
 .employee-table svg {
     margin-right: 10px;
     cursor: pointer;
@@ -80,34 +92,43 @@ nav.header ul {
     color: cornflowerblue;
 }
 
-
-.employee-form {
-    margin: 20px;
+.centered-form {
+    margin: 20px auto;
     max-width: 500px;
     border: 1px solid #ddd;
 }
 
-.employee-form .title {
-    background: #ddd;
+.centered-form .title {
+    background: #2d84b4;
     padding: 10px;
     margin-bottom: 10px;
     font-size: 24px;
+    color: white;
 }
 
-.employee-form .title span {
+.centered-form .title span {
     margin-left: 10px;
 }
 
-.employee-form form {
+.centered-form form {
     padding: 10px;
 }
 
-.employee-form .buttons {
+.centered-form form label {
+    font-weight: bold;
+}
+
+.centered-form .buttons {
     text-align: right;
 }
 
-.employee-form .buttons * {
+.centered-form .buttons * {
     margin-left: 10px;
+}
+
+.centered-form .form-error {
+    color: red;
+    margin-left: 5px;
 }
 
 .toast-header svg {

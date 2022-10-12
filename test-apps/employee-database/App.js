@@ -1,49 +1,63 @@
 import defaultData from "./default_data.js";
 import Loading from "./Loading.js";
+import LoginForm from "./LoginForm.js";
+import {AuthenticationManager} from "./AuthenticationManager.js";
 
-const {EIDBFactory, EncryptionConfigManager, ModuleCryptoJsAes256} = EncryptedIndexedDB;
-
-const password = "mypassword";
-
-const encryptionConfigManager = new EncryptionConfigManager(window.localStorage);
-
-if (!encryptionConfigManager.configSet()) {
-    const encryptionConfig = EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID);
-    encryptionConfigManager.setConfig(encryptionConfig, password);
-}
-
-const encryptionConfig = encryptionConfigManager.getConfig(password);
-
-console.log(encryptionConfig);
-
-const indexedDb = new EIDBFactory(window.indexedDB, encryptionConfig);
+const {EIDBFactory} = EncryptedIndexedDB;
 
 export default  {
     data() {
         return {
-            user: null,
-            indexedDb: indexedDb,
+            indexedDb: null,
             db: null,
+            authManager: new AuthenticationManager(),
+            user: null
         }
     },
-    mounted() {
-        const req = this.indexedDb.open("employees", 1);
-        req.onupgradeneeded = () => {
-            const db = req.result;
-            const store =  db.createObjectStore("employees", {keyPath: "id"});
-            defaultData.forEach(e => {
-                store.add(e);
-            })
-            console.log("Indexed Database schema installed.");
-        }
+    created() {
+        // TODO we should actually name show the app
+        // until this is done.
+      this.authManager
+          .init()
+          .then(() => {
+              if (this.authManager.isAuthenticated()) {
+                  this.onLogin();
+              }
+          })
+          .catch(e => console.error(e));
+    },
+    methods: {
+        onLogin() {
+            console.log("User Logged In");
+            this.user = this.authManager.getLoggedInUserName();
 
-        req.onsuccess = () => {
-            this.db = req.result;
-            console.log("Indexed Database open successfully");
+            this.indexedDb = new EIDBFactory(window.indexedDB, this.authManager.getEncryptionConfig());
+
+            const req = this.indexedDb.open("employees", 1);
+            req.onupgradeneeded = () => {
+                const db = req.result;
+                const store =  db.createObjectStore("employees", {keyPath: "id"});
+                defaultData.forEach(e => {
+                    store.add(e);
+                })
+                console.log("Indexed Database schema installed.");
+            }
+
+            req.onsuccess = () => {
+                this.db = req.result;
+                console.log("Indexed Database open successfully");
+            }
+        },
+        logout() {
+            this.authManager.logout();
+            this.user = null;
+            this.db = null;
+            this.indexedDb = null;
         }
     },
     components: {
-        Loading
+        Loading,
+        LoginForm
     },
     template: `
       <nav class="navbar navbar-expand-lg bg-light">
@@ -64,10 +78,14 @@ export default  {
           <li class="nav-item">
             <a class="nav-link" target="_blank" href="https://github.com/mmacfadden/csc-807-project">GitHub</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" @click="logout"><i class="fa-solid fa-power-off" /></a>
+          </li>
         </ul>
       </div>
       </nav>
-      <router-view v-if="db" :db="db"></router-view>
-      <loading v-if="!db"/>
+      <router-view v-if="db && user" :db="db"></router-view>
+      <loading v-if="user && !db"/>
+      <login-form v-if="!user" @login="onLogin" :auth-manager="authManager"/>
     `
 };
