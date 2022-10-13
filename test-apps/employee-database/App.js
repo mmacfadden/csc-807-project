@@ -2,7 +2,6 @@ import defaultData from "./default_data.js";
 import Loading from "./Loading.js";
 import LoginForm from "./LoginForm.js";
 import {AuthenticationManager} from "./AuthenticationManager.js";
-
 const {EIDBFactory} = EncryptedIndexedDB;
 
 export default  {
@@ -11,15 +10,17 @@ export default  {
             indexedDb: null,
             db: null,
             authManager: new AuthenticationManager(),
-            user: null
+            user: null,
+            initialized: false
         }
     },
     created() {
         // TODO we should actually name show the app
-        // until this is done.
+        //  until this is done.
       this.authManager
           .init()
           .then(() => {
+              this.initialized = true;
               if (this.authManager.isAuthenticated()) {
                   this.onLogin();
               }
@@ -78,14 +79,21 @@ export default  {
           <li class="nav-item">
             <a class="nav-link" target="_blank" href="https://github.com/mmacfadden/csc-807-project">GitHub</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#" @click="logout"><i class="fa-solid fa-power-off" /></a>
+          <li v-if="user" class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-solid fa-user" />
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-start">
+              <li><router-link class="dropdown-item" to="/change-password/"><i class="fa-solid fa-lock" /> Change Password</router-link></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" @click="logout"><i class="fa-solid fa-power-off" /> Logout</a></li>
+            </ul>
           </li>
         </ul>
       </div>
       </nav>
-      <router-view v-if="db && user" :db="db"></router-view>
-      <loading v-if="user && !db"/>
-      <login-form v-if="!user" @login="onLogin" :auth-manager="authManager"/>
+      <loading v-if="!initialized || (user && !db)"/>
+      <login-form v-if="initialized && !user" @login="onLogin" :auth-manager="authManager"/>
+      <router-view v-if="initialized && db && user" :db="db" :auth-manager="authManager"></router-view>
     `
 };

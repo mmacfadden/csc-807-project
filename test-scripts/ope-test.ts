@@ -4,8 +4,7 @@ import {EndianUtils} from "../src/util/EndianUtils";
 
 const encryptor = new OpeEncryptor("Sx7oMWG3l3mIWuMmlh3ZHYAwitZr6dp+MgZ2Nv8sk7E=");
 
-
-for(let i = 0; i < 1; i++) {
+for(let i = 0; i < 100; i++) {
     const l1 = Math.floor(Math.random() * 20) + 1;
     const str1 = RandomStringGenerator.generate(l1).toLowerCase();
 

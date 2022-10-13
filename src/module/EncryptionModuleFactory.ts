@@ -32,34 +32,34 @@ export class EncryptionModuleFactory {
   public static createModule(config: IEncryptionConfig): EncryptionModule {
     switch (config.moduleId) {
       case ModuleCryptoJsAes256.MODULE_ID:
-        return new ModuleCryptoJsAes256(config.secret);
+        return new ModuleCryptoJsAes256(config.dataSecret);
 
       case ModuleCryptoJsAes128.MODULE_ID:
-        return new ModuleCryptoJsAes128(config.secret);
+        return new ModuleCryptoJsAes128(config.dataSecret);
 
       case ModuleCryptoJsTripleDes.MODULE_ID:
-        return new ModuleCryptoJsTripleDes(config.secret);
+        return new ModuleCryptoJsTripleDes(config.dataSecret);
 
       case ModuleTripleSec.MODULE_ID:
-        return new ModuleTripleSec(config.secret);
+        return new ModuleTripleSec(config.dataSecret);
 
       case ModuleWebCryptoAes128.MODULE_ID:
-        return new ModuleWebCryptoAes128(config.secret);
+        return new ModuleWebCryptoAes128(config.dataSecret);
 
       case ModuleWebCryptoAes256.MODULE_ID:
-        return new ModuleWebCryptoAes256(config.secret);
+        return new ModuleWebCryptoAes256(config.dataSecret);
 
         case ModuleNodeWebCryptoAes128.MODULE_ID:
-        return new ModuleNodeWebCryptoAes128(config.secret);
+        return new ModuleNodeWebCryptoAes128(config.dataSecret);
 
       case ModuleNodeWebCryptoAes256.MODULE_ID:
-        return new ModuleNodeWebCryptoAes256(config.secret);
+        return new ModuleNodeWebCryptoAes256(config.dataSecret);
 
       case ModuleBlowfish.MODULE_ID:
-        return new ModuleBlowfish(config.secret);
+        return new ModuleBlowfish(config.dataSecret);
 
       case ModuleTwoFish.MODULE_ID:
-        return new ModuleTwoFish(config.secret);
+        return new ModuleTwoFish(config.dataSecret);
 
       case ModuleClearText.MODULE_ID:
         return new ModuleClearText();

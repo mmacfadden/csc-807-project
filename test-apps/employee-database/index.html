@@ -30,12 +30,14 @@
     import Employees from './Employees.js'
     import About from './About.js'
     import EmployeeForm from "./EmployeeForm.js";
+    import ChangePasswordForm from "./ChangePasswordForm.js";
 
     const routes = [
         {path: '/', component: Employees},
         {path: '/about', component: About},
         {path: '/employees/:id', component: EmployeeForm, props: true},
-        {path: '/create-employee/', component: EmployeeForm}
+        {path: '/create-employee/', component: EmployeeForm},
+        {path: '/change-password/', component: ChangePasswordForm},
     ];
 
     const router = VueRouter.createRouter({

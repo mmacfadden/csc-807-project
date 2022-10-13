@@ -1,6 +1,6 @@
 /**
  * Represents the configuration that defines how data will be encrypted
- * in storage.
+ * within IndexedDB.
  */
 export interface IEncryptionConfig {
   /**
@@ -8,12 +8,19 @@ export interface IEncryptionConfig {
    */
   moduleId: string;
 
+  /**
+   * Option module specific parameters.
+   */
   moduleParams?: any;
 
   /**
-   * The symmetric secret used for the encryption.
+   * The symmetric secret used for encrypting the documents within IndexedDB.
    */
-  secret: string;
+  dataSecret: string;
 
+  /**
+   * The key used for Order Preserving Encryption that is used for encrypting
+   * keys and indices that need to support range queries.
+   */
   opeKey: string;
 }

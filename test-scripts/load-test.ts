@@ -17,7 +17,7 @@ const opeKey = OpeEncryptor.generateKey();
 const config: ILoadTestConfig = {
     encryptionConfig: {
         moduleId: ModuleCryptoJsAes256.MODULE_ID,
-        secret: encryption_secret,
+        dataSecret: encryption_secret,
         opeKey
     },
     objectStoreConfig: {

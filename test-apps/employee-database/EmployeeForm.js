@@ -1,5 +1,3 @@
-import EmployeeTable from "./EmployeeTable.js";
-
 const ssnRegEx = /(?!666|000|9\d{2})\d{3}-(?!00)\d{2}-(?!0{4})\d{4}/;
 const emailRegEx = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
@@ -44,7 +42,7 @@ export default {
 
         req.onsuccess = () => {
           console.log("employee saved");
-          this.$router.replace({ path: '/' })
+          this.$router.replace({ path: '/' });
         };
 
         req.onerror = () => {
@@ -85,9 +83,6 @@ export default {
       return this.errors.length === 0;
     }
 
-  },
-  components: {
-    EmployeeTable
   },
   template: `
     <div class="centered-form">

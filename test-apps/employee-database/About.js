@@ -1,13 +1,10 @@
 export default {
-  props: [],
-  data: () => {
-    return {};
-  },
-  created: function () {
-
-  },
-  methods: {},
   template: `
-    <h1>About</h1>
+    <div class="about">
+      <h1>About Encrypted Indexed DB</h1>
+      <p>
+     
+      </p>
+    </div>
   `
 };
