@@ -1,47 +1,59 @@
 import {
-    ILoadTestConfig,
-    LoadTester,
-    IEncryptionConfig,
-    IObjectStoreConfig,
-    ModuleClearText,
-    ModuleCryptoJsAes256
+  LoadTester,
+  ModuleClearText,
+  ModuleCryptoJsAes256,
+  EncryptionConfigManager
 } from "../src";
 import "fake-indexeddb/auto";
-import {RandomStringGenerator} from "../src/util/RandomStringGenerator";
-import {OPE} from "../src/ope/OPE";
-import {OpeEncryptor} from "../src/ope/OpeEncryptor";
 
-const encryption_secret = RandomStringGenerator.generate(200);
-const opeKey = OpeEncryptor.generateKey();
-
-const config: ILoadTestConfig = {
-    encryptionConfig: {
-        moduleId: ModuleCryptoJsAes256.MODULE_ID,
-        dataSecret: encryption_secret,
-        opeKey
+const objectStoreConfig = {
+  documentSchema: {
+    id: {
+      chance: "guid"
     },
-    objectStoreConfig: {
-        documentSchema: {
-            "id": {
-                chance: "guid"
-            },
-            firstName: {
-                faker: "name.firstName"
-            },
-            lastName: {
-                faker: "name.lastName"
-            },
-            accountNumber: {
-                faker: "finance.account"
-            },
-            phoneNumber: {
-                faker: "phone.phoneNumber"
-            }
-        },
-        keyPath: "id"
+    firstName: {
+      faker: "name.firstName"
     },
-    operationCount: 1
-
+    lastName: {
+      faker: "name.lastName"
+    },
+    accountNumber: {
+      faker: "finance.account"
+    },
+    phoneNumber: {
+      faker: "phone.phoneNumber"
+    },
+    biography: {
+      faker: "lorem.paragraphs()"
+    },
+    age: {
+      faker: "datatype.number()"
+    },
+    birthday: {
+      faker: "datatype.datetime()"
+    },
+    arrayData: {
+      faker: "datatype.array()"
+    }
+  },
+  keyPath: "id"
 }
 
-LoadTester.runTests([config], indexedDB, false);
+const config = EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID)
+const encryptionConfigs = [config];
+const operationCount = 30;
+const quiet = false;
+
+async function test() {
+  const results = await LoadTester.testEncryptionConfigs(
+      encryptionConfigs,
+      operationCount,
+      objectStoreConfig,
+      indexedDB,
+      quiet
+  );
+
+  console.log(results);
+}
+
+test();
