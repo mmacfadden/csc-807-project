@@ -3,11 +3,11 @@ const emailRegEx = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@
 
 export default {
   props: ["db", "id"],
+  emits: ['error'],
   data: () => {
     return {
       employeeId: null,
       employee: {},
-      toast: null,
       errors: []
     };
   },
@@ -21,11 +21,10 @@ export default {
       };
 
       req.onerror = () => {
+        this.$emit("error", req.error.message);
         console.log(req.error);
       }
     }
-
-    this.toast = new bootstrap.Toast(document.getElementById('saveToast'))
   },
   methods: {
     save() {
@@ -47,7 +46,7 @@ export default {
 
         req.onerror = () => {
           if (req.error.name === "ConstraintError") {
-            this.toast.show();
+            this.errors.push("An employee with the specified id already exists.")
           }
         };
       }
@@ -123,18 +122,6 @@ export default {
           <button type="submit" class="btn btn-primary" @click="save">Save</button>
         </div>
       </form>
-    </div>
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="saveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-header">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <strong class="me-auto">Error</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body">
-        An employee with the specified id already exists.
-      </div>
-    </div>
     </div>
   `
 };

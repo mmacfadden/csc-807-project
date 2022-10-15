@@ -1,6 +1,6 @@
 export default {
   props: ['authManager'],
-  emits: ['login'],
+  emits: ['login', 'error'],
   data: () => {
     return {
       error: "",
@@ -21,6 +21,7 @@ export default {
             }
           })
           .catch(e => {
+            this.$emit("error", e.message);
             console.log(e);
           });
     }
@@ -41,11 +42,11 @@ export default {
         </div>
         <div class="mb-3">
           <label for="username" class="form-label">Username</label>
-          <input type="text" v-model="username" class="form-control" id="username">
+          <input type="text" v-model="username" class="form-control" id="username" autocomplete="username">
         </div>
         <div class="mb-3">
           <label for="password" class="form-label">Password</label>
-          <input type="password" v-model="password" class="form-control" id="password">
+          <input type="password" v-model="password" class="form-control" id="password" autocomplete="current-password">
         </div>
         <div class="form-error" v-if="error">{{error}}</div>
         <div class="buttons">

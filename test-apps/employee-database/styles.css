@@ -140,3 +140,9 @@ nav.header ul {
     margin: 20px auto;
     max-width: 1024px;
 }
+
+#toast {
+    right: 10px;
+    bottom: 10px;
+    position: absolute;
+}

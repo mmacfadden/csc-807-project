@@ -66,7 +66,7 @@ export class AuthenticationManager {
 
     async changePassword(currentPassword, newPassword) {
         this._encryptionConfigManager.changePassword(currentPassword, newPassword);
-        await this._setCredentials(AuthenticationManager._DEMO_USERNAME, newPassword);
+        return await this._setCredentials(AuthenticationManager._DEMO_USERNAME, newPassword);
     }
 
     async init() {

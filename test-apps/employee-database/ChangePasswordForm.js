@@ -1,5 +1,6 @@
 export default {
   props: ["authManager"],
+  events: ['error'],
   data: () => {
     return {
       currentPassword: "",
@@ -10,10 +11,15 @@ export default {
   },
   methods: {
     async changePassword() {
-      const valid = await this.validateForm();
-      if (valid) {
-        await this.authManager.changePassword(this.currentPassword, this.newPassword);
-        this.$router.replace({ path: '/' });
+      try {
+        const valid = await this.validateForm();
+        if (valid) {
+          await this.authManager.changePassword(this.currentPassword, this.newPassword);
+          this.$router.replace({ path: '/' });
+        }
+      } catch (e) {
+        console.error(e);
+        this.$emit("error", e.message);
       }
     },
     async validateForm() {
@@ -32,14 +38,14 @@ export default {
       }
 
       if (this.errors.length === 0) {
-        return this.authManager
+        const success = await this.authManager
             .validateCredentials(this.authManager.getLoggedInUserName(), this.currentPassword)
-            .then(success => {
-              if (!success) {
-                this.errors.push("The current password was incorrect.");
-              }
-              return success;
-            });
+        if (!success) {
+          this.errors.push("The current password was incorrect.");
+        }
+
+        return success;
+
       } else {
         return false;
       }

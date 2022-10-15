@@ -11,7 +11,9 @@ export default  {
             db: null,
             authManager: new AuthenticationManager(),
             user: null,
-            initialized: false
+            initialized: false,
+            toast: null,
+            error: ""
         }
     },
     created() {
@@ -25,7 +27,14 @@ export default  {
                   this.onLogin();
               }
           })
-          .catch(e => console.error(e));
+          .catch(e => {
+              this.$emit('error', e.message);
+              console.error(e);
+          });
+    },
+    mounted() {
+        const toastElement = document.getElementById('toast');
+        this.toast = new bootstrap.Toast(toastElement);
     },
     methods: {
         onLogin() {
@@ -54,6 +63,11 @@ export default  {
             this.user = null;
             this.db = null;
             this.indexedDb = null;
+        },
+        onError(msg) {
+            console.log("error event")
+            this.error = msg;
+            this.toast.show();
         }
     },
     components: {
@@ -93,7 +107,15 @@ export default  {
       </div>
       </nav>
       <loading v-if="!initialized || (user && !db)"/>
-      <login-form v-if="initialized && !user" @login="onLogin" :auth-manager="authManager"/>
-      <router-view v-if="initialized && db && user" :db="db" :auth-manager="authManager"></router-view>
+      <login-form v-if="initialized && !user" @login="onLogin" @error="onError" :auth-manager="authManager" />
+      <router-view v-if="initialized && db && user" :db="db" :auth-manager="authManager" @error="onError"></router-view>
+      <div class="toast" id="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <i class="fa-solid fa-exclamation-circle" />
+        <strong class="me-auto">Error</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">{{ this.error }}</div>
+      </div>
     `
 };
