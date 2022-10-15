@@ -3,8 +3,9 @@ import * as CryptoJS from "crypto-js";
 export class CryptoJsUtils {
 
     public static convertUint8ArrayToWordArray(u8Array:Uint8Array): CryptoJS.lib.WordArray {
-        const words = [], len = u8Array.length;
-        let i = 0
+        const words = [];
+        const len = u8Array.length;
+        let i = 0;
         while (i < len) {
             words.push(
                 (u8Array[i++] << 24) |
@@ -14,7 +15,7 @@ export class CryptoJsUtils {
             );
         }
 
-        return CryptoJS.lib.WordArray.create(words, words.length * 4);
+        return CryptoJS.lib.WordArray.create(words, u8Array.length);
     }
 
     public static convertWordArrayToUint8Array(wordArray: CryptoJS.lib.WordArray): Uint8Array {

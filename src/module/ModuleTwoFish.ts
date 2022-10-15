@@ -32,8 +32,8 @@ export class ModuleTwoFish extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-  protected async _encryptSerializedDocument(plainText: string): Promise<Uint8Array> {
-    const ptBytes = [...Buffer.from(plainText, "utf-8")];
+  protected async _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
+    const ptBytes = [...plainText];
     const ctBytes = this._twofish.encrypt(this._key, ptBytes);
     const data = Uint8Array.from(ctBytes);
     // There seems to be an issue when decrypting that that decrypted
@@ -51,12 +51,12 @@ export class ModuleTwoFish extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-  protected async _decryptSerializedDocumentString(cipherText: Uint8Array): Promise<string> {
+  protected async _decryptSerializedDocumentString(cipherText: Uint8Array): Promise<Uint8Array> {
     const ptLenBytes = cipherText.slice(0, 4);
     const ptLen = (new Int32Array(ptLenBytes))[0];
     const ctBytes = cipherText.slice(4, cipherText.length);
     const ptBytes = this._twofish.decrypt(this._key, [...ctBytes]);
     const truncated = ptBytes.slice(0, ptLen);
-    return Buffer.from(truncated).toString("utf-8");
+    return new Uint8Array(truncated);
   }
 }

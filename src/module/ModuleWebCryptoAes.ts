@@ -47,13 +47,12 @@ export abstract class ModuleWebCryptoAes extends SymmetricEncryptionBasedModule 
   /**
    * @inheritDoc
    */
-  protected async _encryptSerializedDocument(plainText: string): Promise<Uint8Array> {
-    const dataAsBytes = Buffer.from(plainText, "utf-8");
+  protected async _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
     const salt = this._crypto.getRandomValues(new Uint8Array(32));
 
-    const saltedData = new Uint8Array(dataAsBytes.length + salt.length);
+    const saltedData = new Uint8Array(plainText.length + salt.length);
     saltedData.set(salt)
-    saltedData.set(dataAsBytes, salt.length);
+    saltedData.set(plainText, salt.length);
 
     const iv = this._crypto.getRandomValues(new Uint8Array(12));
     const encryptedContent = await this._crypto.subtle.encrypt({name: "AES-GCM", iv}, this._derivedKey!, saltedData);
@@ -69,7 +68,7 @@ export abstract class ModuleWebCryptoAes extends SymmetricEncryptionBasedModule 
   /**
    * @inheritDoc
    */
-  protected async _decryptSerializedDocumentString(cipherText: Uint8Array): Promise<string> {
+  protected async _decryptSerializedDocumentString(cipherText: Uint8Array): Promise<Uint8Array> {
     const iv = cipherText.slice(0, 12);
     const data = cipherText.slice(12);
 
@@ -81,6 +80,6 @@ export abstract class ModuleWebCryptoAes extends SymmetricEncryptionBasedModule 
 
     const saltedData = new Uint8Array(decryptedContent);
     const decryptedData = saltedData.slice(32);
-    return Buffer.from(decryptedData).toString("utf-8");
+    return decryptedData;
   }
 }

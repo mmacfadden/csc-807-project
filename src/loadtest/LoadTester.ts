@@ -1,9 +1,9 @@
-import {EIDBFactory, IEncryptionConfig} from "../";
+import {EIDBFactory, IEncryptionConfig, ObjectSizeCalculator} from "../";
 import {Timing} from "./Timing";
 import {ILoadTesterHooks} from "./ILoadTesterHooks";
 import {ILoadTestResult} from "./ILoadTestResult";
 import {ILoadTestConfig} from "./ILoadTestConfig";
-import {RequestUtils} from "../util/RequestUtils";
+import {RequestUtils} from "../util";
 import {DocumentGenerator} from "./DocumentGenerator";
 import {IObjectStoreConfig} from "./IObjectStoreConfig";
 
@@ -34,10 +34,10 @@ export class LoadTester {
    *   The encryption configurations to test.
    * @param operationCount
    *   The number of entries to read and write to Storage.
-   * @param valueSizeBytes
-   *   The number of characters in the value to store.
-   * @param storage
-   *   The HTML5 Storage object to use to store data.
+   * @param objectStoreConfig
+   *   The configuration used to create object stores and documents.
+   * @param indexedDb
+   *   The HTML5 IndexedDB object to use to store data.
    * @param quiet
    *   Whether to suppress log output.
    * @param hooks
@@ -209,8 +209,11 @@ export class LoadTester {
 
     Timing.startMeasurementSession();
 
+    let totalBytes = 0;
+
     for (let i = 0; i < this._config.operationCount; i++) {
       const doc: any = DocumentGenerator.generateDocument(this._config.objectStoreConfig.documentSchema);
+      totalBytes += ObjectSizeCalculator.sizeOf(doc);
 
       const tx = db.transaction(LoadTester._OBJECT_STORE_NAME, "readwrite");
       const store = tx.objectStore(LoadTester._OBJECT_STORE_NAME);
@@ -220,9 +223,10 @@ export class LoadTester {
       Timing.writeEnd(i);
 
       Timing.readStart(i);
-      const readDoc = await RequestUtils.requestToPromise(store.get(doc.id));
-      console.log(readDoc);
+      await RequestUtils.requestToPromise(store.get(doc.id));
       Timing.readEnd(i);
+
+      // FIXME need to delete the document to make sure we don't have any ud conflicts,
     }
 
     const cumulativeReadTime = Timing.getTotalReadTime();
@@ -233,9 +237,6 @@ export class LoadTester {
     const averageWriteTimeMs = cumulativeWriteTime / this._config.operationCount;
     const averageReadTimeMs = cumulativeReadTime / this._config.operationCount;
 
-    // FIXME how do we calculate the size of a document????
-    //const totalBytes = this._config.operationCount * this._config.valueSizeBytes;
-    const totalBytes = 10;
     const avgReadThroughputKbps = (totalBytes / 1000) / (cumulativeReadTime / 1000);
     const avgWriteThroughputKbps = (totalBytes / 1000) / (cumulativeWriteTime / 1000);
 

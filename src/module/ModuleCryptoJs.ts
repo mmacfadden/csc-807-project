@@ -9,24 +9,28 @@ export abstract class ModuleCryptoJs extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-   protected async _encryptSerializedDocument(plainText: string): Promise<Uint8Array> {
-    const result =this._encrypt(plainText, this._encryptionSecret);
-    const encoded = CryptoJS.enc.Base64.parse(result.toString());
-    return CryptoJsUtils.convertWordArrayToUint8Array(encoded);;
+  protected async _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
+    const wordArray = CryptoJsUtils.convertUint8ArrayToWordArray(plainText);
+    const result = this._encrypt(wordArray, this._encryptionSecret);
+    const cipherText = CryptoJS.lib.WordArray.create().concat(result.salt).concat(result.ciphertext);
+    return CryptoJsUtils.convertWordArrayToUint8Array(cipherText);
   }
 
   /**
    * @inheritDoc
    */
-  protected  async _decryptSerializedDocumentString(cipherText: Uint8Array): Promise<string> {
-    const words = CryptoJsUtils.convertUint8ArrayToWordArray(cipherText);
-    const encoded = CryptoJS.enc.Base64.stringify(words);
-    const bytes = this._decrypt(encoded, this._encryptionSecret);
-    return bytes.toString(CryptoJS.enc.Utf8);
+  protected async _decryptSerializedDocumentString(cipherText: Uint8Array): Promise<Uint8Array> {
+    const ciphertextWords = CryptoJsUtils.convertUint8ArrayToWordArray(cipherText);
+    const salt = CryptoJS.lib.WordArray.create(ciphertextWords.words.slice(0, 2));
+    ciphertextWords.words.splice(0, 2);
+    ciphertextWords.sigBytes -= 16;
+    const params =  CryptoJS.lib.CipherParams.create({ ciphertext: ciphertextWords, salt: salt });
+    const bytes = this._decrypt(params, this._encryptionSecret);
+    return CryptoJsUtils.convertWordArrayToUint8Array(bytes);
   }
 
-  protected abstract _encrypt(plainText: string, secret: string): CryptoJS.lib.CipherParams;
+  protected abstract _encrypt(plainText: CryptoJS.lib.WordArray, secret: string): CryptoJS.lib.CipherParams;
 
-  protected abstract _decrypt(cipherText: string, secret: string): CryptoJS.lib.WordArray;
+  protected abstract _decrypt(cipherText: CryptoJS.lib.CipherParams, secret: string): CryptoJS.lib.WordArray;
 
 }

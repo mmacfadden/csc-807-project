@@ -1,4 +1,5 @@
 import {EncryptionModule} from "./EncryptionModule";
+import {encode, decode} from "@msgpack/msgpack";
 
 /**
  * An abstract base class for symmetric key encryption.
@@ -29,7 +30,7 @@ export abstract class SymmetricEncryptionBasedModule extends EncryptionModule {
    *   The unencrypted data to encrypt.
    */
   public encrypt(plainText: any): Promise<Uint8Array> {
-    const serialized = JSON.stringify(plainText);
+    const serialized = encode(plainText);
     return this._encryptSerializedDocument(serialized);
   }
 
@@ -40,10 +41,13 @@ export abstract class SymmetricEncryptionBasedModule extends EncryptionModule {
    *   The encrypted text to decrypt.
    */
   public decrypt(cipherText: Uint8Array): Promise<any> {
-    return this._decryptSerializedDocumentString(cipherText).then(deserialized => JSON.parse(deserialized));
+    return this._decryptSerializedDocumentString(cipherText)
+        .then(deserialized => {
+          return decode(deserialized);
+        });
   }
 
-  protected abstract _encryptSerializedDocument(plaintext: string): Promise<Uint8Array>;
+  protected abstract _encryptSerializedDocument(plaintext: Uint8Array): Promise<Uint8Array>;
 
-  protected abstract _decryptSerializedDocumentString(ciphertext: Uint8Array): Promise<string>;
+  protected abstract _decryptSerializedDocumentString(ciphertext: Uint8Array): Promise<Uint8Array>;
 }

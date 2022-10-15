@@ -4,6 +4,7 @@ import {str_to_bitstring} from "./util";
 import {assert} from "./errors";
 import {sample_hgd, sample_uniform} from "./stat";
 import {ValueRange} from "./ValueRange";
+import {CryptoJsUtils} from "../util/CryptoJsUtils";
 
 const DEFAULT_IN_RANGE_START = 0;
 const DEFAULT_IN_RANGE_END = 2**15 - 1;
@@ -164,7 +165,7 @@ export class OPE {
         const data = CryptoJS.enc.Utf8.parse(input.toString())
 
         // Derive a key from data
-        const keyAsWordArray = convertUint8ArrayToWordArray(this.key);
+        const keyAsWordArray = CryptoJsUtils.convertUint8ArrayToWordArray(this.key);
         const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, keyAsWordArray);
         hmac.update(data);
 
@@ -183,7 +184,7 @@ export class OPE {
 
         while (true)  {
             const encrypted_words = aesEncryptor.process(zeros);
-            const encrypted_bytes = convertWordArrayToUint8Array(encrypted_words);
+            const encrypted_bytes = CryptoJsUtils.convertWordArrayToUint8Array(encrypted_words);
 
             // Convert the data to a list of bits
             const bits = str_to_bitstring(encrypted_bytes);
@@ -193,27 +194,4 @@ export class OPE {
             }
         }
     }
-}
-
-function convertUint8ArrayToWordArray(u8Array:Uint8Array): CryptoJS.lib.WordArray {
-    const words = [], len = u8Array.length;
-    let i = 0
-    while (i < len) {
-        words.push(
-            (u8Array[i++] << 24) |
-            (u8Array[i++] << 16) |
-            (u8Array[i++] << 8)  |
-            (u8Array[i++])
-        );
-    }
-
-    return CryptoJS.lib.WordArray.create(words, words.length * 4);
-}
-
-function convertWordArrayToUint8Array(wordArray: CryptoJS.lib.WordArray): Uint8Array {
-    const dataArray = new Uint8Array(wordArray.sigBytes);
-    for (let i = 0x0; i < wordArray.sigBytes; i++) {
-        dataArray[i] = wordArray.words[i >>> 0x2] >>> 0x18 - i % 0x4 * 0x8 & 0xff;
-    }
-    return dataArray;
 }

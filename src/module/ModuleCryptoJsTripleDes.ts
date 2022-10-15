@@ -22,11 +22,11 @@ export class ModuleCryptoJsTripleDes extends ModuleCryptoJs {
     super(ModuleCryptoJsTripleDes.MODULE_ID, secret);
   }
 
-  protected _decrypt(cipherText: string, secret: string): CryptoJS.lib.WordArray {
+  protected _decrypt(cipherText: CryptoJS.lib.CipherParams, secret: string): CryptoJS.lib.WordArray {
     return CryptoJS.TripleDES.decrypt(cipherText, this._encryptionSecret);
   }
 
-  protected _encrypt(plainText: string, secret: string): CryptoJS.lib.CipherParams {
+  protected _encrypt(plainText: CryptoJS.lib.WordArray, secret: string): CryptoJS.lib.CipherParams {
     return CryptoJS.TripleDES.encrypt(plainText, this._encryptionSecret);
   }
 }
