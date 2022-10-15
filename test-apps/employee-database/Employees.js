@@ -1,7 +1,8 @@
 import EmployeeTable from "./EmployeeTable.js";
 
 export default {
-  props: ["db"],
+  props: ["db", "authManager"],
+  emits: ["error"],
   data: () => {
     return {};
   },
