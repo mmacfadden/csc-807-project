@@ -13,7 +13,8 @@ export abstract class ModuleCryptoJs extends SymmetricEncryptionBasedModule {
     const wordArray = CryptoJsUtils.convertUint8ArrayToWordArray(plainText);
     const result = this._encrypt(wordArray, this._encryptionSecret);
     const cipherText = CryptoJS.lib.WordArray.create().concat(result.salt).concat(result.ciphertext);
-    return CryptoJsUtils.convertWordArrayToUint8Array(cipherText);
+    const bytes =  CryptoJsUtils.convertWordArrayToUint8Array(cipherText);
+    return bytes
   }
 
   /**
@@ -23,10 +24,11 @@ export abstract class ModuleCryptoJs extends SymmetricEncryptionBasedModule {
     const ciphertextWords = CryptoJsUtils.convertUint8ArrayToWordArray(cipherText);
     const salt = CryptoJS.lib.WordArray.create(ciphertextWords.words.slice(0, 2));
     ciphertextWords.words.splice(0, 2);
-    ciphertextWords.sigBytes -= 16;
+    ciphertextWords.sigBytes -= 8;
     const params =  CryptoJS.lib.CipherParams.create({ ciphertext: ciphertextWords, salt: salt });
-    const bytes = this._decrypt(params, this._encryptionSecret);
-    return CryptoJsUtils.convertWordArrayToUint8Array(bytes);
+    const ptWords = this._decrypt(params, this._encryptionSecret);
+    const ptBytes =  CryptoJsUtils.convertWordArrayToUint8Array(ptWords);
+    return ptBytes;
   }
 
   protected abstract _encrypt(plainText: CryptoJS.lib.WordArray, secret: string): CryptoJS.lib.CipherParams;
