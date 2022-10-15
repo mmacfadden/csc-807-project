@@ -7,8 +7,10 @@ module.exports = {
   },
   entry: "./src/index.ts",
   output: {
-    library: "EncryptedIndexedDB",
-    libraryTarget: "umd",
+    library:{
+        name: "EncryptedIndexedDB",
+        type: "umd"
+    },
     umdNamedDefine: true,
     filename: "encrypted-indexed-db.js"
   },
@@ -21,6 +23,12 @@ module.exports = {
       {
         test: /\.md$/,
         use: 'ignore-loader'
+      },
+      {
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false
+        }
       }
     ]
   },
