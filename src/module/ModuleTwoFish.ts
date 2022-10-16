@@ -36,13 +36,16 @@ export class ModuleTwoFish extends SymmetricEncryptionBasedModule {
     const ptBytes = [...plainText];
     const ctBytes = this._twofish.encrypt(this._key, ptBytes);
     const data = Uint8Array.from(ctBytes);
+
     // There seems to be an issue when decrypting that that decrypted
     // data gets put into an array of the same size as the encrypted
     // data, which leaves 0's at the end. So we push on the length
     // of the pt data so we can truncate it later.
     const len32BitArray = Int32Array.of(ptBytes.length);
+    const ptLenBytes = new Uint8Array(len32BitArray.buffer);
+
     const result = new Uint8Array(len32BitArray.byteLength + data.length);
-    result.set(len32BitArray);
+    result.set(ptLenBytes);
     result.set(data, len32BitArray.byteLength);
 
     return result;
@@ -52,11 +55,12 @@ export class ModuleTwoFish extends SymmetricEncryptionBasedModule {
    * @inheritDoc
    */
   protected async _decryptSerializedDocumentString(cipherText: Uint8Array): Promise<Uint8Array> {
-    const ptLenBytes = cipherText.slice(0, 4);
-    const ptLen = (new Int32Array(ptLenBytes))[0];
-    const ctBytes = cipherText.slice(4, cipherText.length);
+    const ptLen = (new Int32Array(cipherText.buffer));
+
+    const ctBytes = cipherText.slice(4);
     const ptBytes = this._twofish.decrypt(this._key, [...ctBytes]);
-    const truncated = ptBytes.slice(0, ptLen);
+    const truncated = ptBytes.slice(0, ptLen[0]);
+
     return new Uint8Array(truncated);
   }
 }
