@@ -41,7 +41,7 @@ export abstract class SymmetricEncryptionBasedModule extends EncryptionModule {
    *   The encrypted text to decrypt.
    */
   public decrypt(cipherText: Uint8Array): Promise<any> {
-    return this._decryptSerializedDocumentString(cipherText)
+    return this._decryptSerializedDocument(cipherText)
         .then(deserialized => {
           return decode(deserialized);
         });
@@ -49,5 +49,5 @@ export abstract class SymmetricEncryptionBasedModule extends EncryptionModule {
 
   protected abstract _encryptSerializedDocument(plaintext: Uint8Array): Promise<Uint8Array>;
 
-  protected abstract _decryptSerializedDocumentString(ciphertext: Uint8Array): Promise<Uint8Array>;
+  protected abstract _decryptSerializedDocument(ciphertext: Uint8Array): Promise<Uint8Array>;
 }

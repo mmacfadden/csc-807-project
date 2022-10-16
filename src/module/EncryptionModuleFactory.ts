@@ -9,8 +9,8 @@ import {
   ModuleTripleSec,
   ModuleWebCryptoAes256,
   ModuleWebCryptoAes128,
-  ModuleNodeWebCryptoAes128,
-  ModuleNodeWebCryptoAes256
+  ModuleNodeCryptoAes256,
+  ModuleNodeCryptoAes128
 } from "./";
 import {ModuleTwoFish} from "./ModuleTwoFish";
 
@@ -49,11 +49,11 @@ export class EncryptionModuleFactory {
       case ModuleWebCryptoAes256.MODULE_ID:
         return new ModuleWebCryptoAes256(config.dataSecret);
 
-        case ModuleNodeWebCryptoAes128.MODULE_ID:
-        return new ModuleNodeWebCryptoAes128(config.dataSecret);
+      case ModuleNodeCryptoAes128.MODULE_ID:
+        return new ModuleNodeCryptoAes128(config.dataSecret);
 
-      case ModuleNodeWebCryptoAes256.MODULE_ID:
-        return new ModuleNodeWebCryptoAes256(config.dataSecret);
+      case ModuleNodeCryptoAes256.MODULE_ID:
+        return new ModuleNodeCryptoAes256(config.dataSecret);
 
       case ModuleBlowfish.MODULE_ID:
         return new ModuleBlowfish(config.dataSecret);
@@ -63,6 +63,8 @@ export class EncryptionModuleFactory {
 
       case ModuleClearText.MODULE_ID:
         return new ModuleClearText();
+
+
 
       default:
         throw new Error("Unknown module id: " + config.moduleId);

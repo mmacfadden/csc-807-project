@@ -59,7 +59,7 @@ export class LoadTester {
       };
     });
 
-    return LoadTester.runTests(testConfigs, indexedDb, quiet, hooks);
+    return await LoadTester.runTests(testConfigs, indexedDb, quiet, hooks);
   }
 
   /**
@@ -91,6 +91,7 @@ export class LoadTester {
     const results: ILoadTestResult[] = [];
 
     for await (let result of LoadTester._generateTests(testConfigs, indexedDb, quiet, hooks)) {
+      console.log("test result", result)
       results.push(result);
     }
 
@@ -121,7 +122,8 @@ export class LoadTester {
     for (const i in testConfigs) {
       const config = testConfigs[i];
       const tester = new LoadTester(config, indexedDb);
-      yield tester.loadTest(quiet, hooks);
+      const result = await tester.loadTest(quiet, hooks);
+      yield result;
     }
   }
 
@@ -175,7 +177,6 @@ export class LoadTester {
    *   Callback hooks to get status during testing.
    */
   public async loadTest(quiet: boolean, hooks?: ILoadTesterHooks): Promise<ILoadTestResult> {
-
     const dbNames = await this._idb.databases();
     if (dbNames.findIndex(i => i.name === LoadTester._DB_NAME) >= 0) {
       const deleteRequest = this._idb.deleteDatabase(LoadTester._DB_NAME);
@@ -226,7 +227,9 @@ export class LoadTester {
       await RequestUtils.requestToPromise(store.get(doc.id));
       Timing.readEnd(i);
 
-      // FIXME need to delete the document to make sure we don't have any ud conflicts,
+      // Clear the store to make sure we don't have any id conflicts. This does not
+      // need to be part of the timing.
+      await RequestUtils.requestToPromise(store.clear());
     }
 
     const cumulativeReadTime = Timing.getTotalReadTime();
@@ -250,6 +253,12 @@ export class LoadTester {
       avgReadThroughputKbps,
       avgWriteThroughputKbps
     };
+
+    db.close();
+
+    if (!quiet) {
+      console.log(`Finished Testing ${this._idb.encryptionModuleId()}`);
+    }
 
     if (hooks) {
       hooks.testFinished(result);

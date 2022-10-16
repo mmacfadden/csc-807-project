@@ -12,6 +12,7 @@ export abstract class ModuleCryptoJs extends SymmetricEncryptionBasedModule {
   protected async _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
     const wordArray = CryptoJsUtils.convertUint8ArrayToWordArray(plainText);
     const result = this._encrypt(wordArray, this._encryptionSecret);
+    console.log(result.salt);
     const cipherText = CryptoJS.lib.WordArray.create().concat(result.salt).concat(result.ciphertext);
     const bytes =  CryptoJsUtils.convertWordArrayToUint8Array(cipherText);
     return bytes
@@ -20,7 +21,7 @@ export abstract class ModuleCryptoJs extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-  protected async _decryptSerializedDocumentString(cipherText: Uint8Array): Promise<Uint8Array> {
+  protected async _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
     const ciphertextWords = CryptoJsUtils.convertUint8ArrayToWordArray(cipherText);
     const salt = CryptoJS.lib.WordArray.create(ciphertextWords.words.slice(0, 2));
     ciphertextWords.words.splice(0, 2);

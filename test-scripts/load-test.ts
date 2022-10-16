@@ -2,7 +2,14 @@ import {
   LoadTester,
   ModuleClearText,
   ModuleCryptoJsAes256,
-  EncryptionConfigManager
+  EncryptionConfigManager,
+  ModuleTwoFish,
+  ModuleBlowfish,
+  ModuleCryptoJsTripleDes,
+  ModuleNodeCryptoAes256,
+  ModuleCryptoJsAes128,
+  ModuleTripleSec,
+  ModuleNodeCryptoAes128
 } from "../src";
 import "fake-indexeddb/auto";
 
@@ -39,8 +46,17 @@ const objectStoreConfig = {
   keyPath: "id"
 }
 
-const config = EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID)
-const encryptionConfigs = [config];
+const encryptionConfigs = [
+  // EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID),
+  // EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID),
+  EncryptionConfigManager.generateConfig(ModuleCryptoJsAes128.MODULE_ID),
+  // EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID),
+  // EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes128.MODULE_ID),
+  // EncryptionConfigManager.generateConfig(ModuleTwoFish.MODULE_ID),
+  // EncryptionConfigManager.generateConfig(ModuleBlowfish.MODULE_ID),
+  // EncryptionConfigManager.generateConfig(ModuleCryptoJsTripleDes.MODULE_ID),
+  // EncryptionConfigManager.generateConfig(ModuleTripleSec.MODULE_ID),
+];
 const operationCount = 30;
 const quiet = false;
 

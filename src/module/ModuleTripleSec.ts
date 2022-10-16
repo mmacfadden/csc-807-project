@@ -43,7 +43,7 @@ export class ModuleTripleSec extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-  protected async _decryptSerializedDocumentString(cipherText: Uint8Array): Promise<Uint8Array> {
+  protected async _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
     const data = Buffer.from(cipherText);
     return new Promise((resolve, reject) => {
       this._decryptor.run({data}, (err, res: Buffer) => {

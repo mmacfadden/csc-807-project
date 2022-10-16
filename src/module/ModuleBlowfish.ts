@@ -37,7 +37,7 @@ export class ModuleBlowfish extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-  public async _decryptSerializedDocumentString(cipherText: Uint8Array): Promise<Uint8Array> {
+  public async _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
     return this._bf.decode(cipherText, Blowfish.TYPE.UINT8_ARRAY);
   }
 }

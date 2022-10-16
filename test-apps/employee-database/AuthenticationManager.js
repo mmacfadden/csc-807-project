@@ -1,4 +1,4 @@
-const {EncryptionConfigManager, ModuleCryptoJsAes256} = EncryptedIndexedDB;
+const {EncryptionConfigManager, ModuleCryptoJsAes256, ModuleWebCryptoAes256} = EncryptedIndexedDB;
 
 export class AuthenticationManager {
     static CREDENTIALS_KEY = "_demo_credentials";
@@ -29,7 +29,7 @@ export class AuthenticationManager {
 
         if (valid) {
             if (!this._encryptionConfigManager.configSet()) {
-                const encryptionConfig = EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID);
+                const encryptionConfig = EncryptionConfigManager.generateConfig(ModuleWebCryptoAes256.MODULE_ID);
                 this._encryptionConfigManager.setConfig(encryptionConfig, password);
             }
 
