@@ -1,5 +1,5 @@
 import {SymmetricEncryptionBasedModule} from "./SymmetricEncryptionBasedModule";
-import {WebCryptoUtil} from "./WebCryptoUtil";
+import { Base64 } from 'js-base64';
 
 /**
  * This module uses the HTML5 WebCrypto API to implement an AES
@@ -26,13 +26,11 @@ export abstract class ModuleWebCryptoAes extends SymmetricEncryptionBasedModule 
    *   The crypto instance to use to perform encryption.
    * @param moduleId
    *   The unique module id for this type of encryption module.
-   * @param secret
-   *   The symmetric encryption secret to derive a key from.
    * @param aesLength
    *   The length of the AES encryption key.
    */
-  protected constructor(crypto: Crypto, moduleId: string, secret: string, aesLength: number) {
-    super(moduleId, secret);
+  protected constructor(crypto: Crypto, moduleId: string, aesLength: number) {
+    super(moduleId);
     this._aesLength = aesLength;
     this._derivedKey = null;
     this._crypto = crypto;
@@ -43,9 +41,20 @@ export abstract class ModuleWebCryptoAes extends SymmetricEncryptionBasedModule 
   /**
    * @inheritDoc
    */
-  public async init(): Promise<void> {
-    const salt = this._crypto.getRandomValues(new Uint8Array(this._saltLen));
-    this._derivedKey = await WebCryptoUtil.deriveKey(this._crypto, this._encryptionSecret, salt, this._aesLength);
+  public async init(secret: string): Promise<void> {
+    const keyBytes = Base64.toUint8Array(secret);
+    this._derivedKey = await crypto.subtle.importKey(
+        "raw",
+        keyBytes,
+        {name: "AES-GCM"},
+        false,
+        ['encrypt', 'decrypt']
+    );
+  }
+
+  public createRandomEncryptionSecret(): Promise<string> {
+    const key = this._crypto.getRandomValues(new Uint8Array(this._aesLength / 4));
+    return Promise.resolve(Base64.fromUint8Array(key));
   }
 
   /**

@@ -1,5 +1,6 @@
 import * as CryptoJS from "crypto-js";
 import {ModuleCryptoJs} from "./ModuleCryptoJs";
+import {ModuleCryptoJsAes} from "./ModuleCryptoJsAes";
 
 /**
  * This module uses the CryptoJS library to implement  AES 256 bit
@@ -9,24 +10,13 @@ import {ModuleCryptoJs} from "./ModuleCryptoJs";
  * Information about the AES Cypher can be found here:
  *    https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
  */
-export class ModuleCryptoJsAes256 extends ModuleCryptoJs {
+export class ModuleCryptoJsAes256 extends ModuleCryptoJsAes {
   static readonly MODULE_ID = "AES 256 (Crypto JS)";
 
   /**
-   * Creates a new ModuleBlowfish instance.
-   *
-   * @param secret
-   *   The symmetric encryption secret to derive a key from.
+   * Creates a new ModuleCryptoJsAes256 instance.
    */
-  constructor(secret: string) {
-    super(ModuleCryptoJsAes256.MODULE_ID, secret);
-  }
-
-  protected _decrypt(cipherText: CryptoJS.lib.CipherParams, secret: string): CryptoJS.lib.WordArray {
-    return CryptoJS.AES.decrypt(cipherText, secret);
-  }
-
-  protected _encrypt(plainText: CryptoJS.lib.WordArray, secret: string): CryptoJS.lib.CipherParams {
-    return CryptoJS.AES.encrypt(plainText, secret);
+  constructor() {
+    super(ModuleCryptoJsAes256.MODULE_ID, 256);
   }
 }

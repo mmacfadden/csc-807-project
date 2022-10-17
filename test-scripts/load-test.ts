@@ -8,8 +8,8 @@ import {
   ModuleCryptoJsTripleDes,
   ModuleNodeCryptoAes256,
   ModuleCryptoJsAes128,
-  ModuleTripleSec,
-  ModuleNodeCryptoAes128
+  ModuleNodeCryptoAes128,
+  ModuleRC5, IEncryptionConfig
 } from "../src";
 import "fake-indexeddb/auto";
 
@@ -46,21 +46,23 @@ const objectStoreConfig = {
   keyPath: "id"
 }
 
-const encryptionConfigs = [
-  // EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID),
-  // EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID),
-  EncryptionConfigManager.generateConfig(ModuleCryptoJsAes128.MODULE_ID),
-  // EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID),
-  // EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes128.MODULE_ID),
-  // EncryptionConfigManager.generateConfig(ModuleTwoFish.MODULE_ID),
-  // EncryptionConfigManager.generateConfig(ModuleBlowfish.MODULE_ID),
-  // EncryptionConfigManager.generateConfig(ModuleCryptoJsTripleDes.MODULE_ID),
-  // EncryptionConfigManager.generateConfig(ModuleTripleSec.MODULE_ID),
-];
+
 const operationCount = 30;
 const quiet = false;
 
 async function test() {
+  const encryptionConfigs: IEncryptionConfig[] = [
+    await EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes128.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes128.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleTwoFish.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleBlowfish.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleCryptoJsTripleDes.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleRC5.MODULE_ID),
+  ];
+
   const results = await LoadTester.testEncryptionConfigs(
       encryptionConfigs,
       operationCount,

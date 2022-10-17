@@ -1,4 +1,3 @@
-import {IEncryptionConfig} from "../config";
 import {
   EncryptionModule,
   ModuleBlowfish,
@@ -6,11 +5,11 @@ import {
   ModuleCryptoJsAes128,
   ModuleCryptoJsAes256,
   ModuleCryptoJsTripleDes,
-  ModuleTripleSec,
   ModuleWebCryptoAes256,
   ModuleWebCryptoAes128,
   ModuleNodeCryptoAes256,
-  ModuleNodeCryptoAes128
+  ModuleNodeCryptoAes128,
+  ModuleRC5
 } from "./";
 import {ModuleTwoFish} from "./ModuleTwoFish";
 
@@ -22,52 +21,51 @@ export class EncryptionModuleFactory {
   /**
    * Creates a new WebStorageEncryptionModule base on the config passed in.
    *
-   * @param config
-   *   The configuration which determines which type of module to create.
+   * @param moduleId
+   *   The id of the module to create.
    *
    * @returns The created module of the correct type.
    *
    * @throws If the config.moduleId is not recognized.
+
    */
-  public static createModule(config: IEncryptionConfig): EncryptionModule {
-    switch (config.moduleId) {
+  public static createModule(moduleId: string): EncryptionModule {
+    switch (moduleId) {
       case ModuleCryptoJsAes256.MODULE_ID:
-        return new ModuleCryptoJsAes256(config.dataSecret);
+        return new ModuleCryptoJsAes256();
 
       case ModuleCryptoJsAes128.MODULE_ID:
-        return new ModuleCryptoJsAes128(config.dataSecret);
+        return new ModuleCryptoJsAes128();
 
       case ModuleCryptoJsTripleDes.MODULE_ID:
-        return new ModuleCryptoJsTripleDes(config.dataSecret);
-
-      case ModuleTripleSec.MODULE_ID:
-        return new ModuleTripleSec(config.dataSecret);
+        return new ModuleCryptoJsTripleDes();
 
       case ModuleWebCryptoAes128.MODULE_ID:
-        return new ModuleWebCryptoAes128(config.dataSecret);
+        return new ModuleWebCryptoAes128();
 
       case ModuleWebCryptoAes256.MODULE_ID:
-        return new ModuleWebCryptoAes256(config.dataSecret);
+        return new ModuleWebCryptoAes256();
 
       case ModuleNodeCryptoAes128.MODULE_ID:
-        return new ModuleNodeCryptoAes128(config.dataSecret);
+        return new ModuleNodeCryptoAes128();
 
       case ModuleNodeCryptoAes256.MODULE_ID:
-        return new ModuleNodeCryptoAes256(config.dataSecret);
+        return new ModuleNodeCryptoAes256();
 
       case ModuleBlowfish.MODULE_ID:
-        return new ModuleBlowfish(config.dataSecret);
+        return new ModuleBlowfish();
 
       case ModuleTwoFish.MODULE_ID:
-        return new ModuleTwoFish(config.dataSecret);
+        return new ModuleTwoFish();
+
+      case ModuleRC5.MODULE_ID:
+        return new ModuleRC5();
 
       case ModuleClearText.MODULE_ID:
         return new ModuleClearText();
 
-
-
       default:
-        throw new Error("Unknown module id: " + config.moduleId);
+        throw new Error("Unknown module id: " + moduleId);
     }
   }
 }

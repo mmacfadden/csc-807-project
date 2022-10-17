@@ -13,11 +13,13 @@ export class EIDBFactory implements IDBFactory {
 
     private _delegate: IDBFactory;
     private readonly _encryptionModule: EncryptionModule;
-    private readonly _valueMapper: EIDBValueMapper ;
+    private readonly _valueMapper: EIDBValueMapper;
+    private readonly _encryptionConfig: IEncryptionConfig;
 
     constructor(delegate: IDBFactory, config: IEncryptionConfig) {
         this._delegate = delegate;
-        this._encryptionModule = EncryptionModuleFactory.createModule(config);
+        this._encryptionConfig = config;
+        this._encryptionModule = EncryptionModuleFactory.createModule(config.moduleId);
         const opeEncryptor = new OpeEncryptor(config.opeKey);
         this._valueMapper = new EIDBValueMapper(this._encryptionModule, opeEncryptor);
     }
@@ -27,7 +29,7 @@ export class EIDBFactory implements IDBFactory {
     }
 
     public initEncryption(): Promise<void> {
-        return this._encryptionModule.init()
+        return this._encryptionModule.init(this._encryptionConfig.dataSecret, this._encryptionConfig.moduleParams)
     }
 
     public cmp(first: any, second: any): number {

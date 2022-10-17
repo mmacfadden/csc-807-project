@@ -1,7 +1,7 @@
 import * as CryptoJS from 'crypto-js';
 import {IEncryptionConfig} from "./IEncryptionConfig";
-import {RandomStringGenerator} from "../util";
 import {OpeEncryptor} from "../ope/OpeEncryptor";
+import {EncryptionModuleFactory} from "../module";
 
 /**
  * Stores and retrieves the encryption configuration for the Encrypted
@@ -24,17 +24,21 @@ export class EncryptionConfigManager {
    *
    * @param encryptionModuleId
    *   The id of the encryption module to use.
-   * @param params
-   *   Option module specific parameters.
+   *
+   * @param moduleParams
+   *   Optional module specific parameters.
    */
-  public static generateConfig(encryptionModuleId: string, params?: any): IEncryptionConfig {
-    const dataSecret = RandomStringGenerator.generate(32);
+  public static async generateConfig(encryptionModuleId: string, moduleParams?: any): Promise<IEncryptionConfig> {
     const opeKey = OpeEncryptor.generateKey();
+    const module = EncryptionModuleFactory.createModule(encryptionModuleId);
+    const dataSecret = await module.createRandomEncryptionSecret(moduleParams);
+
+    // FIXME address module params.
 
     return {
       moduleId: encryptionModuleId,
-      moduleParams: params,
-      dataSecret: dataSecret,
+      moduleParams: moduleParams,
+      dataSecret,
       opeKey
     }
   }
@@ -104,11 +108,7 @@ export class EncryptionConfigManager {
     }
 
     const key = this.getConfig(currentPassword);
-    console.log("get existing config");
-
     this.setConfig(key, newPassword);
-
-    console.log("stored new config existing config");
   }
 
   /**

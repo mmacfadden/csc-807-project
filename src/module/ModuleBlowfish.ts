@@ -13,31 +13,43 @@ import {RandomStringGenerator} from "../util";
 export class ModuleBlowfish extends SymmetricEncryptionBasedModule {
   public static readonly MODULE_ID = "Blowfish (egoroof)";
 
-  private readonly _bf: Blowfish;
+  private _bf: Blowfish | null;
 
   /**
    * Creates a new ModuleBlowfish instance.
-   *
-   * @param secret
-   *   The symmetric encryption secret to derive a key from.
    */
-  constructor(secret: string) {
-    super(ModuleBlowfish.MODULE_ID, secret);
-    this._bf = new Blowfish(this._encryptionSecret, Blowfish.MODE.ECB, Blowfish.PADDING.NULL);
-    this._bf.setIv(RandomStringGenerator.generate(8));
+  constructor() {
+    super(ModuleBlowfish.MODULE_ID);
+    this._bf = null
+
   }
 
   /**
    * @inheritDoc
    */
   public async _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
-    return this._bf.encode(plainText);
+    return this._bf!.encode(plainText);
   }
 
   /**
    * @inheritDoc
    */
   public async _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
-    return this._bf.decode(cipherText, Blowfish.TYPE.UINT8_ARRAY);
+    return this._bf!.decode(cipherText, Blowfish.TYPE.UINT8_ARRAY);
+  }
+
+  createRandomEncryptionSecret(): Promise<string> {
+    const key = RandomStringGenerator.generate(32);
+    const iv = RandomStringGenerator.generate(8);
+    return Promise.resolve(iv + key);
+  }
+
+  init(encryptionSecret: string): Promise<void> {
+    const iv = encryptionSecret.slice(0, 8);
+    const key = encryptionSecret.slice(8);
+    this._bf = new Blowfish(key, Blowfish.MODE.ECB, Blowfish.PADDING.NULL);
+    this._bf.setIv(iv);
+
+    return Promise.resolve(undefined);
   }
 }

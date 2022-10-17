@@ -1,10 +1,12 @@
-import {ModuleNodeCryptoAes128} from "../src/module/ModuleNodeCryptoAes128";
+
+import {ModuleRC5} from "../src/";
+
 
 async function test() {
   const value = "my string";
 
-  const module = new ModuleNodeCryptoAes128("my secret key1");
-  await module.init();
+  const module = new ModuleRC5();
+  await module.init("my secret key1");
 
   const encrypted = await module.encrypt(value);
   const decrypted = await module.decrypt(encrypted);

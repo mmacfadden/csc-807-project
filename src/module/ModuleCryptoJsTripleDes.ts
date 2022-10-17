@@ -13,20 +13,22 @@ export class ModuleCryptoJsTripleDes extends ModuleCryptoJs {
   static readonly MODULE_ID = "Triple DES (Crypto JS)";
 
   /**
-   * Creates a new ModuleBlowfish instance.
-   *
-   * @param secret
-   *   The symmetric encryption secret to derive a key from.
+   * Creates a new ModuleCryptoJsTripleDes instance.
    */
-  constructor(secret: string) {
-    super(ModuleCryptoJsTripleDes.MODULE_ID, secret);
+  constructor() {
+    super(ModuleCryptoJsTripleDes.MODULE_ID, 128);
   }
 
-  protected _decrypt(cipherText: CryptoJS.lib.CipherParams, secret: string): CryptoJS.lib.WordArray {
-    return CryptoJS.TripleDES.decrypt(cipherText, this._encryptionSecret);
+
+  protected _encrypt(plainText: CryptoJS.lib.WordArray,
+                     key: CryptoJS.lib.WordArray,
+                     iv: CryptoJS.lib.WordArray): CryptoJS.lib.CipherParams {
+    return CryptoJS.TripleDES.encrypt(plainText, key, {iv: iv});
   }
 
-  protected _encrypt(plainText: CryptoJS.lib.WordArray, secret: string): CryptoJS.lib.CipherParams {
-    return CryptoJS.TripleDES.encrypt(plainText, this._encryptionSecret);
+  protected _decrypt(cipherText: CryptoJS.lib.CipherParams,
+                     key: CryptoJS.lib.WordArray,
+                     iv: CryptoJS.lib.WordArray): CryptoJS.lib.WordArray {
+    return CryptoJS.TripleDES.decrypt(cipherText, key, {iv: iv});
   }
 }

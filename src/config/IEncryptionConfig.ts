@@ -14,7 +14,7 @@ export interface IEncryptionConfig {
   moduleParams?: any;
 
   /**
-   * The symmetric secret used for encrypting the documents within IndexedDB.
+   * The module specific data secret used to encrypt the data.
    */
   dataSecret: string;
 

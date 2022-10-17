@@ -1,5 +1,6 @@
 import {twofish, ITwoFish} from "twofish";
 import {SymmetricEncryptionBasedModule} from "./SymmetricEncryptionBasedModule";
+import {RandomStringGenerator} from "../util";
 
 
 /**
@@ -15,18 +16,23 @@ export class ModuleTwoFish extends SymmetricEncryptionBasedModule {
   public static readonly MODULE_ID = "TwoFish (wouldgo)";
 
   private readonly _twofish: ITwoFish;
-  private readonly _key: number[];
+  private _key: number[] | null;
 
   /**
    * Creates a new ModuleBlowfish instance.
-   *
-   * @param secret
-   *   The symmetric encryption secret to derive a key from.
    */
-  constructor(secret: string) {
-    super(ModuleTwoFish.MODULE_ID, secret);
+  constructor() {
+    super(ModuleTwoFish.MODULE_ID);
     this._twofish = twofish();
-    this._key = this._twofish.stringToByteArray(secret);
+    this._key = null;
+  }
+
+  public async createRandomEncryptionSecret(): Promise<string> {
+    return RandomStringGenerator.generate(32);
+  }
+
+  public async init(encryptionSecret: string): Promise<void> {
+    this._key = this._twofish.stringToByteArray(encryptionSecret);
   }
 
   /**
@@ -34,7 +40,7 @@ export class ModuleTwoFish extends SymmetricEncryptionBasedModule {
    */
   protected async _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
     const ptBytes = [...plainText];
-    const ctBytes = this._twofish.encrypt(this._key, ptBytes);
+    const ctBytes = this._twofish.encrypt(this._key!, ptBytes);
     const data = Uint8Array.from(ctBytes);
 
     // There seems to be an issue when decrypting that that decrypted
@@ -58,7 +64,7 @@ export class ModuleTwoFish extends SymmetricEncryptionBasedModule {
     const ptLen = (new Int32Array(cipherText.buffer));
 
     const ctBytes = cipherText.slice(4);
-    const ptBytes = this._twofish.decrypt(this._key, [...ctBytes]);
+    const ptBytes = this._twofish.decrypt(this._key!, [...ctBytes]);
     const truncated = ptBytes.slice(0, ptLen[0]);
 
     return new Uint8Array(truncated);

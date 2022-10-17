@@ -91,7 +91,6 @@ export class LoadTester {
     const results: ILoadTestResult[] = [];
 
     for await (let result of LoadTester._generateTests(testConfigs, indexedDb, quiet, hooks)) {
-      console.log("test result", result)
       results.push(result);
     }
 
@@ -190,13 +189,9 @@ export class LoadTester {
           LoadTester._OBJECT_STORE_NAME,
           {keyPath: this._config.objectStoreConfig.keyPath}
       );
-
-      console.log("object store created");
     }
 
     const db = await RequestUtils.requestToPromise(openReq);
-
-    console.log("db created");
 
     if (hooks) {
       hooks.testStarted(this._idb.encryptionModuleId());

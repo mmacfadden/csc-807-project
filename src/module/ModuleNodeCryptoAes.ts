@@ -1,52 +1,49 @@
 import {SymmetricEncryptionBasedModule} from "./SymmetricEncryptionBasedModule";
 
-const ALGO = 'aes-256-gcm';
 import * as crypto from "crypto";
 
-/**
- * This module uses the HTML5 WebCrypto APT to implement an AES 128
- * encryption algorithm.  More information on the WebCrypto API can
- * be found at:
- *    https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
- *
- * Information about the AES Cypher can be found here:
- *    https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
- */
 export abstract class ModuleNodeCryptoAes extends SymmetricEncryptionBasedModule {
 
   private readonly _saltLen;
   private readonly _ivLen;
-  private _derivedKey: Buffer | null = null;
   private readonly _keyLen: number;
   private readonly _algo: string;
+  private _encryptionKey: Buffer | null = null;
 
   /**
-   * Creates a new ModuleBlowfish instance.
+   * Creates a new ModuleNodeCryptoAes instance.
    *
-   * @param secret
-   *   The symmetric encryption secret to derive a key from.
+   * @param moduleId
+   * @param algo
+   * @param keyLen
    */
-  constructor(moduleId: string, secret: string, algo: string, keyLen: number) {
-    super(moduleId, secret);
+  protected constructor(moduleId: string, algo: string, keyLen: number) {
+    super(moduleId);
     this._saltLen = 32;
     this._ivLen = 12;
     this._algo = algo;
     this._keyLen = keyLen;
   }
 
-  public init(): Promise<void> {
-    const salt = crypto.randomBytes(this._saltLen);
-    return new Promise((resolve, reject) => {
-      crypto.pbkdf2(this._encryptionSecret, salt, 100000, this._keyLen, "sha256",
-          (err: Error | null, derivedKey: Buffer) => {
-            if (err) {
-              reject(err);
-            } else {
-              this._derivedKey = derivedKey;
-              resolve();
-            }
-          });
-    })
+  public async init(secret: string): Promise<void> {
+    this._encryptionKey = Buffer.from(secret, "base64");
+  }
+
+  public createRandomEncryptionSecret(): Promise<string> {
+    const key = crypto.randomBytes(this._keyLen);
+    return Promise.resolve(key.toString("base64"));
+    // const salt = crypto.randomBytes(this._saltLen);
+    // return new Promise((resolve, reject) => {
+    //   crypto.pbkdf2(password, salt, 100000, this._keyLen, "sha256",
+    //       (err: Error | null, derivedKey: Buffer) => {
+    //         if (err) {
+    //           reject(err);
+    //         } else {
+    //
+    //           resolve(derivedKey.toString("base64"));
+    //         }
+    //       });
+    // })
   }
 
   protected _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
@@ -56,7 +53,7 @@ export abstract class ModuleNodeCryptoAes extends SymmetricEncryptionBasedModule
     saltedData.set(plainText, salt.length);
 
     const iv = crypto.randomBytes(this._ivLen);
-    const cipher = crypto.createCipheriv(this._algo, this._derivedKey!, iv);
+    const cipher = crypto.createCipheriv(this._algo, this._encryptionKey!, iv);
     const encryptedData = cipher.update(saltedData);
     cipher.final();
 
@@ -67,13 +64,12 @@ export abstract class ModuleNodeCryptoAes extends SymmetricEncryptionBasedModule
   protected _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
     const iv = cipherText.slice(0, this._ivLen);
     const encryptedData = cipherText.slice(this._ivLen);
-    const decipher = crypto.createDecipheriv(this._algo, this._derivedKey!, iv);
+    const decipher = crypto.createDecipheriv(this._algo, this._encryptionKey!, iv);
     const decryptedContent = decipher.update(encryptedData);
 
     const saltedData = new Uint8Array(decryptedContent);
     const plainText = saltedData.slice(this._saltLen);
 
     return Promise.resolve(plainText)
-
   }
 }

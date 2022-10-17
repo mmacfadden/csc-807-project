@@ -1,5 +1,3 @@
-// TODO update encryption API to perhaps return a Uint8Array instead of
-//  a base64 encoded string.
 /**
  * The base class of all Storage Encryption modules that facilitate
  * encrypted storage to the HTML5 WebStorage API.
@@ -24,6 +22,16 @@ export abstract class EncryptionModule {
     return this._id;
   }
 
+  public abstract createRandomEncryptionSecret(moduleParams?: any): Promise<string>;
+
+  /**
+   * A helper method that subclasses can override if they need
+   * to initialize any data asynchronously before being ready
+   * to encrypt / decrypt data.
+   */
+  public abstract init(encryptionSecret: string, moduleParams?: any): Promise<void>;
+
+
   /**
    * Asynchronously encrypts a JavaScript object.
    *
@@ -39,16 +47,4 @@ export abstract class EncryptionModule {
    *   The encrypted text to decrypt.
    */
   public abstract decrypt(cipherText: any): Promise<any>;
-
-  /**
-   * A helper method that subclasses can override if they need
-   * to initialize any data asynchronously before being ready
-   * to encrypt / decrypt data.
-   */
-  public async init(): Promise<void> {
-    // no-op in this base class.
-    return;
-  }
-
-
 }

@@ -26,4 +26,12 @@ export class ModuleClearText extends EncryptionModule {
   public async decrypt(cipherText: any): Promise<any> {
     return cipherText;
   }
+
+  createRandomEncryptionSecret(): Promise<string> {
+    return Promise.resolve("");
+  }
+
+  init(encryptionSecret: string): Promise<void> {
+    return Promise.resolve(undefined);
+  }
 }
