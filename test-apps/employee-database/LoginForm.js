@@ -8,6 +8,9 @@ export default {
       password: ""
     };
   },
+  mounted() {
+    document.getElementById("username").focus();
+  },
   methods: {
     login() {
       this.authManager
@@ -42,7 +45,7 @@ export default {
         </div>
         <div class="mb-3">
           <label for="username" class="form-label">Username</label>
-          <input type="text" v-model="username" class="form-control" id="username" autocomplete="username">
+          <input type="text" v-model="username" class="form-control" id="username" autocomplete="username" autofocus>
         </div>
         <div class="mb-3">
           <label for="password" class="form-label">Password</label>

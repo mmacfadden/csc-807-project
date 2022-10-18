@@ -95,12 +95,8 @@ export class AuthenticationManager {
         const encoder = new TextEncoder();
         const data = encoder.encode(password);
         const passwordHash = await crypto.subtle.digest('SHA-256', data);
-        const u8 = new Uint8Array(passwordHash);
-        const decoder = new TextDecoder();
-        const decoded = decoder.decode(u8);
-        // fixme.. we added a base 64 library.
-        const base64Hash = btoa(unescape(encodeURIComponent(decoded)));
-
+        const hashAsUtf8 = new TextDecoder().decode(new Uint8Array(passwordHash))
+        const base64Hash = btoa(unescape(encodeURIComponent(hashAsUtf8)));
         return `${username}:${base64Hash}`
     }
 }
