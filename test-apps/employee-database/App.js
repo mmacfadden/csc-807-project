@@ -29,7 +29,7 @@ export default  {
           })
           .catch(e => {
               this.$emit('error', e.message);
-              console.error(e);
+              console.log(e);
           });
     },
     mounted() {
@@ -37,11 +37,12 @@ export default  {
         this.toast = new bootstrap.Toast(toastElement);
     },
     methods: {
-        onLogin() {
+        async onLogin() {
             console.log("User Logged In");
             this.user = this.authManager.getLoggedInUserName();
 
             this.indexedDb = new EIDBFactory(window.indexedDB, this.authManager.getEncryptionConfig());
+            await this.indexedDb.initEncryption();
 
             const req = this.indexedDb.open("employees", 1);
             req.onupgradeneeded = () => {

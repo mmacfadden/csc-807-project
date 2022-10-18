@@ -1,4 +1,4 @@
-const {EncryptionConfigManager, ModuleCryptoJsAes256, ModuleWebCryptoAes256} = EncryptedIndexedDB;
+const {EncryptionConfigManager, ModuleCryptoJsAes256, ModuleWebCryptoAes256, ModuleNodeCryptoAes256} = EncryptedIndexedDB;
 
 export class AuthenticationManager {
     static CREDENTIALS_KEY = "_demo_credentials";
@@ -29,7 +29,7 @@ export class AuthenticationManager {
 
         if (valid) {
             if (!this._encryptionConfigManager.configSet()) {
-                const encryptionConfig = EncryptionConfigManager.generateConfig(ModuleWebCryptoAes256.MODULE_ID);
+                const encryptionConfig = await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID);
                 this._encryptionConfigManager.setConfig(encryptionConfig, password);
             }
 
@@ -98,6 +98,7 @@ export class AuthenticationManager {
         const u8 = new Uint8Array(passwordHash);
         const decoder = new TextDecoder();
         const decoded = decoder.decode(u8);
+        // fixme.. we added a base 64 library.
         const base64Hash = btoa(unescape(encodeURIComponent(decoded)));
 
         return `${username}:${base64Hash}`

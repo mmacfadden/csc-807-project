@@ -15,7 +15,7 @@ import { Base64 } from 'js-base64';
 export abstract class ModuleWebCryptoAes extends SymmetricEncryptionBasedModule {
 
   private _derivedKey: CryptoKey | null;
-  private readonly _aesLength;
+  private readonly _aesBits;
   private readonly _crypto: Crypto;
   private readonly _saltLen: number;
   private readonly _ivLen: number;
@@ -31,7 +31,7 @@ export abstract class ModuleWebCryptoAes extends SymmetricEncryptionBasedModule 
    */
   protected constructor(crypto: Crypto, moduleId: string, aesLength: number) {
     super(moduleId);
-    this._aesLength = aesLength;
+    this._aesBits = aesLength;
     this._derivedKey = null;
     this._crypto = crypto;
     this._saltLen = 32;
@@ -53,7 +53,7 @@ export abstract class ModuleWebCryptoAes extends SymmetricEncryptionBasedModule 
   }
 
   public createRandomEncryptionSecret(): Promise<string> {
-    const key = this._crypto.getRandomValues(new Uint8Array(this._aesLength / 4));
+    const key = this._crypto.getRandomValues(new Uint8Array(this._aesBits / 8));
     return Promise.resolve(Base64.fromUint8Array(key));
   }
 
@@ -69,6 +69,7 @@ export abstract class ModuleWebCryptoAes extends SymmetricEncryptionBasedModule 
 
     const iv = this._crypto.getRandomValues(new Uint8Array(this._ivLen));
     const encryptedContent = await this._crypto.subtle.encrypt({name: "AES-GCM", iv}, this._derivedKey!, saltedData);
+    console.log(encryptedContent);
     const encryptedBytes = new Uint8Array(encryptedContent);
 
     const payload = new Uint8Array(iv.length + encryptedBytes.length);

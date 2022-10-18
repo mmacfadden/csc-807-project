@@ -5,7 +5,7 @@ import {EIDBValueMapper} from "./EIDBValueMapper";
 import {EncryptionModule} from "../module";
 import {IEncryptedDocument} from "./IEncryptedDocument";
 import {MutableIDBRequest} from "./MutableIDBRequest";
-import {KeyPathUtil, RequestUtils} from "../util/";
+import {KeyPathUtil} from "../util/";
 import {OpeEncryptor} from "../ope/OpeEncryptor";
 import {EIDBKeyEncryptor} from "./EIDBKeyEncryptor";
 
@@ -79,7 +79,6 @@ export class EIDBObjectStore implements IDBObjectStore {
         const result = new MutableIDBRequest(this, this.transaction);
         const encryptedQuery = this._keyEncryptor.encryptKeyOrRange(query)!;
         const getReq = this._store.get(encryptedQuery);
-
         getReq.onsuccess = () => {
             const encryptedDoc = <IEncryptedDocument>getReq.result;
             this._encryptionModule.decrypt(encryptedDoc.value)
@@ -166,13 +165,15 @@ export class EIDBObjectStore implements IDBObjectStore {
         const result = new MutableIDBRequest<IDBValidKey>(this, this.transaction);
         this._encrypt(value)
             .then((v) => {
-                return RequestUtils.requestToPromise(storeMethod(v, key));
-            })
-            .then(v => {
-                result.succeed(v);
-            })
-            .catch(err => {
-                result.fail(err);
+                const req = storeMethod(v, key);
+
+                req.onsuccess = () => {
+                    result.succeed(req.result);
+                }
+
+                req.onerror = () => {
+                    result.fail(req.error!);
+                }
             });
 
         return result;
