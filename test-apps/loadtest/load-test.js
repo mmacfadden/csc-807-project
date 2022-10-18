@@ -41,10 +41,6 @@ const hooks = {
   testStarted(module) {
     testCounter++;
     status.html(`Test ${testCounter} of ${totalTests}:  ${module}`);
-    const percent = Math.round((testCounter - 1) / totalTests * 100);
-    const percentage = `${percent}%`;
-    progress.html( percentage );
-    progress.width(percentage );
     inProgressRow = $(`<tr><td>${module}</td><td colspan="7">In Progress</td></tr>`);
     resultTable.append(inProgressRow);
   },
@@ -52,6 +48,10 @@ const hooks = {
     inProgressRow.remove();
     appendResultRow(result);
     inProgressRow = null;
+    const percent = Math.round((testCounter) / totalTests * 100);
+    const percentage = `${percent}%`;
+    progress.html( percentage );
+    progress.width(percentage );
   }
 }
 
