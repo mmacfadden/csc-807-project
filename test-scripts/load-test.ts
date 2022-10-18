@@ -1,4 +1,5 @@
 import {
+  IEncryptionConfig,
   LoadTester,
   ModuleClearText,
   ModuleCryptoJsAes256,
@@ -9,9 +10,13 @@ import {
   ModuleNodeCryptoAes256,
   ModuleCryptoJsAes128,
   ModuleNodeCryptoAes128,
-  ModuleRC5, IEncryptionConfig
+  ModuleRC5,
+  ModuleNodeCryptoChaCha20,
+  ModuleXSalsa20NaCl,
+  ModuleChaCha20
 } from "../src";
 import "fake-indexeddb/auto";
+import {} from "../src/module/ModuleChaCha20";
 
 const objectStoreConfig = {
   documentSchema: {
@@ -57,10 +62,13 @@ async function test() {
     await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes128.MODULE_ID),
     await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID),
     await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes128.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleNodeCryptoChaCha20.MODULE_ID),
     await EncryptionConfigManager.generateConfig(ModuleTwoFish.MODULE_ID),
     await EncryptionConfigManager.generateConfig(ModuleBlowfish.MODULE_ID),
     await EncryptionConfigManager.generateConfig(ModuleCryptoJsTripleDes.MODULE_ID),
     await EncryptionConfigManager.generateConfig(ModuleRC5.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleXSalsa20NaCl.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleChaCha20.MODULE_ID),
   ];
 
   const results = await LoadTester.testEncryptionConfigs(

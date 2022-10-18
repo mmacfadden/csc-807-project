@@ -4,3 +4,11 @@ This repository hosts Michael MacFadden's Project source code for [Dakota State 
 
 API Changes From IndexedDB
 - IDBCursorWithValue returns a promise.
+
+Additional algorithms to look at:
+
+- https://www.stablelib.com/classes/_stablelib_chacha20poly1305.ChaCha20Poly1305.html
+- https://en.wikipedia.org/wiki/SM4_(cipher)
+- https://en.wikipedia.org/wiki/International_Data_Encryption_Algorithm
+- https://en.wikipedia.org/wiki/ARIA_(cipher)
+- https://en.wikipedia.org/wiki/CAST-256

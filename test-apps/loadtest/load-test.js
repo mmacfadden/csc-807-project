@@ -7,11 +7,15 @@ const {
   ModuleCryptoJsTripleDes,
   ModuleNodeCryptoAes128,
   ModuleNodeCryptoAes256,
+  ModuleNodeCryptoChaCha20,
   ModuleTwoFish,
   ModuleBlowfish,
   ModuleRC5,
   ModuleWebCryptoAes128,
   ModuleWebCryptoAes256,
+  ModuleXSalsa20NaCl,
+  ModuleChaCha20,
+  ModuleSM4CBC,
   EncryptionConfigManager
 } = EncryptedIndexedDB;
 
@@ -37,6 +41,7 @@ const hooks = {
   testingStarted(testConfigs) {
     totalTests = testConfigs.length;
     testCounter = 0;
+    updateProgress();
   },
   testStarted(module) {
     testCounter++;
@@ -48,11 +53,15 @@ const hooks = {
     inProgressRow.remove();
     appendResultRow(result);
     inProgressRow = null;
-    const percent = Math.round((testCounter) / totalTests * 100);
-    const percentage = `${percent}%`;
-    progress.html( percentage );
-    progress.width(percentage );
+    updateProgress();
   }
+}
+
+function updateProgress() {
+  const percent = Math.round((testCounter) / totalTests * 100);
+  const percentage = `${percent}%`;
+  progress.html( percentage );
+  progress.width(percentage );
 }
 
 
@@ -91,15 +100,18 @@ const objectStoreConfig = {
 
 async function createConfigs() {
   return [
-    await EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes128.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes128.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleTwoFish.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleBlowfish.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleCryptoJsTripleDes.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleRC5.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes128.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes128.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleTwoFish.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleBlowfish.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleCryptoJsTripleDes.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleRC5.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleXSalsa20NaCl.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleChaCha20.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleSM4CBC.MODULE_ID)
   ];
 }
 

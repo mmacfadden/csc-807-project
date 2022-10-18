@@ -2,16 +2,20 @@ import {SymmetricEncryptionBasedModule} from "./SymmetricEncryptionBasedModule";
 
 import * as crypto from "crypto";
 
-export abstract class ModuleNodeCryptoAes extends SymmetricEncryptionBasedModule {
+// TODO look at the auth tag and associated data mentioned in the ChaCha
+//  20 link.
+//  https://www.derpturkey.com/chacha20poly1305-aead-with-node-js/
+export abstract class ModuleNodeCrypto extends SymmetricEncryptionBasedModule {
 
   private readonly _saltLen;
   private readonly _ivLen;
   private readonly _keyLen: number;
   private readonly _algo: string;
   private _encryptionKey: Buffer | null = null;
+  private readonly _cipherOptions: any;
 
   /**
-   * Creates a new ModuleNodeCryptoAes instance.
+   * Creates a new ModuleNodeCrypto instance.
    *
    * @param moduleId
    * @param algo
@@ -23,6 +27,7 @@ export abstract class ModuleNodeCryptoAes extends SymmetricEncryptionBasedModule
     this._ivLen = 12;
     this._algo = algo;
     this._keyLen = keyLen;
+    this._cipherOptions = { authTagLength: 16 };
   }
 
   public async init(secret: string): Promise<void> {
@@ -32,18 +37,6 @@ export abstract class ModuleNodeCryptoAes extends SymmetricEncryptionBasedModule
   public createRandomEncryptionSecret(): Promise<string> {
     const key = crypto.randomBytes(this._keyLen);
     return Promise.resolve(key.toString("base64"));
-    // const salt = crypto.randomBytes(this._saltLen);
-    // return new Promise((resolve, reject) => {
-    //   crypto.pbkdf2(password, salt, 100000, this._keyLen, "sha256",
-    //       (err: Error | null, derivedKey: Buffer) => {
-    //         if (err) {
-    //           reject(err);
-    //         } else {
-    //
-    //           resolve(derivedKey.toString("base64"));
-    //         }
-    //       });
-    // })
   }
 
   protected _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
@@ -53,7 +46,7 @@ export abstract class ModuleNodeCryptoAes extends SymmetricEncryptionBasedModule
     saltedData.set(plainText, salt.length);
 
     const iv = crypto.randomBytes(this._ivLen);
-    const cipher = crypto.createCipheriv(this._algo, this._encryptionKey!, iv);
+    const cipher = crypto.createCipheriv(this._algo, this._encryptionKey!, iv, this._cipherOptions);
     const encryptedData = cipher.update(saltedData);
     cipher.final();
 
@@ -64,7 +57,7 @@ export abstract class ModuleNodeCryptoAes extends SymmetricEncryptionBasedModule
   protected _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
     const iv = cipherText.slice(0, this._ivLen);
     const encryptedData = cipherText.slice(this._ivLen);
-    const decipher = crypto.createDecipheriv(this._algo, this._encryptionKey!, iv);
+    const decipher = crypto.createDecipheriv(this._algo, this._encryptionKey!, iv, this._cipherOptions);
     const decryptedContent = decipher.update(encryptedData);
 
     const saltedData = new Uint8Array(decryptedContent);

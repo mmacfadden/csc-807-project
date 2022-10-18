@@ -1,7 +1,7 @@
-import {ModuleNodeCryptoAes} from "./ModuleNodeCryptoAes";
+import {ModuleNodeCrypto} from "./ModuleNodeCrypto";
 
 
-export class ModuleNodeCryptoAes256 extends ModuleNodeCryptoAes {
+export class ModuleNodeCryptoAes256 extends ModuleNodeCrypto {
   static readonly MODULE_ID = "AES 256 (node-crypto)";
 
   /**

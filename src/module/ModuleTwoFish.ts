@@ -61,12 +61,10 @@ export class ModuleTwoFish extends SymmetricEncryptionBasedModule {
    * @inheritDoc
    */
   protected async _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
-    const ptLen = (new Int32Array(cipherText.buffer));
-
+    const ptLen = new Int32Array(cipherText.buffer);
     const ctBytes = cipherText.slice(4);
     const ptBytes = this._twofish.decrypt(this._key!, [...ctBytes]);
     const truncated = ptBytes.slice(0, ptLen[0]);
-
     return new Uint8Array(truncated);
   }
 }

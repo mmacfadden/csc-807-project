@@ -9,7 +9,9 @@ import {
   ModuleWebCryptoAes128,
   ModuleNodeCryptoAes256,
   ModuleNodeCryptoAes128,
-  ModuleRC5
+  ModuleNodeCryptoChaCha20,
+  ModuleRC5,
+  ModuleXSalsa20NaCl, ModuleChaCha20, ModuleSM4CBC
 } from "./";
 import {ModuleTwoFish} from "./ModuleTwoFish";
 
@@ -52,6 +54,9 @@ export class EncryptionModuleFactory {
       case ModuleNodeCryptoAes256.MODULE_ID:
         return new ModuleNodeCryptoAes256();
 
+      case ModuleNodeCryptoChaCha20.MODULE_ID:
+        return new ModuleNodeCryptoChaCha20();
+
       case ModuleBlowfish.MODULE_ID:
         return new ModuleBlowfish();
 
@@ -60,6 +65,15 @@ export class EncryptionModuleFactory {
 
       case ModuleRC5.MODULE_ID:
         return new ModuleRC5();
+
+      case ModuleXSalsa20NaCl.MODULE_ID:
+        return new ModuleXSalsa20NaCl();
+
+      case ModuleChaCha20.MODULE_ID:
+        return new ModuleChaCha20();
+
+      case ModuleSM4CBC.MODULE_ID:
+        return new ModuleSM4CBC();
 
       case ModuleClearText.MODULE_ID:
         return new ModuleClearText();
