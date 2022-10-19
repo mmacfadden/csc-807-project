@@ -13,7 +13,7 @@ import {
   ModuleRC5,
   ModuleNodeCryptoChaCha20,
   ModuleXSalsa20NaCl,
-  ModuleChaCha20
+  ModuleChaCha20, ModuleSM4CBC
 } from "../src";
 import "fake-indexeddb/auto";
 
@@ -56,18 +56,19 @@ const quiet = false;
 
 async function test() {
   const encryptionConfigs: IEncryptionConfig[] = [
-    await EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes128.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes128.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleNodeCryptoChaCha20.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleTwoFish.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleBlowfish.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleCryptoJsTripleDes.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleRC5.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleXSalsa20NaCl.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleChaCha20.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes128.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes128.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleNodeCryptoChaCha20.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleTwoFish.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleBlowfish.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleCryptoJsTripleDes.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleRC5.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleChaCha20.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleXSalsa20NaCl.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleSM4CBC.MODULE_ID),
   ];
 
   const results = await LoadTester.testEncryptionConfigs(
