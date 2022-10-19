@@ -26,16 +26,22 @@ button.btn {
     flex-direction: column;
 }
 
-#status {
-    border: 1px solid darkgray;
-    font-size: 12px;
-    min-height: 1em;
-    padding: 4px;
-    margin-bottom: 10px;
+#status-table {
+    max-width: 600px;
 }
 
-#status .list-group-item {
-    padding: .1rem .5rem;
+#status-table td {
+    padding: 5px;
+}
+#status-table td:first-child {
+    width: 1%;
+    white-space: nowrap;
+    font-weight: bold;
+    vertical-align: center;
+}
+
+#module-progress {
+    transition: width .1s;
 }
 
 #results-csv {
@@ -46,7 +52,6 @@ button.btn {
     font-size: 12px;
 }
 
-
 table th {
     text-align: center;
 }
@@ -54,3 +59,8 @@ table th {
 table td.number {
     text-align: right;
 }
+
+#results-table th {
+    vertical-align: middle;
+}
+

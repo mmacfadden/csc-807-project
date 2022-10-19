@@ -23,47 +23,58 @@ const {
 // UI Elements
 //
 const status = $("#status");
-const progress = $("#progress");
+const totalProgress = $("#total-progress");
+const moduleProgress = $("#module-progress");
 
 const runButton = $("#run");
 const downloadButton = $("#download");
 
-const resultTable = $("#results-table");
+const resultTable = $("#results-table").children("tbody");
 const resultsTextArea = $("#results-csv");
 
 // Tracks the current test's status item.
 let inProgressRow = null;
 let testCounter = 0;
-let totalTests = 0;
+let moduleCount = 0;
+const operationCount = 30;
+let totalDocuments = 0;
 
 // Used to be notified of test progress.
 const hooks = {
   testingStarted(testConfigs) {
-    totalTests = testConfigs.length;
+    moduleCount = testConfigs.length;
+    totalDocuments = moduleCount * operationCount;
     testCounter = 0;
     updateProgress();
   },
-  testStarted(module) {
+  moduleStarted(module) {
     testCounter++;
-    status.html(`Test ${testCounter} of ${totalTests}:  ${module}`);
-    inProgressRow = $(`<tr><td>${module}</td><td colspan="7">In Progress</td></tr>`);
+    status.html(`Test ${testCounter} of ${moduleCount}:  ${module}`);
+    inProgressRow = $(`<tr><td>${module}</td><td colspan="8">In Progress</td></tr>`);
     resultTable.append(inProgressRow);
   },
-  testFinished(result) {
+  documentCompleted(docCompleted) {
+    updateProgress(docCompleted);
+  },
+  moduleFinished(result) {
     inProgressRow.remove();
     appendResultRow(result);
     inProgressRow = null;
-    updateProgress();
   }
 }
 
-function updateProgress() {
-  const percent = Math.round((testCounter) / totalTests * 100);
-  const percentage = `${percent}%`;
-  progress.html( percentage );
-  progress.width(percentage );
-}
+function updateProgress(currentTestDocs) {
+  const totalCompletedDocs = (testCounter - 1) * operationCount + currentTestDocs;
+  const totalPercent = Math.round((totalCompletedDocs) / totalDocuments * 100);
+  const totalPercentage = `${totalPercent}%`;
+  totalProgress.html(totalPercentage);
+  totalProgress.width(totalPercentage);
 
+  const modulePercent = Math.round((currentTestDocs) / operationCount * 100);
+  const modulePercentage = `${modulePercent}%`;
+  moduleProgress.html(modulePercentage);
+  moduleProgress.width(modulePercentage);
+}
 
 const objectStoreConfig = {
   documentSchema: {
@@ -93,6 +104,32 @@ const objectStoreConfig = {
     },
     arrayData: {
       faker: "datatype.array()"
+    },
+    extraShit: {
+      firstName: {
+        faker: "name.firstName"
+      },
+      lastName: {
+        faker: "name.lastName"
+      },
+      accountNumber: {
+        faker: "finance.account"
+      },
+      phoneNumber: {
+        faker: "phone.phoneNumber"
+      },
+      biography: {
+        faker: "lorem.paragraphs()"
+      },
+      age: {
+        faker: "datatype.number()"
+      },
+      birthday: {
+        faker: "datatype.datetime()"
+      },
+      arrayData: {
+        faker: "datatype.array()"
+      }
     }
   },
   keyPath: "id"
@@ -100,17 +137,17 @@ const objectStoreConfig = {
 
 async function createConfigs() {
   return [
-    // await EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes128.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes128.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleTwoFish.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleBlowfish.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleCryptoJsTripleDes.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleRC5.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleXSalsa20NaCl.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleChaCha20.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes128.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes128.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleTwoFish.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleBlowfish.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleCryptoJsTripleDes.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleRC5.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleXSalsa20NaCl.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleChaCha20.MODULE_ID),
     await EncryptionConfigManager.generateConfig(ModuleSM4CBC.MODULE_ID)
   ];
 }
@@ -126,7 +163,6 @@ async function loadTest() {
   runButton.prop("disabled", true);
   downloadButton.prop("disabled", true);
 
-  const operationCount = 30;
   const quiet = true;
 
   try {
@@ -163,6 +199,7 @@ function appendResultRow(result) {
 
   row.append($(`<td class="string">${result.moduleId}</td>`));
   row.append($(`<td class="number">${result.operationCount}</td>`));
+  row.append($(`<td class="number">${round(result.averageDocumentSize, 1)}</td>`));
   row.append($(`<td class="number">${round(result.totalTimeMs, 3)}</td>`));
   row.append($(`<td class="number">${round(result.averageReadTimeMs, 3)}</td>`));
   row.append($(`<td class="number">${round(result.averageWriteTimeMs, 3)}</td>`));

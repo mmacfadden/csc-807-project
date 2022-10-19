@@ -80,7 +80,7 @@ export class LoadTester {
                                indexedDb: IDBFactory,
                                quiet: boolean,
                                hooks?: ILoadTesterHooks): Promise<ILoadTestResult[]> {
-    if (hooks) {
+    if (hooks?.testingStarted) {
       hooks.testingStarted(testConfigs);
     }
 
@@ -96,6 +96,10 @@ export class LoadTester {
 
     if (!quiet) {
       console.log("IndexedDB Encryption Load Testing Completed");
+    }
+
+    if (hooks?.testingFinished) {
+      hooks.testingFinished(results);
     }
 
     return results;
@@ -193,8 +197,8 @@ export class LoadTester {
 
     const db = await RequestUtils.requestToPromise(openReq);
 
-    if (hooks) {
-      hooks.testStarted(this._idb.encryptionModuleId());
+    if (hooks?.moduleStarted) {
+      hooks.moduleStarted(this._idb.encryptionModuleId());
     }
 
     if (!quiet) {
@@ -225,6 +229,10 @@ export class LoadTester {
       // Clear the store to make sure we don't have any id conflicts. This does not
       // need to be part of the timing.
       await RequestUtils.requestToPromise(store.clear());
+
+      if (hooks?.documentCompleted) {
+        hooks.documentCompleted(i + 1);
+      }
     }
 
     const cumulativeReadTime = Timing.getTotalReadTime();
@@ -238,9 +246,12 @@ export class LoadTester {
     const avgReadThroughputKbps = (totalBytes / 1000) / (cumulativeReadTime / 1000);
     const avgWriteThroughputKbps = (totalBytes / 1000) / (cumulativeWriteTime / 1000);
 
+    const averageDocumentSize = totalBytes / this._config.operationCount / 1000;
+
     const result: ILoadTestResult = {
       moduleId: this._idb.encryptionModuleId(),
       operationCount: this._config.operationCount,
+      averageDocumentSize,
       totalTimeMs,
       averageWriteTimeMs,
       averageReadTimeMs,
@@ -255,8 +266,8 @@ export class LoadTester {
       console.log(`Finished Testing ${this._idb.encryptionModuleId()}`);
     }
 
-    if (hooks) {
-      hooks.testFinished(result);
+    if (hooks?.moduleFinished) {
+      hooks.moduleFinished(result);
     }
 
     return result;

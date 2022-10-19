@@ -16,7 +16,6 @@ import {
   ModuleChaCha20
 } from "../src";
 import "fake-indexeddb/auto";
-import {} from "../src/module/ModuleChaCha20";
 
 const objectStoreConfig = {
   documentSchema: {

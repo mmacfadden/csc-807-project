@@ -11,7 +11,7 @@ export interface ILoadTesterHooks {
    * @param testCount
    *   The number of tests to run.
    */
-  testingStarted: (configs: ILoadTestConfig[]) => void;
+  testingStarted?: (configs: ILoadTestConfig[]) => void;
 
 
   /**
@@ -19,7 +19,10 @@ export interface ILoadTesterHooks {
    * @param module
    *   The name of the module being tested.
    */
-  testStarted: (module: string) => void;
+  moduleStarted?: (module: string) => void;
+
+
+  documentCompleted?: (num: number) => void;
 
   /**
    * Indicates that a test run has finished.
@@ -27,5 +30,8 @@ export interface ILoadTesterHooks {
    * @param module
    *   The name of the module that was tested.
    */
-  testFinished: (result: ILoadTestResult) => void;
+  moduleFinished?: (result: ILoadTestResult) => void;
+
+
+  testingFinished?: (results: ILoadTestResult[]) => void;
 }

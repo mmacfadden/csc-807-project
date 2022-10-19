@@ -28,7 +28,6 @@ export class ModuleXSalsa20NaCl extends SymmetricEncryptionBasedModule {
     return Promise.resolve();
   }
 
-
   protected _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
     const nonce = randomBytes(secretbox.nonceLength);
     const box = secretbox(plainText, nonce, this._key!);

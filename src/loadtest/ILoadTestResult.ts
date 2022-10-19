@@ -12,6 +12,8 @@ export interface ILoadTestResult {
    */
   operationCount: number;
 
+  averageDocumentSize: number;
+
   /**
    * The total time reading and writing in milliseconds.
    */
