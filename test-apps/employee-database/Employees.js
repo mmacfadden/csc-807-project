@@ -16,7 +16,7 @@ export default {
     EmployeeTable
   },
   template: `
-    <div class="accordion" id="accordionExample">
+    <div class="accordion">
     <div class="accordion-item">
       <h2 class="accordion-header" id="headingOne">
         <button class="accordion-button collapsed" 

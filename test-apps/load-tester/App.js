@@ -1,104 +1,15 @@
 import Controls from "./Controls.js";
 import Status from "./Status.js";
 import Results from "./Results.js";
+import Config from "./Config.js";
+
+import {ALL_MODULES, DEFAULT_DOCUMENT_SCHEMA} from "./all_configs.js";
 
 const {
   LoadTester,
   CsvGenerator,
-  ModuleClearText,
-  ModuleCryptoJsAes128,
-  ModuleCryptoJsAes256,
-  ModuleCryptoJsTripleDes,
-  ModuleNodeCryptoAes128,
-  ModuleNodeCryptoAes256,
-  ModuleNodeCryptoChaCha20,
-  ModuleTwoFish,
-  ModuleBlowfish,
-  ModuleRC5,
-  ModuleWebCryptoAes128,
-  ModuleWebCryptoAes256,
-  ModuleXSalsa20NaCl,
-  ModuleChaCha20,
-  ModuleSM4CBC,
   EncryptionConfigManager
 } = EncryptedIndexedDB;
-
-
-const objectStoreConfig = {
-  documentSchema: {
-    id: {
-      chance: "guid"
-    },
-    firstName: {
-      faker: "name.firstName"
-    },
-    lastName: {
-      faker: "name.lastName"
-    },
-    accountNumber: {
-      faker: "finance.account"
-    },
-    phoneNumber: {
-      faker: "phone.phoneNumber"
-    },
-    biography: {
-      faker: "lorem.paragraphs()"
-    },
-    age: {
-      faker: "datatype.number()"
-    },
-    birthday: {
-      faker: "datatype.datetime()"
-    },
-    arrayData: {
-      faker: "datatype.array()"
-    },
-    extraShit: {
-      firstName: {
-        faker: "name.firstName"
-      },
-      lastName: {
-        faker: "name.lastName"
-      },
-      accountNumber: {
-        faker: "finance.account"
-      },
-      phoneNumber: {
-        faker: "phone.phoneNumber"
-      },
-      biography: {
-        faker: "lorem.paragraphs()"
-      },
-      age: {
-        faker: "datatype.number()"
-      },
-      birthday: {
-        faker: "datatype.datetime()"
-      },
-      arrayData: {
-        faker: "datatype.array()"
-      }
-    }
-  },
-  keyPath: "id"
-}
-
-async function createConfigs() {
-  return [
-    // await EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes128.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes128.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleTwoFish.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleBlowfish.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleCryptoJsTripleDes.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleRC5.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleXSalsa20NaCl.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleChaCha20.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleSM4CBC.MODULE_ID)
-  ];
-}
 
 export default {
   data() {
@@ -111,7 +22,11 @@ export default {
       documentsPerModule: 30,
       loadTester: null,
       results: [],
-      resultsCsv: null
+      resultsCsv: null,
+      testConfig: {
+        selectedModules: ALL_MODULES,
+        documentSchema: DEFAULT_DOCUMENT_SCHEMA
+      }
     }
   },
   mounted() {
@@ -144,13 +59,16 @@ export default {
       }
 
       try {
-
-        const encryptionConfigs = await createConfigs();
+        const encryptionConfigs = [];
+        for (let i = 0; i < this.testConfig.selectedModules.length; i++) {
+          const moduleConfig = await EncryptionConfigManager.generateConfig(this.testConfig.selectedModules[i]);
+          encryptionConfigs.push(moduleConfig);
+        }
 
         const results = await LoadTester.testEncryptionConfigs(
             encryptionConfigs,
             this.documentsPerModule,
-            objectStoreConfig,
+            this.testConfig.documentSchema,
             indexedDB,
             quiet,
             hooks);
@@ -194,7 +112,8 @@ export default {
   components: {
     Controls,
     Status,
-    Results
+    Results,
+    Config
   },
   template: `
     <nav class="navbar navbar-dark bg-dark">
@@ -216,6 +135,7 @@ export default {
     </div>
     </nav>
     <div id="main">
+    <config/>
     <h1>Controls</h1>
     <controls
         @start="onStart"
@@ -232,6 +152,7 @@ export default {
         :documents-completed="documentsCompleted"
         :documents-per-module="documentsPerModule"
     />
+
     <h1>Results</h1>
     <results :in-progress-module="currentModule" :results="results"/>
     <textarea readonly="readonly" id="results-csv">{{resultsCsv || ""}}</textarea>
