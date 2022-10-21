@@ -73,8 +73,8 @@ async function test() {
 
   const results = await LoadTester.testEncryptionConfigs(
       encryptionConfigs,
+      [objectStoreConfig],
       operationCount,
-      objectStoreConfig,
       indexedDB,
       quiet
   );

@@ -32,9 +32,10 @@ export class LoadTester {
    *
    * @param encryptionConfigs
    *   The encryption configurations to test.
+   * @param objectStoreConfigs
+   *
    * @param operationCount
    *   The number of entries to read and write to Storage.
-   * @param objectStoreConfig
    *   The configuration used to create object stores and documents.
    * @param indexedDb
    *   The HTML5 IndexedDB object to use to store data.
@@ -46,17 +47,19 @@ export class LoadTester {
    * @returns A string array of all test results in CSV format.
    */
   public static async testEncryptionConfigs(encryptionConfigs: IEncryptionConfig[],
+                                            objectStoreConfigs: IObjectStoreConfig[],
                                             operationCount: number,
-                                            objectStoreConfig: IObjectStoreConfig,
                                             indexedDb: IDBFactory,
                                             quiet: boolean,
                                             hooks?: ILoadTesterHooks): Promise<ILoadTestResult[]> {
-    const testConfigs: ILoadTestConfig[] = encryptionConfigs.map(ec => {
-      return {
-        encryptionConfig: ec,
-        objectStoreConfig,
-        operationCount: operationCount
-      };
+    const testConfigs: ILoadTestConfig[] = encryptionConfigs.flatMap(ec => {
+      return objectStoreConfigs.map(osc => {
+        return {
+          encryptionConfig: ec,
+          objectStoreConfig: osc,
+          operationCount: operationCount
+        };
+      });
     });
 
     return await LoadTester.runTests(testConfigs, indexedDb, quiet, hooks);
