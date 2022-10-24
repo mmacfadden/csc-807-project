@@ -1,25 +1,25 @@
 export default {
-  props: ["modules", "schemas"],
+  props: ["modules", "schemas", "selectedModules", "selectedSchemas"],
   events: ["update"],
   data() {
     return {
-      selectedModules: new Map(this.modules.map(m => [m, true])),
-      selectedDocSchemas: new Map(this.schemas.map(s => [s.name, true])),
+      selectedModuleMap: new Map(this.modules.map(m => [m, this.selectedModules.includes(m)])),
+      selectedSchemaMap: new Map(this.schemas.map(s => [s.name, this.selectedSchemas.find(o => o.name === s.name) !== undefined])),
     }
   },
   methods: {
     selectModule(e) {
-      this.selectedModules.set(e.target.value, e.target.checked);
+      this.selectedModuleMap.set(e.target.value, e.target.checked);
       this.emitConfig();
     },
     selectSchema(e) {
-      this.selectedDocSchemas.set(e.target.value, e.target.checked);
+      this.selectedSchemaMap.set(e.target.value, e.target.checked);
       this.emitConfig();
     },
     emitConfig() {
       const update = {
-        selectedModules: this.modules.filter(m => this.selectedModules.get(m)),
-        selectedDocSchemas: this.schemas.filter(s => this.selectedDocSchemas.get(s.name))
+        selectedModules: this.modules.filter(m => this.selectedModuleMap.get(m)),
+        selectedSchemas: this.schemas.filter(s => this.selectedSchemaMap.get(s.name))
       }
       this.$emit("update", update);
     }
@@ -48,7 +48,7 @@ export default {
               <div class="card">
                 <div class="card-body row">
                   <div class="col-4" v-for="module in modules">
-                    <input class="form-check-input me-1" type="checkbox" :checked="this.selectedModules.get(module)"
+                    <input class="form-check-input me-1" type="checkbox" :checked="this.selectedModuleMap.get(module)"
                            :value="module" @click="selectModule">
                     <label class="form-check-label" for="firstCheckbox">{{ module }}</label>
                   </div>
@@ -64,7 +64,7 @@ export default {
                   <div class="row">
                     <div class="col-4" v-for="schema in schemas">
                       <input class="form-check-input me-1" type="checkbox"
-                             :checked="this.selectedDocSchemas.get(schema.name)"
+                             :checked="this.selectedSchemaMap.get(schema.name)"
                              :value="schema.name" @click="selectSchema">
                       <label class="form-check-label" for="firstCheckbox">{{ schema.name }}</label>
                     </div>

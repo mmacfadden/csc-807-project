@@ -19,7 +19,7 @@ export interface ILoadTesterHooks {
    * @param module
    *   The name of the module being tested.
    */
-  moduleStarted?: (module: string) => void;
+  testStarted?: (module: string, schema: string) => void;
 
 
   documentCompleted?: (num: number) => void;
@@ -30,7 +30,7 @@ export interface ILoadTesterHooks {
    * @param module
    *   The name of the module that was tested.
    */
-  moduleFinished?: (result: ILoadTestResult) => void;
+  testFinished?: (result: ILoadTestResult) => void;
 
 
   testingFinished?: (results: ILoadTestResult[]) => void;

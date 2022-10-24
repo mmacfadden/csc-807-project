@@ -47,7 +47,8 @@ const objectStoreConfig = {
       faker: "datatype.array()"
     }
   },
-  keyPath: "id"
+  keyPath: "id",
+  name: "test-document"
 }
 
 

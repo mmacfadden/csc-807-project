@@ -1,6 +1,6 @@
 export const MOCK_CUSTOMER =
 {
-  name: "Mock Customer",
+  name: "Customer",
   enabledByDefault: true,
   config: `{
     "keyPath": "id",
@@ -9,28 +9,39 @@ export const MOCK_CUSTOMER =
         "chance": "guid"
       },
       "firstName": {
-        faker: "name.firstName"
+        "faker": "name.firstName"
       },
-      lastName: {
-        faker: "name.lastName"
+      "lastName": {
+        "faker": "name.lastName"
       },
-      accountNumber: {
-        faker: "finance.account"
+      "accountNumber": {
+        "faker": "finance.account"
       },
-      phoneNumber: {
-        faker: "phone.phoneNumber"
+      "phoneNumber": {
+        "faker": "phone.phoneNumber"
       },
-      biography: {
-        faker: "lorem.paragraphs()"
+      "biography": {
+        "faker": "random.words(100)"
       },
-      age: {
-        faker: "datatype.number()"
+      "age": {
+        "faker": "datatype.number({\\"max\\": 90})"
       },
-      birthday: {
-        faker: "datatype.datetime()"
+      "birthday": {
+        "faker": "datatype.datetime()"
       },
-      arrayData: {
-        faker: "datatype.array()"
+      "address": {
+        "street": {
+          "faker": "address.streetAddress()"
+        },
+        "city": {
+          "faker": "address.city()"
+        },
+        "state": {
+          "faker": "address.state()"
+        },
+        "zip": {
+          "faker": "address.zipCode()"
+        }
       }
     }
   }`

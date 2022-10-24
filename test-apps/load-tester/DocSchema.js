@@ -1,16 +1,23 @@
-const {DocumentGenerator} = EncryptedIndexedDB;
-
+import {Persistence} from "./Persistence.js";
 import {parseSchema} from "./document_schemas/utils.js";
+import {formatSize} from "./utils.js";
+
+const {DocumentGenerator, ObjectSizeCalculator} = EncryptedIndexedDB;
 
 export default {
-  props: ["documentSchemas"],
-  events: ["update"],
+  props: [],
+  events: [],
   data() {
+    const documentSchemas = Persistence.loadSchemas();
     return {
-      selectedSchema: this.documentSchemas[0],
+      documentSchemas,
+      selectedSchema: documentSchemas[0],
       schemaSourceValid: true,
       exampleEditor: null,
       sourceEditor: null,
+      exampleMinBytes: -1,
+      exampleMaxBytes: -1,
+      exampleAvgBytes: -1,
     }
   },
   mounted() {
@@ -45,6 +52,9 @@ export default {
     this.sourceEditor.destroy();
   },
   methods: {
+    formatSize(size) {
+      return formatSize(size);
+    },
     updateConfig() {
       const schema = this.documentSchemas.find(s => s.name === this.selectedSchema.name)
       this.sourceEditor.session.setValue(schema.config);
@@ -52,8 +62,23 @@ export default {
     updateExampleDoc() {
       try {
         const selected = parseSchema(this.selectedSchema);
-        const doc = DocumentGenerator.generateDocument(selected.config.documentSchema);
-        const selectedSchemaExample = JSON.stringify(doc, null, "  ");
+        const docs = [];
+        const numDocs = 10;
+        let totalSize = 0;
+        this.exampleMinBytes = Number.MAX_SAFE_INTEGER;
+        this.exampleMaxBytes = 0;
+        for (let i = 0; i < numDocs;i++) {
+          const doc = DocumentGenerator.generateDocument(selected.config.documentSchema);
+          docs.push(doc)
+          const size = ObjectSizeCalculator.sizeOf(doc);
+          this.exampleMinBytes = Math.min(size, this.exampleMinBytes);
+          this.exampleMaxBytes = Math.max(size, this.exampleMaxBytes);
+          totalSize += size;
+        }
+
+        this.exampleAvgBytes = totalSize /numDocs;
+
+        const selectedSchemaExample = JSON.stringify(docs[0], null, "  ");
 
         if (this.exampleEditor?.session) {
           this.exampleEditor.session.setValue(selectedSchemaExample);
@@ -79,9 +104,8 @@ export default {
     <div class="row flex-fill">
       <div class="col-auto d-flex">
         <div class="flex-fill d-flex flex-column">
-          <label for="config-select" class="form-label">Select Config</label>
-          <select @change="onSelect" class="form-select flex-fill" id="config-select" multiple
-                  aria-label="multiple select example">
+          <label for="config-select" class="form-label">Select Schema</label>
+          <select @change="onSelect" class="form-select flex-fill" id="config-select" aria-label="Select Schema">
             <option v-for="schema in documentSchemas" :value="schema.name" :selected="schema === this.selectedSchema">
               {{ schema.name }}
             </option>
@@ -99,9 +123,25 @@ export default {
             <label for="config-source" class="form-label">Document Schema</label>
             <div id="config-source" class="flex-fill"></div>
           </div>
+          
           <div class="col d-flex flex-column">
             <label for="example-document" class="form-label">Example Document</label>
             <div id="example-document" class="flex-fill"></div>
+            <div class="example-document-stats d-flex flex-row">
+              <span class="col">
+                <span class="label">Average Size:</span>
+                <span>{{formatSize(this.exampleAvgBytes)}}</span>
+              </span>
+              <span class="col">
+                <span class="label">Minimum Size:</span>
+                <span>{{formatSize(this.exampleMinBytes)}}</span>
+              </span>
+              <span class="col">
+                <span class="label">Maximum Size</span>
+                <span>{{formatSize(this.exampleMaxBytes)}}</span>
+              </span>
+            </div>
+            
           </div>
         </div>
 

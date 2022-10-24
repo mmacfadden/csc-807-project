@@ -52,8 +52,8 @@ export class LoadTester {
                                             indexedDb: IDBFactory,
                                             quiet: boolean,
                                             hooks?: ILoadTesterHooks): Promise<ILoadTestResult[]> {
-    const testConfigs: ILoadTestConfig[] = encryptionConfigs.flatMap(ec => {
-      return objectStoreConfigs.map(osc => {
+    const testConfigs: ILoadTestConfig[] = objectStoreConfigs.flatMap(osc => {
+      return encryptionConfigs.map(ec => {
         return {
           encryptionConfig: ec,
           objectStoreConfig: osc,
@@ -200,8 +200,8 @@ export class LoadTester {
 
     const db = await RequestUtils.requestToPromise(openReq);
 
-    if (hooks?.moduleStarted) {
-      hooks.moduleStarted(this._idb.encryptionModuleId());
+    if (hooks?.testStarted) {
+      hooks.testStarted(this._idb.encryptionModuleId(), this._config.objectStoreConfig.name);
     }
 
     if (!quiet) {
@@ -253,6 +253,7 @@ export class LoadTester {
 
     const result: ILoadTestResult = {
       moduleId: this._idb.encryptionModuleId(),
+      schemaName: this._config.objectStoreConfig.name,
       operationCount: this._config.operationCount,
       averageDocumentSize,
       totalTimeMs,
@@ -269,8 +270,8 @@ export class LoadTester {
       console.log(`Finished Testing ${this._idb.encryptionModuleId()}`);
     }
 
-    if (hooks?.moduleFinished) {
-      hooks.moduleFinished(result);
+    if (hooks?.testFinished) {
+      hooks.testFinished(result);
     }
 
     return result;

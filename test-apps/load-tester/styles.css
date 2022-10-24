@@ -73,4 +73,16 @@ table td.number {
     display: none;
 }
 
+.example-document-stats {
+    padding: 5px 10px;
+    font-size: 12px;
+    background: #01161c;
+    color: white;
+    text-align: center;
+}
 
+.example-document-stats .label {
+
+    font-weight: bold;
+    margin-right: 5px;
+}

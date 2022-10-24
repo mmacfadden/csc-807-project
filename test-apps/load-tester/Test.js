@@ -6,6 +6,7 @@ import Config from "./TestConfig.js";
 import ALL_MODULES from "./modules.js";
 
 import {parseSchema} from "./document_schemas/utils.js";
+import {Persistence} from "./Persistence.js";
 
 const {
   LoadTester,
@@ -14,51 +15,54 @@ const {
 } = EncryptedIndexedDB;
 
 export default {
-  props: ["documentSchemas"],
   data() {
+    const config = Persistence.loadTestConfig();
     return {
       ALL_MODULES,
+      documentSchemas: Persistence.loadSchemas(),
       testingInProgress: false,
       currentModule: null,
-      totalModuleCount: 10,
-      modulesCompleted: 0,
+      currentSchema: null,
+      totalTestCount: 10,
+      testsCompleted: 0,
       documentsCompleted: 0,
-      documentsPerModule: 30,
+      documentsPerTest: 30,
       loadTester: null,
       results: [],
       resultsCsv: null,
-      testConfig: {
-        selectedModules: ALL_MODULES,
-        selectedSchemas: this.documentSchemas.slice(0)
-      }
+      selectedModules: config.selectedModules,
+      selectedSchemas: config.selectedSchemas
     }
   },
   mounted() {
   },
   methods: {
     configUpdated(config) {
-      console.log(config)
+      this.selectedModules = config.selectedModules;
+      this.selectedSchemas = config.selectedDocSchemas;
+      Persistence.saveTestConfig(config);
     },
     async onStart() {
-      const quiet = false;
+      const quiet = true;
       this.results = [];
       this.resultsCsv = null;
-      this.modulesCompleted = 0;
+      this.testsCompleted = 0;
       this.documentsCompleted = 0;
 
       const hooks = {
         testingStarted: (testConfigs) => {
-          this.totalModuleCount = testConfigs.length;
+          this.totalTestCount = testConfigs.length;
         },
-        moduleStarted: (module) => {
+        testStarted: (module, schema) => {
           this.currentModule = module;
+          this.currentSchema = schema;
           this.documentsCompleted = 0;
         },
         documentCompleted: (docCompleted) => {
           this.documentsCompleted = docCompleted;
         },
-        moduleFinished: (result) => {
-          this.modulesCompleted++;
+        testFinished: (result) => {
+          this.testsCompleted++;
           this.currentModule = null;
           this.results.push(result);
           this.documentsCompleted = 0;
@@ -67,15 +71,18 @@ export default {
 
       try {
         const encryptionConfigs = [];
-        for (let i = 0; i < this.testConfig.selectedModules.length; i++) {
-          const moduleConfig = await EncryptionConfigManager.generateConfig(this.testConfig.selectedModules[i]);
+        for (let i = 0; i < this.selectedModules.length; i++) {
+          const moduleConfig = await EncryptionConfigManager.generateConfig(this.selectedModules[i]);
           encryptionConfigs.push(moduleConfig);
         }
 
         const results = await LoadTester.testEncryptionConfigs(
             encryptionConfigs,
-            this.testConfig.selectedSchemas.map(parseSchema).map(s => s.config),
-            this.documentsPerModule,
+            this.selectedSchemas.map(parseSchema).map(s => {
+                  return {...(s.config), name: s.name}
+                }
+            ),
+            this.documentsPerTest,
             indexedDB,
             quiet,
             hooks);
@@ -123,9 +130,11 @@ export default {
     Config
   },
   template: `
-    <config 
+    <config
         :modules="ALL_MODULES"
+        :selectedModules="selectedModules"
         :schemas="documentSchemas"
+        :selectedSchemas="selectedSchemas"
         @update="configUpdated"
     />
     <h1>Controls</h1>
@@ -139,13 +148,14 @@ export default {
     <h1>Status</h1>
     <status
         :current-module="currentModule"
-        :total-modules="totalModuleCount"
-        :modules-completed="modulesCompleted"
+        :current-schema="currentSchema"
+        :total-tests="totalTestCount"
+        :tests-completed="testsCompleted"
         :documents-completed="documentsCompleted"
-        :documents-per-module="documentsPerModule"
+        :documents-per-test="documentsPerTest"
     />
     <h1>Results</h1>
-    <results :in-progress-module="currentModule" :results="results"/>
+    <results :in-progress-module="currentModule" :in-progress-schema="currentSchema" :results="results"/>
     <textarea readonly="readonly" id="results-csv">{{resultsCsv || ""}}</textarea>
   `
 }

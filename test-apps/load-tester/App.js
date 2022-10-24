@@ -1,11 +1,7 @@
-import DEFAULT_DOCUMENT_SCHEMAS from "./document_schemas/all_schemas.js";
+
+import {Persistence} from "./Persistence.js";
 
 export default {
-  data() {
-    return {
-      documentSchemas: DEFAULT_DOCUMENT_SCHEMAS
-    }
-  },
   template: `
     <nav class="navbar navbar-expand navbar-dark bg-dark">
     <div class="container-fluid">
@@ -32,7 +28,7 @@ export default {
     </div>
     </nav>
     <div class="d-flex flex-fill flex-column" id="main">
-      <router-view :document-schemas="documentSchemas"></router-view>
+      <router-view></router-view>
     </div>
   `
 }

@@ -8,6 +8,11 @@ export interface ILoadTestResult {
   moduleId: string;
 
   /**
+   * The name of the Document Schema used in the test.
+   */
+  schemaName: string;
+
+  /**
    * The number of read/write operations performed.
    */
   operationCount: number;
