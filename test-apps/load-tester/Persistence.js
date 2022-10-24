@@ -20,6 +20,7 @@ export class Persistence {
   }
 
   static loadTestConfig() {
+    // FIXME take the enabled by default flag into consideration for the schemas.
     const data = localStorage.getItem(Persistence.TEST_CONFIG_KEY);
     if (data) {
       return JSON.parse(data);

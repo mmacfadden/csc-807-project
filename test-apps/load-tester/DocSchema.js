@@ -93,7 +93,7 @@ export default {
     onSelect(e) {
       const schemaName = e.target.selectedOptions[0].value;
       this.selectedSchema = this.documentSchemas.find(s => s.name === schemaName);
-      console.log(this.selectedSchema)
+
       this.updateConfig();
       this.updateExampleDoc();
     }
@@ -105,7 +105,7 @@ export default {
       <div class="col-auto d-flex">
         <div class="flex-fill d-flex flex-column">
           <label for="config-select" class="form-label">Select Schema</label>
-          <select @change="onSelect" class="form-select flex-fill" id="config-select" aria-label="Select Schema">
+          <select @change="onSelect" class="form-select flex-fill" id="config-select" size="4" aria-label="Select Schema">
             <option v-for="schema in documentSchemas" :value="schema.name" :selected="schema === this.selectedSchema">
               {{ schema.name }}
             </option>

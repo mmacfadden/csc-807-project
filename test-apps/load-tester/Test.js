@@ -39,7 +39,7 @@ export default {
   methods: {
     configUpdated(config) {
       this.selectedModules = config.selectedModules;
-      this.selectedSchemas = config.selectedDocSchemas;
+      this.selectedSchemas = config.selectedSchemas;
       Persistence.saveTestConfig(config);
     },
     async onStart() {
