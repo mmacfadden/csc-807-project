@@ -1,6 +1,3 @@
-
-import {Persistence} from "./Persistence.js";
-
 export default {
   template: `
     <nav class="navbar navbar-expand navbar-dark bg-dark">

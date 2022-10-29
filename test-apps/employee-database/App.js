@@ -24,7 +24,7 @@ export default  {
           .then(() => {
               this.initialized = true;
               if (this.authManager.isAuthenticated()) {
-                  this.onLogin();
+                  return this.onLogin();
               }
           })
           .catch(e => {
@@ -42,7 +42,7 @@ export default  {
             this.user = this.authManager.getLoggedInUserName();
 
             this.indexedDb = new EIDBFactory(window.indexedDB, this.authManager.getEncryptionConfig());
-            await this.indexedDb.initEncryption();
+            this.indexedDb.initEncryption();
 
             const req = this.indexedDb.open("employees", 1);
             req.onupgradeneeded = () => {

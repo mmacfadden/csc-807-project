@@ -34,6 +34,7 @@
     "fake-indexeddb": "^4.0.0",
     "fs-extra": "^10.1.0",
     "gm-crypto": "^0.1.8",
+    "highcharts": "^10.2.1",
     "ignore-loader": "^0.1.2",
     "indexeddb": "^0.0.0",
     "jquery": "^3.6.1",
