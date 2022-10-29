@@ -1,5 +1,3 @@
-import * as CryptoJS from "crypto-js";
-import {ModuleCryptoJs} from "./ModuleCryptoJs";
 import {ModuleCryptoJsAes} from "./ModuleCryptoJsAes";
 
 /**

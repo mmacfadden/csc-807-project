@@ -1,5 +1,3 @@
-import * as CryptoJS from "crypto-js";
-import {ModuleCryptoJs} from "./ModuleCryptoJs";
 import {ModuleCryptoJsAes} from "./ModuleCryptoJsAes";
 
 /**
@@ -19,6 +17,5 @@ export class ModuleCryptoJsAes128 extends ModuleCryptoJsAes {
    */
   constructor() {
     super(ModuleCryptoJsAes128.MODULE_ID, 128);
-
   }
 }

@@ -21,17 +21,15 @@ export class ModuleChaCha20 extends SymmetricEncryptionBasedModule {
     this._nonceLen = 12;
   }
 
-  public createRandomEncryptionSecret(): Promise<string> {
-    const key = Base64.fromUint8Array(randomBytes(32));
-    return Promise.resolve(key);
+  public createRandomEncryptionSecret(): string {
+    return Base64.fromUint8Array(randomBytes(32));
   }
 
-  public init(encryptionSecret: string): Promise<void> {
+  public init(encryptionSecret: string): void {
     this._key = Base64.toUint8Array(encryptionSecret);
-    return Promise.resolve();
   }
 
-  protected _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
+  protected _encryptSerializedDocument(plainText: Uint8Array): Uint8Array {
     const nonce = randomBytes(this._nonceLen);
     const encrypted = new Chacha20(this._key!, nonce).encrypt(plainText);
 
@@ -40,14 +38,12 @@ export class ModuleChaCha20 extends SymmetricEncryptionBasedModule {
     fullMessage.set(nonce);
     fullMessage.set(encrypted, nonce.length);
 
-    return Promise.resolve(fullMessage);
+    return fullMessage;
   }
 
-  protected _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
+  protected _decryptSerializedDocument(cipherText: Uint8Array): Uint8Array {
     const nonce = cipherText.slice(0, this._nonceLen);
     const message = cipherText.slice(this._nonceLen, cipherText.length);
-    const decrypted = new Chacha20(this._key!, nonce).decrypt(message);
-
-    return Promise.resolve(decrypted);
+    return new Chacha20(this._key!, nonce).decrypt(message);
   }
 }

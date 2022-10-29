@@ -34,12 +34,12 @@ export abstract class ModuleNodeCrypto extends SymmetricEncryptionBasedModule {
     this._encryptionKey = Buffer.from(secret, "base64");
   }
 
-  public createRandomEncryptionSecret(): Promise<string> {
+  public createRandomEncryptionSecret(): string {
     const key = crypto.randomBytes(this._keyLen);
-    return Promise.resolve(key.toString("base64"));
+    return key.toString("base64");
   }
 
-  protected _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
+  protected _encryptSerializedDocument(plainText: Uint8Array): Uint8Array {
     const salt = new Uint8Array(crypto.randomBytes(this._saltLen));
     const saltedData = new Uint8Array(plainText.length + salt.length);
     saltedData.set(salt);
@@ -50,19 +50,17 @@ export abstract class ModuleNodeCrypto extends SymmetricEncryptionBasedModule {
     const encryptedData = cipher.update(saltedData);
     cipher.final();
 
-    const payload = new Uint8Array(Buffer.concat([iv, encryptedData]));
-    return Promise.resolve(payload);
+    return new Uint8Array(Buffer.concat([iv, encryptedData]));
   }
 
-  protected _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
+  protected _decryptSerializedDocument(cipherText: Uint8Array): Uint8Array {
     const iv = cipherText.slice(0, this._ivLen);
     const encryptedData = cipherText.slice(this._ivLen);
     const decipher = crypto.createDecipheriv(this._algo, this._encryptionKey!, iv, this._cipherOptions);
     const decryptedContent = decipher.update(encryptedData);
 
     const saltedData = new Uint8Array(decryptedContent);
-    const plainText = saltedData.slice(this._saltLen);
 
-    return Promise.resolve(plainText)
+    return saltedData.slice(this._saltLen);
   }
 }

@@ -10,7 +10,7 @@ export class EIDBCursorWithValue extends EIDBCursor implements IDBCursorWithValu
         this._encryptionModule = encryptionModule;
     }
 
-    get value(): Promise<any> {
+    get value(): any {
         const doc = <IEncryptedDocument>(<IDBCursorWithValue>this._cursor).value
         return this._encryptionModule.decrypt(doc.value);
     }

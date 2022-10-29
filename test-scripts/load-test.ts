@@ -80,7 +80,7 @@ async function test() {
       quiet
   );
 
-  console.log(results);
+  console.log(JSON.stringify(results));
 }
 
 test();

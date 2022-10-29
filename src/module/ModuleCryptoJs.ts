@@ -22,39 +22,37 @@ export abstract class ModuleCryptoJs extends SymmetricEncryptionBasedModule {
     this._key = null;
   }
 
-  public async createRandomEncryptionSecret(): Promise<string> {
+  public createRandomEncryptionSecret(): string {
     const key = CryptoJS.lib.WordArray.random(this._keyBytes);
     return CryptoJS.enc.Base64.stringify(key);
   }
 
-  public async init(encryptionSecret: string): Promise<void> {
+  public init(encryptionSecret: string): void {
     this._key = CryptoJS.enc.Base64.parse(encryptionSecret);
   }
 
   /**
    * @inheritDoc
    */
-  protected async _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
+  protected _encryptSerializedDocument(plainText: Uint8Array): Uint8Array {
     const wordArray = CryptoJsUtils.convertUint8ArrayToWordArray(plainText);
     const iv = CryptoJS.lib.WordArray.random(this._ivBytes);
     const result = this._encrypt(wordArray, this._key!, iv);
     const cipherText = CryptoJS.lib.WordArray.create().concat(iv).concat(result.ciphertext);
-    const bytes =  CryptoJsUtils.convertWordArrayToUint8Array(cipherText);
-    return bytes
+    return CryptoJsUtils.convertWordArrayToUint8Array(cipherText);
   }
 
   /**
    * @inheritDoc
    */
-  protected async _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
+  protected _decryptSerializedDocument(cipherText: Uint8Array): Uint8Array {
     const ciphertextWords = CryptoJsUtils.convertUint8ArrayToWordArray(cipherText);
     const iv = CryptoJS.lib.WordArray.create(ciphertextWords.words.slice(0, 4));
     ciphertextWords.words.splice(0, this._ivBytes / 4);
     ciphertextWords.sigBytes -= this._ivBytes;
     const params =  CryptoJS.lib.CipherParams.create({ ciphertext: ciphertextWords });
     const ptWords = this._decrypt(params, this._key!, iv);
-    const ptBytes =  CryptoJsUtils.convertWordArrayToUint8Array(ptWords);
-    return ptBytes;
+    return CryptoJsUtils.convertWordArrayToUint8Array(ptWords);
   }
 
   protected abstract _encrypt(plainText: CryptoJS.lib.WordArray,

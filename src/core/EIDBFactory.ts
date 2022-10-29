@@ -28,8 +28,8 @@ export class EIDBFactory implements IDBFactory {
         return this._encryptionModule.moduleId();
     }
 
-    public initEncryption(): Promise<void> {
-        return this._encryptionModule.init(this._encryptionConfig.dataSecret, this._encryptionConfig.moduleParams)
+    public initEncryption(): void {
+        this._encryptionModule.init(this._encryptionConfig.dataSecret, this._encryptionConfig.moduleParams)
     }
 
     public cmp(first: any, second: any): number {

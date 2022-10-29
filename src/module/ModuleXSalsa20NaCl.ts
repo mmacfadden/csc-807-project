@@ -18,17 +18,15 @@ export class ModuleXSalsa20NaCl extends SymmetricEncryptionBasedModule {
     this._key = null;
   }
 
-  public createRandomEncryptionSecret(): Promise<string> {
-    const key = encodeBase64(randomBytes(secretbox.keyLength));
-    return Promise.resolve(key);
+  public createRandomEncryptionSecret(): string {
+    return encodeBase64(randomBytes(secretbox.keyLength));
   }
 
-  public init(encryptionSecret: string): Promise<void> {
+  public init(encryptionSecret: string): void {
     this._key = decodeBase64(encryptionSecret);
-    return Promise.resolve();
   }
 
-  protected _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
+  protected _encryptSerializedDocument(plainText: Uint8Array): Uint8Array {
     const nonce = randomBytes(secretbox.nonceLength);
     const box = secretbox(plainText, nonce, this._key!);
 
@@ -36,10 +34,10 @@ export class ModuleXSalsa20NaCl extends SymmetricEncryptionBasedModule {
     fullMessage.set(nonce);
     fullMessage.set(box, nonce.length);
 
-    return Promise.resolve(fullMessage);
+    return fullMessage;
   }
 
-  protected _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
+  protected _decryptSerializedDocument(cipherText: Uint8Array): Uint8Array {
     const nonce = cipherText.slice(0, secretbox.nonceLength);
     const message = cipherText.slice(secretbox.nonceLength, cipherText.length);
     const decrypted = secretbox.open(message, nonce, this._key!);
@@ -48,6 +46,6 @@ export class ModuleXSalsa20NaCl extends SymmetricEncryptionBasedModule {
       throw new Error("Could not decrypt message");
     }
 
-    return Promise.resolve(decrypted);
+    return decrypted;
   }
 }

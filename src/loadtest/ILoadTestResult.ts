@@ -19,6 +19,10 @@ export interface ILoadTestResult {
 
   averageDocumentSize: number;
 
+  writes: IDocIoRecord[];
+
+  reads: IDocIoRecord[];
+
   /**
    * The total time reading and writing in milliseconds.
    */
@@ -48,4 +52,11 @@ export interface ILoadTestResult {
    * The average write throughput in kBps.
    */
   avgWriteThroughputKbps: number;
+
+
+}
+
+export interface IDocIoRecord {
+  docSize: number;
+  timeMs: number;
 }

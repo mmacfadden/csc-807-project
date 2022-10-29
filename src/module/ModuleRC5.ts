@@ -21,23 +21,22 @@ export class ModuleRC5 extends SymmetricEncryptionBasedModule {
     this._rc5 = null;
   }
 
-  public createRandomEncryptionSecret(): Promise<string> {
-    return Promise.resolve(RandomStringGenerator.generate(255));
+  public createRandomEncryptionSecret(): string {
+    return RandomStringGenerator.generate(255);
   }
 
-  public init(encryptionSecret: string): Promise<void>  {
+  public init(encryptionSecret: string): void  {
     this._rc5 = new RC5(encryptionSecret, this._blockSize, this._rounds);
-    return Promise.resolve();
   }
 
 
-  protected _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
+  protected _encryptSerializedDocument(plainText: Uint8Array): Uint8Array {
     const encrypted = this._rc5!.encrypt(Buffer.from(plainText));
-    return Promise.resolve(new Uint8Array(encrypted));
+    return new Uint8Array(encrypted);
   }
 
-  protected _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
+  protected _decryptSerializedDocument(cipherText: Uint8Array): Uint8Array {
     const decrypted = this._rc5!.decrypt(Buffer.from(cipherText));
-    return Promise.resolve(new Uint8Array(decrypted));
+    return new Uint8Array(decrypted);
   }
 }

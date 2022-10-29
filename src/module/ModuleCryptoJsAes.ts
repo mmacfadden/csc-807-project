@@ -1,16 +1,5 @@
 import * as CryptoJS from "crypto-js";
-import {SymmetricEncryptionBasedModule} from "./SymmetricEncryptionBasedModule";
-import {CryptoJsUtils} from "../util/CryptoJsUtils";
-import {RandomStringGenerator} from "../util";
 import {ModuleCryptoJs} from "./ModuleCryptoJs";
-
-
-interface CipherOption {
-  /**
-   * The IV to use for this operation.
-   */
-  iv?: CryptoJS.lib.WordArray | undefined;
-}
 
 /**
  */
@@ -38,5 +27,4 @@ export abstract class ModuleCryptoJsAes extends ModuleCryptoJs {
                      iv: CryptoJS.lib.WordArray): CryptoJS.lib.WordArray {
     return CryptoJS.AES.decrypt(cipherText, key, {iv: iv});
   }
-
 }

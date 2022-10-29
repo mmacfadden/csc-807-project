@@ -1,4 +1,4 @@
-import {EIDBFactory, IEncryptionConfig, ObjectSizeCalculator} from "../";
+import {EIDBFactory, IDocIoRecord, IEncryptionConfig, ObjectSizeCalculator} from "../";
 import {Timing} from "./Timing";
 import {ILoadTesterHooks} from "./ILoadTesterHooks";
 import {ILoadTestResult} from "./ILoadTestResult";
@@ -172,6 +172,7 @@ export class LoadTester {
     }
 
     this._idb = EIDBFactory.create(indexedDb, config.encryptionConfig);
+    this._idb.initEncryption();
   }
 
   /**
@@ -208,26 +209,30 @@ export class LoadTester {
       console.log(`Testing ${this._idb.encryptionModuleId()}`);
     }
 
-    await this._idb.initEncryption();
-
     Timing.startMeasurementSession();
 
     let totalBytes = 0;
 
+    const reads: IDocIoRecord[] = [];
+    const writes: IDocIoRecord[] = [];
+
     for (let i = 0; i < this._config.operationCount; i++) {
       const doc: any = DocumentGenerator.generateDocument(this._config.objectStoreConfig.documentSchema);
-      totalBytes += ObjectSizeCalculator.sizeOf(doc);
+      const docSize = ObjectSizeCalculator.sizeOf(doc);
+      totalBytes += docSize;
 
       const tx = db.transaction(LoadTester._OBJECT_STORE_NAME, "readwrite");
       const store = tx.objectStore(LoadTester._OBJECT_STORE_NAME);
 
       Timing.writeStart(i);
       await RequestUtils.requestToPromise(store.add(doc));
-      Timing.writeEnd(i);
+      const readTime = Timing.writeEnd(i);
+      writes.push({docSize, timeMs: readTime});
 
       Timing.readStart(i);
       await RequestUtils.requestToPromise(store.get(doc.id));
-      Timing.readEnd(i);
+      const writeTime = Timing.readEnd(i);
+      reads.push({docSize, timeMs: writeTime});
 
       // Clear the store to make sure we don't have any id conflicts. This does not
       // need to be part of the timing.
@@ -255,6 +260,8 @@ export class LoadTester {
       moduleId: this._idb.encryptionModuleId(),
       schemaName: this._config.objectStoreConfig.name,
       operationCount: this._config.operationCount,
+      reads,
+      writes,
       averageDocumentSize,
       totalTimeMs,
       averageWriteTimeMs,

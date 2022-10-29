@@ -81,13 +81,12 @@ export class EIDBObjectStore implements IDBObjectStore {
         const getReq = this._store.get(encryptedQuery);
         getReq.onsuccess = () => {
             const encryptedDoc = <IEncryptedDocument>getReq.result;
-            this._encryptionModule.decrypt(encryptedDoc.value)
-                .then(v => {
-                    result.succeed(v);
-                })
-                .catch(e => {
-                    result.fail(e);
-                });
+            try {
+                const v = this._encryptionModule.decrypt(encryptedDoc.value)
+                result.succeed(v);
+            } catch (e) {
+                result.fail(e as DOMException);
+            }
         }
 
         return result;
@@ -101,16 +100,12 @@ export class EIDBObjectStore implements IDBObjectStore {
         const getReq = this._store.getAll(encryptedQuery);
         getReq.onsuccess = () => {
             const encryptedDocs = <IEncryptedDocument[]>getReq.result;
-            const promises = encryptedDocs.map(encryptedDoc => {
-                return this._decrypt(encryptedDoc);
-            });
-            Promise.all(promises)
-                .then(docs => {
-                    result.succeed(docs);
-                })
-                .catch(e => {
-                    result.fail(e);
-                });
+            try {
+                const docs = encryptedDocs.map(encryptedDoc => this._decrypt(encryptedDoc))
+                result.succeed(docs);
+            } catch (e) {
+              result.fail(e as DOMException);
+            }
         }
 
         return result;
@@ -147,9 +142,9 @@ export class EIDBObjectStore implements IDBObjectStore {
         );
     }
 
-    private async _encrypt(value: any): Promise<IEncryptedDocument> {
+    private _encrypt(value: any): IEncryptedDocument {
         const key = this._extractAndEncryptKeys(value, this.keyPath);
-        const encryptedValue = await this._encryptionModule.encrypt(value);
+        const encryptedValue = this._encryptionModule.encrypt(value);
         return {
             key,
             indices: [],
@@ -157,24 +152,30 @@ export class EIDBObjectStore implements IDBObjectStore {
         };
     }
 
-    private async _decrypt(value: IEncryptedDocument): Promise<any> {
-        return await this._encryptionModule.decrypt(value.value);
+    private _decrypt(value: IEncryptedDocument): any {
+        return this._encryptionModule.decrypt(value.value);
     }
 
     private _encryptAndStore(value: any, key: IDBValidKey | undefined, storeMethod: (value: any, key?: IDBValidKey) => IDBRequest): IDBRequest<IDBValidKey> {
         const result = new MutableIDBRequest<IDBValidKey>(this, this.transaction);
-        this._encrypt(value)
-            .then((v) => {
-                const req = storeMethod(v, key);
+        try {
+            const v =  this._encrypt(value);
+            const req = storeMethod(v, key);
 
-                req.onsuccess = () => {
-                    result.succeed(req.result);
-                }
+            req.onsuccess = () => {
+              result.succeed(req.result);
+            }
 
-                req.onerror = () => {
-                    result.fail(req.error!);
-                }
-            });
+            req.onerror = () => {
+              result.fail(req.error!);
+            }
+        } catch (e) {
+            // Need to do this async so that the event gets emitted
+            // after the caller has a chance to bind to the events.
+            setTimeout(() => {
+              result.fail(e as DOMException);
+            }, 0);
+        }
 
         return result;
     }

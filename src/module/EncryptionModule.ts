@@ -22,14 +22,14 @@ export abstract class EncryptionModule {
     return this._id;
   }
 
-  public abstract createRandomEncryptionSecret(moduleParams?: any): Promise<string>;
+  public abstract createRandomEncryptionSecret(moduleParams?: any): string;
 
   /**
    * A helper method that subclasses can override if they need
    * to initialize any data asynchronously before being ready
    * to encrypt / decrypt data.
    */
-  public abstract init(encryptionSecret: string, moduleParams?: any): Promise<void>;
+  public abstract init(encryptionSecret: string, moduleParams?: any): void;
 
 
   /**
@@ -38,7 +38,7 @@ export abstract class EncryptionModule {
    * @param document
    *   The unencrypted data to encrypt.
    */
-  public abstract encrypt(document: any): Promise<any>;
+  public abstract encrypt(document: any): any;
 
   /**
    * Asynchronously decrypts object data.
@@ -46,5 +46,5 @@ export abstract class EncryptionModule {
    * @param cipherText
    *   The encrypted text to decrypt.
    */
-  public abstract decrypt(cipherText: any): Promise<any>;
+  public abstract decrypt(cipherText: any): any;
 }

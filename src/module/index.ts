@@ -7,8 +7,6 @@ export * from "./ModuleClearText";
 export * from "./ModuleNodeCryptoAes128";
 export * from "./ModuleNodeCryptoAes256";
 export * from "./ModuleNodeCryptoChaCha20";
-export * from "./ModuleWebCryptoAes128";
-export * from "./ModuleWebCryptoAes256";
 export * from "./ModuleBlowfish";
 export * from "./ModuleTwoFish";
 export * from "./ModuleRC5";

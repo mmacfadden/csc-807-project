@@ -20,17 +20,16 @@ export class ModuleSM4CBC extends SymmetricEncryptionBasedModule {
     this._key = null;
   }
 
-  public createRandomEncryptionSecret(): Promise<string> {
-    return Promise.resolve(ModuleSM4CBC._randomHex(16));
+  public createRandomEncryptionSecret(): string {
+    return ModuleSM4CBC._randomHex(16);
   }
 
-  public init(encryptionSecret: string): Promise<void> {
+  public init(encryptionSecret: string): void {
     this._key = encryptionSecret;
-    return Promise.resolve();
   }
 
 
-  protected _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
+  protected _encryptSerializedDocument(plainText: Uint8Array): Uint8Array {
     const ivHex = ModuleSM4CBC._randomHex(16);
     const encryptedData =
         SM4.encrypt(plainText.buffer, this._key!, {iv: ivHex, mode: SM4.constants.CBC});
@@ -49,11 +48,11 @@ export class ModuleSM4CBC extends SymmetricEncryptionBasedModule {
     result.set(ivBytes, ptLenBytes.length);
     result.set(encryptedBytes, ptLenBytes.length + ivBytes.length)
 
-    return Promise.resolve(result);
+    return result;
   }
 
 
-  protected _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
+  protected _decryptSerializedDocument(cipherText: Uint8Array): Uint8Array {
     const ptLen = (new Int32Array(cipherText.slice(0, 4).buffer))[0];
     const ivLen = 16;
     const ivBytes = cipherText.slice(4, 4 + ivLen);
@@ -63,8 +62,6 @@ export class ModuleSM4CBC extends SymmetricEncryptionBasedModule {
     const decryptedData =
         SM4.decrypt(encryptedBytes.buffer, this._key!, {iv: ivHex, mode: SM4.constants.CBC});
 
-    const result = new Uint8Array(decryptedData).slice(0, ptLen);
-
-    return Promise.resolve(result);
+    return new Uint8Array(decryptedData).slice(0, ptLen);
   }
 }

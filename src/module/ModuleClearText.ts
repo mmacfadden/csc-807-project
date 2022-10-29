@@ -16,22 +16,21 @@ export class ModuleClearText extends EncryptionModule {
   /**
    * @inheritDoc
    */
-  public async encrypt(document: any): Promise<any> {
+  public encrypt(document: any): any {
     return document;
   }
 
   /**
    * @inheritDoc
    */
-  public async decrypt(cipherText: any): Promise<any> {
+  public decrypt(cipherText: any): any {
     return cipherText;
   }
 
-  createRandomEncryptionSecret(): Promise<string> {
-    return Promise.resolve("");
+  createRandomEncryptionSecret(): string {
+    return "";
   }
 
-  init(encryptionSecret: string): Promise<void> {
-    return Promise.resolve(undefined);
+  init(encryptionSecret: string): void {
   }
 }

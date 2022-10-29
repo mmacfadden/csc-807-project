@@ -5,15 +5,15 @@ import {
   ModuleCryptoJsAes128,
   ModuleCryptoJsAes256,
   ModuleCryptoJsTripleDes,
-  ModuleWebCryptoAes256,
-  ModuleWebCryptoAes128,
   ModuleNodeCryptoAes256,
   ModuleNodeCryptoAes128,
   ModuleNodeCryptoChaCha20,
   ModuleRC5,
-  ModuleXSalsa20NaCl, ModuleChaCha20, ModuleSM4CBC
+  ModuleXSalsa20NaCl,
+  ModuleChaCha20,
+  ModuleSM4CBC,
+  ModuleTwoFish
 } from "./";
-import {ModuleTwoFish} from "./ModuleTwoFish";
 
 /**
  * A factory class that creates a WebStorageEncryptionModule based on a
@@ -41,12 +41,6 @@ export class EncryptionModuleFactory {
 
       case ModuleCryptoJsTripleDes.MODULE_ID:
         return new ModuleCryptoJsTripleDes();
-
-      case ModuleWebCryptoAes128.MODULE_ID:
-        return new ModuleWebCryptoAes128();
-
-      case ModuleWebCryptoAes256.MODULE_ID:
-        return new ModuleWebCryptoAes256();
 
       case ModuleNodeCryptoAes128.MODULE_ID:
         return new ModuleNodeCryptoAes128();

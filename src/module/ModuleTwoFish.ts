@@ -27,18 +27,18 @@ export class ModuleTwoFish extends SymmetricEncryptionBasedModule {
     this._key = null;
   }
 
-  public async createRandomEncryptionSecret(): Promise<string> {
+  public createRandomEncryptionSecret(): string {
     return RandomStringGenerator.generate(32);
   }
 
-  public async init(encryptionSecret: string): Promise<void> {
+  public init(encryptionSecret: string): void {
     this._key = this._twofish.stringToByteArray(encryptionSecret);
   }
 
   /**
    * @inheritDoc
    */
-  protected async _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
+  protected _encryptSerializedDocument(plainText: Uint8Array): Uint8Array {
     const ptBytes = [...plainText];
     const ctBytes = this._twofish.encrypt(this._key!, ptBytes);
     const data = Uint8Array.from(ctBytes);
@@ -60,7 +60,7 @@ export class ModuleTwoFish extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-  protected async _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
+  protected _decryptSerializedDocument(cipherText: Uint8Array): Uint8Array {
     const ptLen = new Int32Array(cipherText.buffer);
     const ctBytes = cipherText.slice(4);
     const ptBytes = this._twofish.decrypt(this._key!, [...ctBytes]);

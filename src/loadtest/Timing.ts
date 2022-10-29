@@ -13,8 +13,9 @@ export class Timing {
   private static _WRITE_START = "write_start_";
   private static _WRITE_END = "write_end_";
 
+
   /**
-   * Indicates that a storage read operation has begun.
+   * Indicates that a read operation has begun.
    *
    * @param i
    *   The unique sequential id of the read operation.
@@ -24,20 +25,22 @@ export class Timing {
   }
 
   /**
-   * Indicates that a storage read operation has ended.
+   * Indicates that a read operation has ended.
    *
    * @param i
    *   The unique sequential id of the read operation.
    */
-  public static readEnd(i: number): void {
+  public static readEnd(i: number): number {
     const endMark = Timing._READ_END + i;
     globalThis.performance.mark(Timing._READ_END + i);
-    globalThis.performance.measure(
+    const measure = globalThis.performance.measure(
       Timing._READ, Timing._READ_START + i, endMark);
+
+    return measure.duration;
   }
 
   /**
-   * Indicates that a storage write operation has begun.
+   * Indicates that a write operation has begun.
    *
    * @param i
    *   The unique sequential id of the write operation.
@@ -48,16 +51,18 @@ export class Timing {
 
 
   /**
-   * Indicates that a storage write operation has ended.
+   * Indicates that a write operation has ended.
    *
    * @param i
    *   The unique sequential id of the write operation.
    */
-  public static writeEnd(i: number): void {
+  public static writeEnd(i: number): number {
     const endMark = Timing._WRITE_END + i;
     globalThis.performance.mark(Timing._WRITE_END + i);
-    globalThis.performance.measure(
+    const measure = globalThis.performance.measure(
       Timing._WRITE, Timing._WRITE_START + i, endMark);
+
+    return measure.duration;
   }
 
   /**
@@ -90,7 +95,7 @@ export class Timing {
 
   private static _getTotal(name: string): number {
     let total = 0;
-    const entries = globalThis.performance.getEntriesByName( name);
+    const entries = globalThis.performance.getEntriesByName(name);
     for(const e of entries) {
       total += e.duration
     }

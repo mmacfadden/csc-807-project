@@ -22,7 +22,7 @@ export abstract class SymmetricEncryptionBasedModule extends EncryptionModule {
    * @param plainText
    *   The unencrypted data to encrypt.
    */
-  public encrypt(plainText: any): Promise<Uint8Array> {
+  public encrypt(plainText: any): Uint8Array {
     const serialized = encode(plainText);
     return this._encryptSerializedDocument(serialized);
   }
@@ -33,14 +33,12 @@ export abstract class SymmetricEncryptionBasedModule extends EncryptionModule {
    * @param cipherText
    *   The encrypted text to decrypt.
    */
-  public decrypt(cipherText: Uint8Array): Promise<any> {
-    return this._decryptSerializedDocument(cipherText)
-        .then(deserialized => {
-          return decode(deserialized);
-        });
+  public decrypt(cipherText: Uint8Array): any {
+    const deserialized = this._decryptSerializedDocument(cipherText)
+    return decode(deserialized);
   }
 
-  protected abstract _encryptSerializedDocument(plaintext: Uint8Array): Promise<Uint8Array>;
+  protected abstract _encryptSerializedDocument(plaintext: Uint8Array): Uint8Array;
 
-  protected abstract _decryptSerializedDocument(ciphertext: Uint8Array): Promise<Uint8Array>;
+  protected abstract _decryptSerializedDocument(ciphertext: Uint8Array): Uint8Array;
 }

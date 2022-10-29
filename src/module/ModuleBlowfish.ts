@@ -27,29 +27,27 @@ export class ModuleBlowfish extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-  public async _encryptSerializedDocument(plainText: Uint8Array): Promise<Uint8Array> {
+  public _encryptSerializedDocument(plainText: Uint8Array): Uint8Array {
     return this._bf!.encode(plainText);
   }
 
   /**
    * @inheritDoc
    */
-  public async _decryptSerializedDocument(cipherText: Uint8Array): Promise<Uint8Array> {
+  public _decryptSerializedDocument(cipherText: Uint8Array): Uint8Array {
     return this._bf!.decode(cipherText, Blowfish.TYPE.UINT8_ARRAY);
   }
 
-  createRandomEncryptionSecret(): Promise<string> {
+  public createRandomEncryptionSecret(): string {
     const key = RandomStringGenerator.generate(32);
     const iv = RandomStringGenerator.generate(8);
-    return Promise.resolve(iv + key);
+    return iv + key;
   }
 
-  init(encryptionSecret: string): Promise<void> {
+  public init(encryptionSecret: string): void {
     const iv = encryptionSecret.slice(0, 8);
     const key = encryptionSecret.slice(8);
     this._bf = new Blowfish(key, Blowfish.MODE.ECB, Blowfish.PADDING.NULL);
     this._bf.setIv(iv);
-
-    return Promise.resolve(undefined);
   }
 }
