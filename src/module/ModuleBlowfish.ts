@@ -38,13 +38,20 @@ export class ModuleBlowfish extends SymmetricEncryptionBasedModule {
     return this._bf!.decode(cipherText, Blowfish.TYPE.UINT8_ARRAY);
   }
 
+  /**
+   * @inheritDoc
+   */
   public createRandomEncryptionSecret(): string {
     const key = RandomStringGenerator.generate(32);
     const iv = RandomStringGenerator.generate(8);
     return iv + key;
   }
 
-  public init(encryptionSecret: string): void {
+  /**
+   * @inheritDoc
+   */
+  public init(encryptionSecret: string, moduleParams?: any): void {
+    super.init(encryptionSecret, moduleParams);
     const iv = encryptionSecret.slice(0, 8);
     const key = encryptionSecret.slice(8);
     this._bf = new Blowfish(key, Blowfish.MODE.ECB, Blowfish.PADDING.NULL);

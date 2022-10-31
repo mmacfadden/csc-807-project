@@ -1,18 +1,19 @@
-
-import {ModuleSM4CBC, ModuleXSalsa20NaCl} from "../src/";
+import {ModuleCryptoJsAes256, ModuleSM4CBC, ModuleXSalsa20NaCl} from "../src/";
 
 
 async function test() {
-  const value = "my string";
+  const value = {
+    id: 'dd067c33-6b7e-536e-9ee4-46b819645c84'
+  };
 
-  const module = new ModuleSM4CBC();
-  const encryptionSecret = await module.createRandomEncryptionSecret();
-  await module.init(encryptionSecret);
+  const module = new ModuleCryptoJsAes256();
+  const encryptionSecret = module.createRandomEncryptionSecret();
+  module.init(encryptionSecret);
 
-  const encrypted = await module.encrypt(value);
-  const decrypted = await module.decrypt(encrypted);
+  const encrypted = module.encrypt(value);
+  const decrypted = module.decrypt(encrypted);
 
-  console.log(decrypted);
+  // console.log(decrypted);
 }
 
 

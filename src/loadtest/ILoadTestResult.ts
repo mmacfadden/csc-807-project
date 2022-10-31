@@ -39,7 +39,7 @@ export interface ILoadTestResult {
   averageWriteTimeMs: number;
 
   /**
-   * The average time of for a write followed by a read in milliseconds.
+   * The average time of a write followed by a read in milliseconds.
    */
   averageReadWriteTimeMs: number;
 
@@ -52,7 +52,6 @@ export interface ILoadTestResult {
    * The average write throughput in kBps.
    */
   avgWriteThroughputKbps: number;
-
 
 }
 

@@ -1,7 +1,9 @@
 import {MOCK_CUSTOMER} from "./customer.js";
-import {MOCK_IMAGE} from "./image.js";
+import {BASE_64_IMAGE} from "./image.js";
+import {INVENTORY_ITEM} from "./inventory_item.js";
 
 export default [
   MOCK_CUSTOMER,
-  MOCK_IMAGE
+  BASE_64_IMAGE,
+  INVENTORY_ITEM
 ];

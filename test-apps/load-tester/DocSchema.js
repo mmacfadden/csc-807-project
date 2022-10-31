@@ -100,7 +100,7 @@ export default {
   },
   template: `
     <div class="d-flex flex-fill flex-column">
-    <h1>Document Schemas</h1>
+    <h1><i class="fa-solid fa-file-code"></i> Document Schemas</h1>
     <div class="row flex-fill">
       <div class="col-auto d-flex">
         <div class="flex-fill d-flex flex-column">
@@ -115,15 +115,18 @@ export default {
       <div class="col d-flex flex-column">
         <div class="mb-3">
           <label for="config-name" class="form-label">Configuration Name</label>
-          <input type="text" class="form-control" id="config-name" placeholder="Config Name" required
-                 v-model="this.selectedSchema.name">
+          <input type="text" 
+                 class="form-control" 
+                 id="config-name" 
+                 placeholder="Config Name" required
+                 v-model="this.selectedSchema.name"
+          />
         </div>
         <div class="row flex-fill flex-row">
           <div class="col d-flex flex-column">
             <label for="config-source" class="form-label">Document Schema</label>
             <div id="config-source" class="flex-fill"></div>
           </div>
-          
           <div class="col d-flex flex-column">
             <label for="example-document" class="form-label">Example Document</label>
             <div id="example-document" class="flex-fill"></div>
@@ -141,10 +144,8 @@ export default {
                 <span>{{formatSize(this.exampleMaxBytes)}}</span>
               </span>
             </div>
-            
           </div>
         </div>
-
       </div>
     </div>
     </div>

@@ -230,7 +230,8 @@ export class LoadTester {
       writes.push({docSize, timeMs: readTime});
 
       Timing.readStart(i);
-      await RequestUtils.requestToPromise(store.get(doc.id));
+      const key = this._extractKeyFromDocument(doc);
+      await RequestUtils.requestToPromise(store.get(key));
       const writeTime = Timing.readEnd(i);
       reads.push({docSize, timeMs: writeTime});
 
@@ -282,5 +283,32 @@ export class LoadTester {
     }
 
     return result;
+  }
+
+  private _extractKeyFromDocument(doc: any): any[] {
+    let {keyPath} = this._config.objectStoreConfig
+
+    if (!Array.isArray(keyPath)) {
+      return this._extractValueFromDocument(doc, keyPath);
+    } else {
+      return keyPath.map(p => this._extractValueFromDocument(doc, p));
+    }
+  }
+
+  private _extractValueFromDocument(doc: any, path: string): any {
+      const pathComponents = path.split(".");
+      let curSourceVal = doc;
+
+      for (let i = 0; i < pathComponents.length; i++) {
+        const prop = pathComponents[i];
+        curSourceVal = curSourceVal[prop];
+        if (curSourceVal === undefined || curSourceVal === null) {
+          throw new Error("Unable to extract key from document");
+        }
+
+        if (i === pathComponents.length - 1) {
+          return curSourceVal;
+        }
+      }
   }
 }

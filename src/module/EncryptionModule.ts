@@ -1,6 +1,6 @@
 /**
- * The base class of all Storage Encryption modules that facilitate
- * encrypted storage to the HTML5 WebStorage API.
+ * The base class of all IndexedDB Encryption modules that facilitate
+ * encrypted storage to the HTML5 IndexedDB API.
  */
 export abstract class EncryptionModule {
   private readonly _id: string;
@@ -22,6 +22,13 @@ export abstract class EncryptionModule {
     return this._id;
   }
 
+  /**
+   * Creates a random encryption secret that this module will use to encrypt
+   * and decrypt data.
+   *
+   * @param moduleParams
+   *   Module specific parameters used to create the encryption secret.
+   */
   public abstract createRandomEncryptionSecret(moduleParams?: any): string;
 
   /**
@@ -30,7 +37,6 @@ export abstract class EncryptionModule {
    * to encrypt / decrypt data.
    */
   public abstract init(encryptionSecret: string, moduleParams?: any): void;
-
 
   /**
    * Asynchronously encrypts a JavaScript object.

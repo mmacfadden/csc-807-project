@@ -27,11 +27,18 @@ export class ModuleTwoFish extends SymmetricEncryptionBasedModule {
     this._key = null;
   }
 
+  /**
+   * @inheritDoc
+   */
   public createRandomEncryptionSecret(): string {
     return RandomStringGenerator.generate(32);
   }
 
-  public init(encryptionSecret: string): void {
+  /**
+   * @inheritDoc
+   */
+  public init(encryptionSecret: string, moduleParams?: any): void {
+    super.init(encryptionSecret, moduleParams);
     this._key = this._twofish.stringToByteArray(encryptionSecret);
   }
 

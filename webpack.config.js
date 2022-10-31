@@ -6,6 +6,7 @@ module.exports = {
     minimize: false
   },
   entry: "./src/index.ts",
+  devtool: "eval-source-map",
   output: {
     library:{
         name: "EncryptedIndexedDB",

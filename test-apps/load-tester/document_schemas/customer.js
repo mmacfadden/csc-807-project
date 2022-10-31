@@ -17,17 +17,14 @@ export const MOCK_CUSTOMER =
       "accountNumber": {
         "faker": "finance.account"
       },
+      "active": {
+        "faker": "datatype.boolean"
+      },
       "phoneNumber": {
         "faker": "phone.phoneNumber"
       },
-      "biography": {
-        "faker": "random.words(100)"
-      },
       "age": {
         "faker": "datatype.number({\\"max\\": 90})"
-      },
-      "birthday": {
-        "faker": "datatype.datetime()"
       },
       "address": {
         "street": {

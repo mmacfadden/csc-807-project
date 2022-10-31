@@ -16,6 +16,9 @@ export default {
           <router-link class="nav-link" to="/schemas">Schemas</router-link>
         </li>
         <li class="nav-item">
+          <router-link class="nav-link" to="/settings">Settings</router-link>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" target="_blank" href="https://github.com/mmacfadden/csc-807-project">
             <i class="fa-brands fa-github"></i>
             GitHub

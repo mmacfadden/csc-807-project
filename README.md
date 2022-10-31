@@ -5,12 +5,13 @@ This repository hosts Michael MacFadden's Project source code for [Dakota State 
 - IDBCursorWithValue returns a promise.
 
 ## TODO
-Find a common cryptographically strong random byte / string generator.
+- Test composite keys
+- Test indices
+- Test cursor iteration
+- Find a common cryptographically strong random byte / string generator.
 
 Additional algorithms to look at:
 
-- https://www.stablelib.com/classes/_stablelib_chacha20poly1305.ChaCha20Poly1305.html
-- https://en.wikipedia.org/wiki/SM4_(cipher)
 - https://en.wikipedia.org/wiki/International_Data_Encryption_Algorithm
 - https://en.wikipedia.org/wiki/ARIA_(cipher)
 - https://en.wikipedia.org/wiki/CAST-256

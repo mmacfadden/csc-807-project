@@ -34,10 +34,12 @@
   import LoadTestApp from "./App.js";
   import LoadTestPage from "./Test.js";
   import DocSchema from "./DocSchema.js";
+  import Settings from "./Settings.js";
 
   const routes = [
     {path: '/', component: LoadTestPage},
-    {path: '/schemas', component: DocSchema}
+    {path: '/schemas', component: DocSchema},
+    {path: '/settings', component: Settings},
   ];
 
   const router = VueRouter.createRouter({

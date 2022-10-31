@@ -1,15 +1,15 @@
-export const MOCK_IMAGE =
+export const BASE_64_IMAGE =
 {
-  name: "Image",
+  name: "Base64 Image",
   enabledByDefault: false,
   config: `{
-    "keyPath": "id",
+    "keyPath": "fileName",
     "documentSchema": {
-      "id": {
-        "chance": "guid"
+      "fileName": {
+        "faker": "system.commonFileName(png)"
       },
       "data": {
-        "faker": "random.alphaNumeric(10000)"
+        "faker": "random.alphaNumeric(50000)"
       }
     }
   }`

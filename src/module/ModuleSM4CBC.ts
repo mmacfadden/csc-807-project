@@ -4,15 +4,31 @@ import {SM4} from 'gm-crypto';
 
 
 /**
+ * Implements the ShangMi 4 (SM4) block cipher provided by the gm-crypto
+ * npm.  Information on the gm-crypto npm can be found here:
+ *   https://github.com/byte-fe/gm-crypto
+ *
+ * Information on the SM4 cipher can be found here:
+ *   https://en.wikipedia.org/wiki/SM4_(cipher)
  */
 export class ModuleSM4CBC extends SymmetricEncryptionBasedModule {
 
   static readonly MODULE_ID = "SM4 CBC (gm-crypto npm)";
 
+  /**
+   * A helper method to create a random hex string.
+   * @param digits
+   *   The number of digits to generate.
+   * @private
+   */
   private static _randomHex(digits: number): string {
     return crypto.randomBytes(digits).toString("hex");
   }
 
+  /**
+   * The encryption key to use.
+   * @private
+   */
   private _key: string | null;
 
   constructor() {
@@ -20,15 +36,24 @@ export class ModuleSM4CBC extends SymmetricEncryptionBasedModule {
     this._key = null;
   }
 
+  /**
+   * @inheritDoc
+   */
   public createRandomEncryptionSecret(): string {
     return ModuleSM4CBC._randomHex(16);
   }
 
-  public init(encryptionSecret: string): void {
+  /**
+   * @inheritDoc
+   */
+  public init(encryptionSecret: string, moduleParams?: any): void {
+    super.init(encryptionSecret, moduleParams);
     this._key = encryptionSecret;
   }
 
-
+  /**
+   * @inheritDoc
+   */
   protected _encryptSerializedDocument(plainText: Uint8Array): Uint8Array {
     const ivHex = ModuleSM4CBC._randomHex(16);
     const encryptedData =
@@ -51,7 +76,9 @@ export class ModuleSM4CBC extends SymmetricEncryptionBasedModule {
     return result;
   }
 
-
+  /**
+   * @inheritDoc
+   */
   protected _decryptSerializedDocument(cipherText: Uint8Array): Uint8Array {
     const ptLen = (new Int32Array(cipherText.slice(0, 4).buffer))[0];
     const ivLen = 16;

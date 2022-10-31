@@ -1,7 +1,7 @@
 import {ModuleCryptoJsAes} from "./ModuleCryptoJsAes";
 
 /**
- * This module uses the CryptoJS library to implement  AES 256 bit
+ * This module uses the CryptoJS library to implement  AES 256-bit
  * encryption.  More information on CryptoJS can be found at:
  *    https://github.com/brix/crypto-js
  *

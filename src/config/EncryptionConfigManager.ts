@@ -31,9 +31,7 @@ export class EncryptionConfigManager {
   public static async generateConfig(encryptionModuleId: string, moduleParams?: any): Promise<IEncryptionConfig> {
     const opeKey = OpeEncryptor.generateKey();
     const module = EncryptionModuleFactory.createModule(encryptionModuleId);
-    const dataSecret = await module.createRandomEncryptionSecret(moduleParams);
-
-    // FIXME address module params.
+    const dataSecret = module.createRandomEncryptionSecret(moduleParams);
 
     return {
       moduleId: encryptionModuleId,

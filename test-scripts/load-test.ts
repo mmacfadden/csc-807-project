@@ -52,13 +52,13 @@ const objectStoreConfig = {
 }
 
 
-const operationCount = 30;
+const operationCount = 10;
 const quiet = false;
 
 async function test() {
   const encryptionConfigs: IEncryptionConfig[] = [
     // await EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID),
+    await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID),
     // await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes128.MODULE_ID),
     // await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID),
     // await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes128.MODULE_ID),
@@ -69,7 +69,7 @@ async function test() {
     // await EncryptionConfigManager.generateConfig(ModuleRC5.MODULE_ID),
     // await EncryptionConfigManager.generateConfig(ModuleChaCha20.MODULE_ID),
     // await EncryptionConfigManager.generateConfig(ModuleXSalsa20NaCl.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleSM4CBC.MODULE_ID),
+    // await EncryptionConfigManager.generateConfig(ModuleSM4CBC.MODULE_ID),
   ];
 
   const results = await LoadTester.testEncryptionConfigs(
@@ -80,7 +80,7 @@ async function test() {
       quiet
   );
 
-  console.log(JSON.stringify(results));
+  // console.log(JSON.stringify(results));
 }
 
 test();

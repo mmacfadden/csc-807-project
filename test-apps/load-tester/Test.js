@@ -1,12 +1,14 @@
 import Controls from "./TestControls.js";
 import Status from "./TestStatus.js";
 import Results from "./TestResults.js";
+import Analysis from "./TestResultAnalysis.js";
 import Config from "./TestConfig.js";
 
 import ALL_MODULES from "./modules.js";
 
 import {parseSchema} from "./document_schemas/utils.js";
 import {Persistence} from "./Persistence.js";
+import {download_file} from "./download_utils.js";
 
 const {
   LoadTester,
@@ -16,7 +18,7 @@ const {
 
 export default {
   data() {
-    const config = Persistence.loadTestConfig();
+    const testConfig = Persistence.loadTestConfig();
     return {
       ALL_MODULES,
       documentSchemas: Persistence.loadSchemas(),
@@ -25,21 +27,17 @@ export default {
       currentSchema: null,
       totalTestCount: 10,
       testsCompleted: 0,
+      testingFinished: false,
       documentsCompleted: 0,
-      documentsPerTest: 30,
       loadTester: null,
       results: [],
       resultsCsv: null,
-      selectedModules: config.selectedModules,
-      selectedSchemas: config.selectedSchemas
+      testConfig
     }
-  },
-  mounted() {
   },
   methods: {
     configUpdated(config) {
-      this.selectedModules = config.selectedModules;
-      this.selectedSchemas = config.selectedSchemas;
+      this.testConfig = config;
       Persistence.saveTestConfig(config);
     },
     async onStart() {
@@ -51,6 +49,8 @@ export default {
 
       const hooks = {
         testingStarted: (testConfigs) => {
+          this.testingFinished = false;
+          this.testingInProgress = true;
           this.totalTestCount = testConfigs.length;
         },
         testStarted: (module, schema) => {
@@ -66,23 +66,33 @@ export default {
           this.currentModule = null;
           this.results.push(result);
           this.documentsCompleted = 0;
-        }
+        },
+        testingFinished: (results) => {
+          this.testingFinished = true;
+          this.testingInProgress = false;
+        },
+      }
+
+      const moduleParams = {
+        serializationScheme: this.testConfig.preEncryptionSerialization
       }
 
       try {
         const encryptionConfigs = [];
-        for (let i = 0; i < this.selectedModules.length; i++) {
-          const moduleConfig = await EncryptionConfigManager.generateConfig(this.selectedModules[i]);
+        for (let i = 0; i < this.testConfig.selectedModules.length; i++) {
+          const moduleConfig = await EncryptionConfigManager.generateConfig(this.testConfig.selectedModules[i], moduleParams);
           encryptionConfigs.push(moduleConfig);
         }
 
+        const schemas = this.testConfig.selectedSchemas.map(parseSchema).map(s => {
+              return {...(s.config), name: s.name}
+            }
+        );
+
         const results = await LoadTester.testEncryptionConfigs(
             encryptionConfigs,
-            this.selectedSchemas.map(parseSchema).map(s => {
-                  return {...(s.config), name: s.name}
-                }
-            ),
-            this.documentsPerTest,
+            schemas,
+            this.testConfig.documentsPerTest,
             indexedDB,
             quiet,
             hooks);
@@ -99,45 +109,25 @@ export default {
 
     },
     onDownload() {
-      const textFileAsBlob = new Blob([this.resultsCsv], {type: 'text/plain'});
-      const downloadLink = document.createElement("a");
-      downloadLink.download = "load-test-results.csv";
-      downloadLink.innerHTML = "Download File";
-      if (window.webkitURL != null) {
-        // Chrome allows the link to be clicked
-        // without actually adding it to the DOM.
-        downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
-      } else {
-        // Firefox requires the link to be added to the DOM
-        // before it can be clicked.
-        downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
-        // downloadLink.onclick = destroyClickedElement;
-        downloadLink.style.display = "none";
-        document.body.appendChild(downloadLink);
-      }
-
-      downloadLink.click();
-
-      if (downloadLink.parentNode) {
-        downloadLink.parentNode.removeChild(downloadLink);
-      }
+      download_file( "load-test-results.csv", this.resultsCsv);
     }
   },
   components: {
     Controls,
     Status,
     Results,
-    Config
+    Config,
+    Analysis
   },
   template: `
+    <h1><i class="fa-solid fa-stopwatch"></i> Test</h1>
     <config
         :modules="ALL_MODULES"
-        :selectedModules="selectedModules"
         :schemas="documentSchemas"
-        :selectedSchemas="selectedSchemas"
+        :config="testConfig"
         @update="configUpdated"
     />
-    <h1>Controls</h1>
+    <h2>Controls</h2>
     <controls
         @start="onStart"
         @cancel="onCancel"
@@ -145,17 +135,49 @@ export default {
         :in-progress="testingInProgress"
         :test-completed="this.resultsCsv"
     />
-    <h1>Status</h1>
+    <h2>Status</h2>
     <status
         :current-module="currentModule"
         :current-schema="currentSchema"
         :total-tests="totalTestCount"
         :tests-completed="testsCompleted"
         :documents-completed="documentsCompleted"
-        :documents-per-test="documentsPerTest"
+        :documents-per-test="testConfig.documentsPerTest"
     />
-    <h1>Results</h1>
-    <results :in-progress-module="currentModule" :in-progress-schema="currentSchema" :results="results"/>
+    <h2>Results</h2>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" 
+                id="tests-tab"
+                data-bs-toggle="tab" 
+                data-bs-target="#tests-tab-pane" 
+                type="button" 
+                role="tab" 
+                aria-controls="tests-tab-pane"
+                aria-selected="true">Tests</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" 
+                id="analysis-tab" 
+                data-bs-toggle="tab"
+                data-bs-target="#analysis-tab-pane"
+                type="button" 
+                role="tab" 
+                aria-controls="analysis-tab-pane" 
+                aria-selected="false">Analysis</button>
+      </li>
+    </ul>
+    <div class="tab-content" id="result-tabs">
+      <div class="tab-pane fade show active" id="tests-tab-pane" role="tabpanel" aria-labelledby="tests-tab" tabindex="0">
+        <results :in-progress-module="currentModule" :in-progress-schema="currentSchema" :results="results"/>
+      </div>
+      <div class="tab-pane fade" id="analysis-tab-pane" role="tabpanel" aria-labelledby="analysis-tab" tabindex="0">
+        <analysis v-if="testingFinished" :results="results" />
+        <div v-else-if="testingInProgress">Analysis will be presented when testing is complete.</div>
+        <div v-else>Run tests to see the analysis.</div>
+      </div>
+    </div>
+    
     <textarea readonly="readonly" id="results-csv">{{resultsCsv || ""}}</textarea>
   `
 }
