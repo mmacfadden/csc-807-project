@@ -36,7 +36,7 @@ export class ModuleRC5 extends SymmetricEncryptionBasedModule {
    */
   constructor() {
     super(ModuleRC5.MODULE_ID);
-    this._rounds = 255;
+    this._rounds = 16;
     this._blockSize = 64;
     this._rc5 = null;
   }
