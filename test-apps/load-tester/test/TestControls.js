@@ -14,13 +14,13 @@ export default {
   },
   template: `
     <div id="controls">
-      <button class="btn btn-primary" @click="onStartTest" :disabled="inProgress">
+      <button class="btn btn-primary icon" @click="onStartTest" :disabled="inProgress">
         <i class="fa-solid fa-play"></i>Run Load Test
       </button>
-      <button class="btn btn-primary" @click="onCancel" :disabled="!inProgress">
+      <button class="btn btn-primary icon" @click="onCancel" :disabled="!inProgress">
         <i class="fa-solid fa-stop"></i>Cancel Tests
       </button>
-      <button class="btn btn-primary" @click="onDownload" :disabled="!testCompleted">
+      <button class="btn btn-primary icon" @click="onDownload" :disabled="!testCompleted">
         <i class="fa-solid fa-download"></i>Download Results
       </button>
     </div>

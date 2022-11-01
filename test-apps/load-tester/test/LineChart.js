@@ -25,7 +25,7 @@ export default {
       },
       legend: {
         layout: 'horizontal',
-        align: 'left',
+        align: 'center',
         verticalAlign: 'top',
         x: 10,
         y: 10,

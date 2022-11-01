@@ -209,20 +209,20 @@ export class LoadTester {
       console.log(`Testing ${this._idb.encryptionModuleId()}`);
     }
 
-    Timing.startMeasurementSession();
-
     let totalBytes = 0;
 
     const reads: IDocIoRecord[] = [];
     const writes: IDocIoRecord[] = [];
 
+    const tx = db.transaction(LoadTester._OBJECT_STORE_NAME, "readwrite");
+    const store = tx.objectStore(LoadTester._OBJECT_STORE_NAME);
+
+    Timing.startMeasurementSession();
+
     for (let i = 0; i < this._config.operationCount; i++) {
       const doc: any = DocumentGenerator.generateDocument(this._config.objectStoreConfig.documentSchema);
       const docSize = ObjectSizeCalculator.sizeOf(doc);
       totalBytes += docSize;
-
-      const tx = db.transaction(LoadTester._OBJECT_STORE_NAME, "readwrite");
-      const store = tx.objectStore(LoadTester._OBJECT_STORE_NAME);
 
       Timing.writeStart(i);
       await RequestUtils.requestToPromise(store.add(doc));

@@ -22,3 +22,27 @@ export function download_file(filename, contents) {
     downloadLink.parentNode.removeChild(downloadLink);
   }
 }
+
+export function handle_single_file_upload(element) {
+    return new Promise((resolve, reject) => {
+      element.onchange = (evt)  => {
+
+        const reader = new FileReader();
+
+        reader.onload = (evt) => {
+          if (evt.target.readyState !== 2) {
+            return;
+          }
+
+          if (evt.target.error) {
+            reject(evt.target.error);
+          }
+
+          const content = evt.target.result;
+          resolve(content);
+        };
+
+        reader.readAsText(evt.target.files[0]);
+      }
+    });
+}

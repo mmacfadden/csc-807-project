@@ -4,11 +4,11 @@ import Results from "./TestResults.js";
 import Analysis from "./TestResultAnalysis.js";
 import Config from "./TestConfig.js";
 
-import ALL_MODULES from "./modules.js";
+import ALL_MODULES from "../data/modules.js";
 
-import {parseSchema} from "./document_schemas/utils.js";
-import {Persistence} from "./Persistence.js";
-import {download_file} from "./download_utils.js";
+import {parseSchema} from "../data/document_schemas/utils.js";
+import {Persistence} from "../data/Persistence.js";
+import {download_file} from "../util/file_utils.js";
 
 const {
   LoadTester,

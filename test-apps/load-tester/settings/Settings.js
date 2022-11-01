@@ -1,5 +1,5 @@
-import {Persistence} from "./Persistence.js";
-import {download_file} from "./download_utils.js";
+import {Persistence} from "../data/Persistence.js";
+import {download_file} from "../util/file_utils.js";
 
 export default {
   props: [],
@@ -53,7 +53,7 @@ export default {
                 Please export settings prior to resetting them if you wish to save them.
               </p>
               <div class="text-end">
-                <button class="btn btn-primary" @click="exportSettings">
+                <button class="btn btn-primary icon" @click="exportSettings">
                   <i class="fa-solid fa-download"/> Export Settings
                 </button>
               </div>
@@ -83,7 +83,7 @@ export default {
                 Please export settings prior to resetting them if you wish to save them.
               </p>
               <div class="text-end">
-                <button class="btn btn-danger" @click="reset">
+                <button class="btn btn-danger icon" @click="reset">
                   <i class="fa-solid fa-refresh"/> Reset Settings
                 </button>
               </div>

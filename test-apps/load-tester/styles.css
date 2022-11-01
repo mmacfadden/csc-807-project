@@ -32,7 +32,7 @@ button.btn {
     margin-right: 10px;
 }
 
-button.btn svg {
+button.btn.icon svg {
     margin-right: 10px;
 }
 
@@ -118,4 +118,18 @@ table .row-toggle:hover {
 
 label.form-label {
     font-weight: bold;
+}
+
+.btn-toolbar {
+    margin-top: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding-left: 10px;
+}
+
+.form-error {
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: .875em;
+    color: #dc3545;
 }
