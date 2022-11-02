@@ -4,6 +4,7 @@ import {formatSize} from "../util/utils.js";
 import {download_file} from "../util/file_utils.js";
 import UploadSchemaModal from "../common/UploadModal.js";
 import SingleValueModal from "../common/SingleValueModal.js";
+import ConfirmModal from "../common/ConfirmModal.js";
 
 const {DocumentGenerator, ObjectSizeCalculator} = EncryptedIndexedDB;
 
@@ -12,7 +13,8 @@ export default {
   events: [],
   components: {
     UploadSchemaModal,
-    SingleValueModal
+    SingleValueModal,
+    ConfirmModal
   },
   data() {
     const documentSchemas = Persistence.loadSchemas();
@@ -24,8 +26,7 @@ export default {
       sourceEditor: null,
       exampleMinBytes: -1,
       exampleMaxBytes: -1,
-      exampleAvgBytes: -1,
-      deleteModal: null
+      exampleAvgBytes: -1
     }
   },
   mounted() {
@@ -47,6 +48,7 @@ export default {
     this.sourceEditor.session.on('change', () => {
       // TODO debounce.
       this.selectedSchema.schema = this.sourceEditor.getValue();
+      Persistence.saveSchemas(this.documentSchemas);
       this.updateExampleDoc();
     });
 
@@ -59,7 +61,18 @@ export default {
   },
   methods: {
     onDeleteRequest() {
-      this.deleteModal.show();
+      this.$refs.deleteModal.show();
+    },
+    deleteConfirmed() {
+      const index = this.documentSchemas.indexOf(this.selectedSchema);
+      const newIndex = Math.max(0, index - 1);
+      this.documentSchemas.splice(index, 1);
+      if (this.documentSchemas.length > 0) {
+        this.selectedSchema = this.documentSchemas[newIndex];
+      } else {
+        this.selectedSchema = null;
+      }
+      Persistence.saveSchemas(this.documentSchemas);
     },
     onUploadRequest() {
       this.$refs.uploadModal.show();
@@ -89,13 +102,19 @@ export default {
       }
     },
     createSchema(name) {
-      this.documentSchemas.push({
+      const newSchema = {
         name,
         enabledByDefault: false,
-        keyPath: "",
-        schema: ""
-      });
-      console.log(name);
+        keyPath: "id",
+        schema: `{\n"id": {\n  "faker": "datatype.number()"\n  }\n}`
+      };
+      this.documentSchemas.push(newSchema);
+      this.selectedSchema = newSchema;
+
+      Persistence.saveSchemas(this.documentSchemas);
+
+      this.updateConfig();
+      this.updateExampleDoc();
     },
     changeSchemaName(newName) {
       console.log(newName);
@@ -104,7 +123,6 @@ export default {
       return formatSize(size);
     },
     updateEnabledByDefault(e) {
-      console.log(e);
       this.selectedSchema.enabledByDefault = e.target.value === "yes";
     },
     updateConfig() {
@@ -232,23 +250,6 @@ export default {
       </div>
     </div>
     </div>
-    <div class="modal" tabindex="-1" ref="deleteModal">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Confirm Delete</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>Are you sure you want to delete the "{{this.selectedSchema.name}}" schema?</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger">Delete</button>
-          </div>
-        </div>
-      </div>
-    </div>
     <upload-schema-modal 
         ref="uploadModal"
         title="Import Document Schemas"
@@ -279,5 +280,13 @@ export default {
         :validator="schemaNameValidator"
         @done="changeSchemaName"
     />
+    <confirm-modal
+        ref="deleteModal"
+        title="Delete Schema"
+        confirm-button="Delete"
+        @confirm="deleteConfirmed"
+    >
+      <p>Are you sure you want to delete the "{{this.selectedSchema.name}}" schema?</p>
+    </confirm-modal>
   `
 }

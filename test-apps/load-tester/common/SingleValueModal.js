@@ -11,6 +11,7 @@ export default {
   },
   mounted() {
     this.modal = new bootstrap.Modal(this.$refs.modal);
+    this.$refs.input.focus();
   },
   unmounted() {
     this.modal.dispose();
@@ -53,6 +54,7 @@ export default {
                    id="single-value-input"
                    :placeholder="this.inputPlaceholder"
                    v-model="this.value"
+                   autofocus
             />
             <div v-if="this.error !== null" class="form-error">{{ this.error }}</div>
           </form>
