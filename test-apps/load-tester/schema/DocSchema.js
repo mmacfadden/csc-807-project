@@ -103,6 +103,10 @@ export default {
     formatSize(size) {
       return formatSize(size);
     },
+    updateEnabledByDefault(e) {
+      console.log(e);
+      this.selectedSchema.enabledByDefault = e.target.value === "yes";
+    },
     updateConfig() {
       const config = this.documentSchemas.find(s => s.name === this.selectedSchema.name)
       this.sourceEditor.session.setValue(config.schema.trim());
@@ -195,9 +199,9 @@ export default {
           </div>
           <div class="col-3">
             <label for="enabled-by-default" class="form-label">Enabled by Default</label>
-            <select class="form-select" aria-label="Default select example">
-              <option :selected="this.selectedSchema.enabledByDefault" value="true">Yes</option>
-              <option :selected="!this.selectedSchema.enabledByDefault" value="false">No</option>
+            <select class="form-select" aria-label="Default select example" @change="updateEnabledByDefault">
+              <option :selected="this.selectedSchema.enabledByDefault" value="yes">Yes</option>
+              <option :selected="!this.selectedSchema.enabledByDefault" value="no">No</option>
             </select>
           </div>
         </div>
