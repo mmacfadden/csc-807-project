@@ -18,7 +18,7 @@ import {
 import "fake-indexeddb/auto";
 
 const objectStoreConfig = {
-  documentSchema: {
+  schema: {
     id: {
       chance: "guid"
     },

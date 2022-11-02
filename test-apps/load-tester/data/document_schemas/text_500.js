@@ -1,16 +1,13 @@
-export const TEXT_500 =
-{
+export const TEXT_500 = {
   name: "Text 500",
   enabledByDefault: false,
-  config: `{
-    "keyPath": "id",
-    "documentSchema": {
-      "id": {
-        "chance": "guid"
-      },
-      "text": {
-        "faker": "random.alphaNumeric(500)"
-      }
-    }
-  }`
+  keyPath: "id",
+  schema: `{
+  "id": {
+    "chance": "guid"
+  },
+  "text": {
+    "faker": "random.alphaNumeric(500)"
+  }
+}`
 };

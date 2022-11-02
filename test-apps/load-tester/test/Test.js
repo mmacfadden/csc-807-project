@@ -85,9 +85,12 @@ export default {
         }
 
         const schemas = this.testConfig.selectedSchemas.map(parseSchema).map(s => {
-              return {...(s.config), name: s.name}
+              const {name, keyPath, schema} = s;
+              return {name, keyPath, schema}
             }
         );
+
+        console.log(schemas);
 
         const results = await LoadTester.testEncryptionConfigs(
             encryptionConfigs,

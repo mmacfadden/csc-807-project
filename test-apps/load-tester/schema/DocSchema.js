@@ -46,7 +46,7 @@ export default {
 
     this.sourceEditor.session.on('change', () => {
       // TODO debounce.
-      this.selectedSchema.config = this.sourceEditor.getValue();
+      this.selectedSchema.schema = this.sourceEditor.getValue();
       this.updateExampleDoc();
     });
 
@@ -89,6 +89,12 @@ export default {
       }
     },
     createSchema(name) {
+      this.documentSchemas.push({
+        name,
+        enabledByDefault: false,
+        keyPath: "",
+        schema: ""
+      });
       console.log(name);
     },
     changeSchemaName(newName) {
@@ -98,8 +104,8 @@ export default {
       return formatSize(size);
     },
     updateConfig() {
-      const schema = this.documentSchemas.find(s => s.name === this.selectedSchema.name)
-      this.sourceEditor.session.setValue(schema.config);
+      const config = this.documentSchemas.find(s => s.name === this.selectedSchema.name)
+      this.sourceEditor.session.setValue(config.schema.trim());
     },
     updateExampleDoc() {
       try {
@@ -110,7 +116,7 @@ export default {
         this.exampleMinBytes = Number.MAX_SAFE_INTEGER;
         this.exampleMaxBytes = 0;
         for (let i = 0; i < numDocs;i++) {
-          const doc = DocumentGenerator.generateDocument(selected.config.documentSchema);
+          const doc = DocumentGenerator.generateDocument(selected.schema);
           docs.push(doc)
           const size = ObjectSizeCalculator.sizeOf(doc);
           this.exampleMinBytes = Math.min(size, this.exampleMinBytes);
@@ -171,9 +177,20 @@ export default {
                      placeholder="Schema Name"
                      disabled
                      readonly
-                     v-model="this.selectedSchema.name"
+                     :value="this.selectedSchema.name"
               />
               <button class="btn btn-outline-secondary" type="button" @click="onChangeSchemaNameRequest"><i class="fa-solid fa-pen-to-square"></i></button>
+            </div>
+          </div>
+          <div class="col-3">
+            <label for="key-path" class="form-label">Key Path</label>
+            <div class="input-group">
+              <input type="text"
+                     class="form-control"
+                     id="key-path"
+                     placeholder="Key Path"
+                     :value="this.selectedSchema.keyPath"
+              />
             </div>
           </div>
           <div class="col-3">

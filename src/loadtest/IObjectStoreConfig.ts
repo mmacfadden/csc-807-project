@@ -2,7 +2,7 @@ export interface IObjectStoreConfig {
 
     name: string;
 
-    documentSchema: object;
+    schema: object;
 
     keyPath: string | string[];
     

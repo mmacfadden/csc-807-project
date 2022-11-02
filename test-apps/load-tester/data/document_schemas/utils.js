@@ -3,8 +3,8 @@ export function parseConfig(c) {
 }
 
 export function parseSchema(s) {
-  const {name, enabledByDefault, config} = s;
+  const {name, enabledByDefault, schema, keyPath} = s;
   return {
-    name, enabledByDefault, config: parseConfig(config)
+    name, enabledByDefault, keyPath, schema: parseConfig(schema)
   };
 }

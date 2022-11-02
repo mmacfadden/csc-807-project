@@ -157,8 +157,8 @@ export class LoadTester {
       throw new Error("objectStoreConfig must be defined");
     }
 
-    if (!config.objectStoreConfig.documentSchema) {
-      throw new Error("objectStoreConfig.documentSchema must be defined");
+    if (!config.objectStoreConfig.schema) {
+      throw new Error("objectStoreConfig.schema must be defined");
     }
 
     if (!config.objectStoreConfig.keyPath) {
@@ -220,7 +220,7 @@ export class LoadTester {
     Timing.startMeasurementSession();
 
     for (let i = 0; i < this._config.operationCount; i++) {
-      const doc: any = DocumentGenerator.generateDocument(this._config.objectStoreConfig.documentSchema);
+      const doc: any = DocumentGenerator.generateDocument(this._config.objectStoreConfig.schema);
       const docSize = ObjectSizeCalculator.sizeOf(doc);
       totalBytes += docSize;
 
