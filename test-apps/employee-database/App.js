@@ -76,9 +76,9 @@ export default  {
         LoginForm
     },
     template: `
-      <nav class="navbar navbar-expand-lg bg-light">
+      <nav class="navbar navbar-dark navbar-expand-lg bg-dark">
       <div class="container-fluid">
-        <span class="brand-logo">
+        <span class="navbar-brand brand-logo">
           <i class="fa-brands fa-html5"/>
           <i class="fa-solid fa-database"/>
           <span>Encrypted IndexedDB Demo</span>

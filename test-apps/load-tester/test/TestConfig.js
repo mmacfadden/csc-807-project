@@ -1,15 +1,37 @@
+import {Persistence} from "../data/Persistence.js";
+import {download_file} from "../util/file_utils.js";
+import UploadModal from "../common/UploadModal.js";
+
 export default {
   props: ["modules", "schemas", "config"],
   events: ["update"],
+  components: {
+    UploadModal
+  },
   data() {
+    const {
+      serializationScheme,
+      documentsPerTest,
+      selectedModuleMap,
+      selectedSchemaMap
+    } = this.configToData(this.config);
+
     return {
-      serializationScheme: this.config.preEncryptionSerialization,
-      documentsPerTest: this.config.documentsPerTest,
-      selectedModuleMap: new Map(this.modules.map(m => [m, this.config.selectedModules.includes(m)])),
-      selectedSchemaMap: new Map(this.schemas.map(s => [s.name, this.config.selectedSchemas.find(o => o.name === s.name) !== undefined])),
-    }
+      serializationScheme,
+      documentsPerTest,
+      selectedModuleMap,
+      selectedSchemaMap
+    };
   },
   methods: {
+    configToData(config) {
+      return {
+        serializationScheme: config.preEncryptionSerialization,
+        documentsPerTest: config.documentsPerTest,
+        selectedModuleMap: new Map(this.modules.map(m => [m, config.selectedModules.includes(m)])),
+        selectedSchemaMap: new Map(this.schemas.map(s => [s.name, config.selectedSchemas.find(o => o.name === s.name) !== undefined])),
+      }
+    },
     updateDocsPerTest(e) {
       try {
         this.documentsPerTest = Number(e.target.value);
@@ -38,6 +60,41 @@ export default {
         selectedSchemas: this.schemas.filter(s => this.selectedSchemaMap.get(s.name))
       }
       this.$emit("update", update);
+    },
+    setDataFromConfig(config) {
+      const {
+        serializationScheme,
+        documentsPerTest,
+        selectedModuleMap,
+        selectedSchemaMap
+      } = this.configToData(config);
+      this.serializationScheme = serializationScheme;
+      this.documentsPerTest = documentsPerTest;
+      this.selectedModuleMap = selectedModuleMap;
+      this.selectedSchemaMap = selectedSchemaMap;
+      this.emitConfig();
+    },
+    reset() {
+      Persistence.reset();
+      const config = Persistence.loadTestConfig();
+      this.setDataFromConfig(config);
+    },
+    importRequest() {
+      this.$refs.uploadModal.show();
+    },
+    onImportSettings(settings) {
+      try {
+        const config = JSON.parse(settings);
+        Persistence.saveTestConfig(config);
+        this.setDataFromConfig(config);
+      } catch (e) {
+        // TODO pop an error
+      }
+    },
+    exportSettings() {
+      const settings = Persistence.loadTestConfig();
+      const settingsJson = JSON.stringify(settings, null, "  ");
+      download_file("load-test-settings.json", settingsJson);
     }
   },
   template: `
@@ -56,6 +113,29 @@ export default {
       <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
            data-bs-parent="#accordionExample">
         <div class="accordion-body">
+          <div class="row mb-3">
+            <div class="col-12 text-end">
+              <button class="btn btn-primary icon" @click="exportSettings">
+                <i class="fa-solid fa-download"/> Export Settings
+              </button>
+              <button class="btn btn-primary icon" @click="importRequest">
+                <i class="fa-solid fa-upload"/> Import Settings
+              </button>
+              <button class="btn btn-danger icon" @click="reset">
+                <i class="fa-solid fa-refresh"/> Reset Settings
+              </button>
+              <upload-modal
+                  ref="uploadModal"
+                  title="Import Test Results"
+                  @upload="onImportSettings"
+              >
+                <div>
+                  <p><strong>Warning: Importing test results will replace any current results.</strong></p>
+                  <p>Select a file to import.</p>
+                </div>
+              </upload-modal>
+            </div>
+          </div>
           <div class="mb-3 row">
             <div class="col-6">
               <label for="docsPerTest" class="form-label">Document Reads/Writes Per Test</label>
@@ -110,5 +190,6 @@ export default {
       </div>
     </div>
     </div>
-  `
+    
+`
 }

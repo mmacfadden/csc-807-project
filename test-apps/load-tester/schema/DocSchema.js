@@ -80,7 +80,12 @@ export default {
     onUpload(data) {
       try {
         const schemas = JSON.parse(data);
+        this.documentSchemas = schemas;
+        this.selectedSchema = schemas[0];
         Persistence.saveSchemas(schemas);
+
+        this.updateConfig();
+        this.updateExampleDoc();
       } catch (e) {
         console.error(e);
         // TODO popup an toast.
@@ -117,7 +122,8 @@ export default {
       this.updateExampleDoc();
     },
     changeSchemaName(newName) {
-      console.log(newName);
+      this.selectedSchema.name = newName;
+      Persistence.saveSchemas(this.documentSchemas);
     },
     formatSize(size) {
       return formatSize(size);
