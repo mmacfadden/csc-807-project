@@ -57,11 +57,10 @@ export class ValueRange {
         return this._end - this._start + 1;
     }
 
-
     /**
      * """Return a number of bits required to encode any value within the range"""
      */
-    public range_bit_size() {
+    public rangeBitSize() {
         return Math.ceil(Math.log2(this.size()));
     }
 

@@ -13,7 +13,8 @@ import {
   ModuleRC5,
   ModuleNodeCryptoChaCha20,
   ModuleXSalsa20NaCl,
-  ModuleChaCha20, ModuleSM4CBC
+  ModuleChaCha20,
+  ModuleSM4CBC
 } from "../src";
 import "fake-indexeddb/auto";
 

@@ -1,10 +1,14 @@
 import {OPE} from "./OPE";
+import CryptoJS from "crypto-js";
+import {CryptoJsUtils} from "../util/CryptoJsUtils";
 
 // TODO see if there is a more compact, yet order preserving encoding.
 // TODO push a byte or something into the array to signify the type
 //   of data.
 export class OpeEncryptor {
-    public static generateKey(block_size: number = 32): string {
+    public static DEFAULT_KEY_BLOCK_SIZE = 32;
+
+    public static generateKey(block_size: number = OpeEncryptor.DEFAULT_KEY_BLOCK_SIZE): string {
         const key = OPE.generate_key(block_size);
         const textDecoder = new TextDecoder();
         return textDecoder.decode(key);
@@ -14,11 +18,21 @@ export class OpeEncryptor {
     private _textDecoder: TextDecoder;
     private _ope: OPE;
 
+    /**
+     *
+     * @param key
+     *      A base64 encoded key.
+     */
     constructor(key: string) {
+        if (!key) {
+            throw new Error("key must be a non-empty string");
+        }
+
         this._textEncoder = new TextEncoder();
         this._textDecoder = new TextDecoder();
 
-        const keyBytes = this._textEncoder.encode(key);
+        const wordArray = CryptoJS.enc.Base64.parse(key);
+        const keyBytes = CryptoJsUtils.convertWordArrayToUint8Array(wordArray);
         this._ope = new OPE(keyBytes);
     }
 
@@ -26,6 +40,10 @@ export class OpeEncryptor {
         const encrypted: Int32Array = new Int32Array(1);
         encrypted[0] = this._ope.encrypt(num);
         return encrypted;
+    }
+
+    public decryptNumber(cipherText: Int32Array): number {
+        return this._ope.decrypt(cipherText[0]);
     }
 
     public encryptString(str: string): Int32Array {
@@ -45,9 +63,5 @@ export class OpeEncryptor {
             bytes[i] = this._ope.decrypt(encNum);
         }
         return this._textDecoder.decode(bytes);
-    }
-
-    public decryptNumber(cipherText: Int32Array): number {
-        return this._ope.decrypt(cipherText[0]);
     }
 }

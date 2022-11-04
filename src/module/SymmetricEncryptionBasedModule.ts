@@ -2,7 +2,7 @@ import {EncryptionModule} from "./EncryptionModule";
 import {encode, decode} from "@msgpack/msgpack";
 import {serialize, deserialize} from "bson";
 
-export type SerializationScheme = "json" | "msgpack" | "bson";
+export type SerializationScheme = "msgpack" | "bson";
 
 /**
  * An abstract base class for symmetric key encryption.
@@ -23,13 +23,17 @@ export abstract class SymmetricEncryptionBasedModule extends EncryptionModule {
 
     this._textEncoder = new TextEncoder();
     this._textDecoder = new TextDecoder("utf-8");
-    this._serializationScheme = "json";
+    this._serializationScheme = "msgpack";
   }
 
   public init(encryptionSecret: string, moduleParams?: any) {
     const {serializationScheme} = moduleParams || {};
     if (serializationScheme) {
-      this._serializationScheme = serializationScheme;
+      if (serializationScheme !== "bson" && serializationScheme !== "msgpack") {
+        throw new Error("Invalid serialization scheme: " + serializationScheme);
+      } else {
+        this._serializationScheme = serializationScheme;
+      }
     }
   }
 
@@ -66,13 +70,11 @@ export abstract class SymmetricEncryptionBasedModule extends EncryptionModule {
    * @private
    */
   private _serializeDocument(plainText: any): Uint8Array {
-    if (this._serializationScheme === "msgpack") {
-      return encode(plainText);
-    } else if (this._serializationScheme === "bson") {
-      return serialize(plainText);
-    } else {
-      const json = JSON.stringify(plainText);
-      return this._textEncoder.encode(json);
+    switch (this._serializationScheme) {
+      case "msgpack":
+        return encode(plainText);
+      case "bson":
+        return new Uint8Array(serialize(plainText));
     }
   }
 
@@ -88,13 +90,11 @@ export abstract class SymmetricEncryptionBasedModule extends EncryptionModule {
    * @private
    */
   private _deserializeDocument(plainText: Uint8Array): any {
-    if (this._serializationScheme === "msgpack") {
-      return decode(plainText);
-    } else if (this._serializationScheme === "bson") {
-      return deserialize(plainText)
-    } else {
-      const json = this._textDecoder.decode(plainText);
-      return JSON.parse(json);
+    switch (this._serializationScheme) {
+      case "msgpack":
+        return decode(plainText);
+      case "bson":
+        return deserialize(plainText)
     }
   }
 

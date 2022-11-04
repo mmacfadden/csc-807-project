@@ -30,7 +30,11 @@ export class OPE {
      *         //     """
      * @param block_size
      */
-    public static generate_key(block_size: number = 32): Uint8Array {
+    public static generate_key(block_size: number): Uint8Array {
+        if (!block_size || block_size < 24) {
+            throw new Error("block_size must be >= 24: " + block_size)
+        }
+        
         const random_seq = CryptoJS.lib.WordArray.random(block_size)
         const random_key = CryptoJS.enc.Base64.stringify(random_seq);
         return new TextEncoder().encode(random_key);

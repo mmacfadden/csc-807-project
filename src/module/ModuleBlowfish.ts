@@ -11,7 +11,9 @@ import {RandomStringGenerator} from "../util";
  *    https://en.wikipedia.org/wiki/Blowfish_(cipher)
  */
 export class ModuleBlowfish extends SymmetricEncryptionBasedModule {
-  public static readonly MODULE_ID = "Blowfish (egoroof)";
+  public static readonly MODULE_ID = "Blowfish CBC (egoroof)";
+  public static readonly _IV_LEN = 8;
+  public static readonly _KEY_LEN = 32;
 
   private _bf: Blowfish | null;
 
@@ -42,8 +44,8 @@ export class ModuleBlowfish extends SymmetricEncryptionBasedModule {
    * @inheritDoc
    */
   public createRandomEncryptionSecret(): string {
-    const key = RandomStringGenerator.generate(32);
-    const iv = RandomStringGenerator.generate(8);
+    const key = RandomStringGenerator.generate(ModuleBlowfish._KEY_LEN);
+    const iv = RandomStringGenerator.generate(ModuleBlowfish._IV_LEN);
     return iv + key;
   }
 
@@ -52,9 +54,9 @@ export class ModuleBlowfish extends SymmetricEncryptionBasedModule {
    */
   public init(encryptionSecret: string, moduleParams?: any): void {
     super.init(encryptionSecret, moduleParams);
-    const iv = encryptionSecret.slice(0, 8);
-    const key = encryptionSecret.slice(8);
-    this._bf = new Blowfish(key, Blowfish.MODE.ECB, Blowfish.PADDING.NULL);
+    const iv = encryptionSecret.slice(0, ModuleBlowfish._IV_LEN);
+    const key = encryptionSecret.slice(ModuleBlowfish._IV_LEN);
+    this._bf = new Blowfish(key, Blowfish.MODE.CBC, Blowfish.PADDING.LAST_BYTE);
     this._bf.setIv(iv);
   }
 }
