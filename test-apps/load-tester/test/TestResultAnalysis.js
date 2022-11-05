@@ -55,36 +55,36 @@ export default {
       <div class="col-lg-6 col-md-12" v-if="readTimeSeries">
         <LineChart 
           :series="readTimeSeries"
-          x-axis="Document Size (kB)"
+          x-axis="Object Size (kB)"
           y-axis="Read Time (ms)"
-          title="Read Time vs Document Size"
+          title="Read Time vs Object Size"
         />
       </div>
   
       <div class="col-lg-6 col-md-12" v-if="writeTimeSeries">
         <LineChart
             :series="writeTimeSeries"
-            x-axis="Document Size (kB)"
+            x-axis="Object Size (kB)"
             y-axis="Write Time (ms)"
-            title="Write Time vs Document Size"
+            title="Write Time vs Object Size"
         />
       </div>
 
       <div class="col-lg-6 col-md-12" v-if="readThroughputSeries">
         <LineChart
             :series="readThroughputSeries"
-            x-axis="Document Size (kB)"
+            x-axis="Object Size (kB)"
             y-axis="Read Throughput (kBps)"
-            title="Read Throughput vs Document Size"
+            title="Read Throughput vs Object Size"
         />
       </div>
 
       <div class="col-lg-6 col-md-12" v-if="writeThroughputSeries">
         <LineChart
             :series="writeThroughputSeries"
-            x-axis="Document Size (kB)"
+            x-axis="Object Size (kB)"
             y-axis="Write Throughput (kBps)"
-            title="Write Throughput vs Document Size"
+            title="Write Throughput vs Object Size"
         />
       </div>
     </div>

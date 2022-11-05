@@ -75,6 +75,10 @@ table td.number {
     text-align: right;
 }
 
+table td.module-id {
+    white-space: nowrap;
+}
+
 table .row-toggle {
     font-size: 14px;
     margin-right: 10px;

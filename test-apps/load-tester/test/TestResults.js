@@ -15,12 +15,11 @@ export default {
     <tr>
       <th>Encryption <br />Module</th>
       <th>Document <br />Schema</th>
-      <th>Avg Document Size<br/>(kB)</th>
-      <th>Document<br />Count</th>
+      <th>Avg Object Size<br/>(kB)</th>
+      <th>Object<br />Count</th>
       <th>Total Time<br/>(ms)</th>
       <th>Avg Read Time<br/>(ms)</th>
       <th>Avg Write Time<br/>(ms)</th>
-      <th>Avg Read/Write Time<br/>(ms)</th>
       <th>Avg Read Throughput<br/>(kBps)</th>
       <th>Avg Write Throughput<br/>(kBps)</th>
     </tr>

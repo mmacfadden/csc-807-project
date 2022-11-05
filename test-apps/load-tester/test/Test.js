@@ -52,7 +52,6 @@ export default {
       Persistence.saveTestConfig(config);
     },
     async onStart() {
-      const quiet = true;
       this.results = [];
       this.resultsCsv = null;
       this.testsCompleted = 0;
@@ -110,7 +109,6 @@ export default {
             schemas,
             this.testConfig.documentsPerTest,
             indexedDB,
-            quiet,
             hooks);
 
         this.resultsCsv = CsvGenerator.generateCsv(results);

@@ -1,6 +1,6 @@
 export default {
   template: `
-    <nav class="navbar navbar-expand navbar-dark bg-dark">
+    <nav class="navbar navbar-expand navbar-dark bg-dark sticky-top">
     <div class="container-fluid">
       <span class="navbar-brand">
         <i class="fa-brands fa-html5"></i>

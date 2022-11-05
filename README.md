@@ -42,8 +42,17 @@ The project has several TODOs.
 - Test indices
 - Test cursor iteration
 - Find a common cryptographically strong random byte / string generator.
+- Generate a set of documents before running the tests, instead of generating them per test.
+- Update the load tester to actually take a test config file format.
 
 Additional algorithms to look at:
 - https://en.wikipedia.org/wiki/International_Data_Encryption_Algorithm
 - https://en.wikipedia.org/wiki/ARIA_(cipher)
 - https://en.wikipedia.org/wiki/CAST-256
+- https://github.com/valderman/threefish.js
+- https://en.wikipedia.org/wiki/RC6
+  - https://raw.githubusercontent.com/mauricelambert/RC6Encryption/a01e52b18f4fce919237fc8db79a9706524c21ee/RC6Encryption.py
+    - https://github.com/domantasm96/RC6-BLOCK-CIPHER/blob/master/src/rc6.java
+
+Validator
+https://8gwifi.org/CipherFunctions.jsp

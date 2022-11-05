@@ -21,7 +21,7 @@ export default {
   },
   template: `
     <tr>
-      <td class="string" >
+      <td class="string module-id" >
         <span @click="toggle" class="row-toggle">
           <span v-show="!expanded"><i class="fa-solid fa-square-plus" /></span>
           <span v-show="expanded"><i class="fa-solid fa-square-minus" /></span>
@@ -34,12 +34,11 @@ export default {
       <td class="number">{{round(result.totalTimeMs, 1)}}</td>
       <td class="number">{{round(result.averageReadTimeMs, 1)}}</td>
       <td class="number">{{round(result.averageWriteTimeMs, 1)}}</td>
-      <td class="number">{{round(result.averageReadWriteTimeMs, 1)}}</td>
       <td class="number">{{round(result.avgReadThroughputKbps, 1)}}</td>
       <td class="number">{{round(result.avgWriteThroughputKbps, 1)}}  </td>
     </tr>
     <tr v-if="expanded">
-      <td colspan="10">  
+      <td colspan="9">  
         <div class="d-flex flex-row">
           <chart :data="result.reads.map(x => x.timeMs)" title="Read Time"/>
           <chart :data="result.writes.map(x => x.timeMs)" title="Write Time"/>

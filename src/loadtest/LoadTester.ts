@@ -39,8 +39,6 @@ export class LoadTester {
    *   The configuration used to create object stores and documents.
    * @param indexedDb
    *   The HTML5 IndexedDB object to use to store data.
-   * @param quiet
-   *   Whether to suppress log output.
    * @param hooks
    *   Callback hooks to get status during testing.
    *
@@ -50,7 +48,6 @@ export class LoadTester {
                                             objectStoreConfigs: IObjectStoreConfig[],
                                             operationCount: number,
                                             indexedDb: IDBFactory,
-                                            quiet: boolean,
                                             hooks?: ILoadTesterHooks): Promise<ILoadTestResult[]> {
     const testConfigs: ILoadTestConfig[] = objectStoreConfigs.flatMap(osc => {
       return encryptionConfigs.map(ec => {
@@ -62,7 +59,7 @@ export class LoadTester {
       });
     });
 
-    return await LoadTester.runTests(testConfigs, indexedDb, quiet, hooks);
+    return await LoadTester.runTests(testConfigs, indexedDb, hooks);
   }
 
   /**
@@ -72,8 +69,6 @@ export class LoadTester {
    *   The encryption module configs to test.
    * @param indexedDb
    *   The HTML5 IndexedDB object to use to store data.
-   * @param quiet
-   *   Whether to suppress log output.
    * @param hooks
    *   Callback hooks to get status during testing.
    *
@@ -81,24 +76,15 @@ export class LoadTester {
    */
   public static async runTests(testConfigs: ILoadTestConfig[],
                                indexedDb: IDBFactory,
-                               quiet: boolean,
                                hooks?: ILoadTesterHooks): Promise<ILoadTestResult[]> {
     if (hooks?.testingStarted) {
       hooks.testingStarted(testConfigs);
     }
 
-    if (!quiet) {
-      console.log("IndexedDB Encryption Load Testing Started");
-    }
-
     const results: ILoadTestResult[] = [];
 
-    for await (let result of LoadTester._generateTests(testConfigs, indexedDb, quiet, hooks)) {
+    for await (let result of LoadTester._generateTests(testConfigs, indexedDb, hooks)) {
       results.push(result);
-    }
-
-    if (!quiet) {
-      console.log("IndexedDB Encryption Load Testing Completed");
     }
 
     if (hooks?.testingFinished) {
@@ -114,8 +100,6 @@ export class LoadTester {
    *   The encryption module configs to test.
    * @param indexedDb
    *   The HTML5 IndexedDB object to use to store data.
-   * @param quiet
-   *   Whether to suppress log output.
    * @param hooks
    *   Callback hooks to get status during testing.
    *
@@ -123,12 +107,11 @@ export class LoadTester {
    */
   private static async* _generateTests(testConfigs: ILoadTestConfig[],
                                        indexedDb: IDBFactory,
-                                       quiet: boolean,
                                        hooks?: ILoadTesterHooks): AsyncIterableIterator<ILoadTestResult> {
     for (const i in testConfigs) {
       const config = testConfigs[i];
       const tester = new LoadTester(config, indexedDb);
-      const result = await tester.loadTest(quiet, hooks);
+      const result = await tester.loadTest(hooks);
       yield result;
     }
   }
@@ -178,12 +161,10 @@ export class LoadTester {
   /**
    * Executes a single load test for the specified configuration.
    *
-   * @param quiet
-   *   Whether to suppress output.
    * @param hooks
    *   Callback hooks to get status during testing.
    */
-  public async loadTest(quiet: boolean, hooks?: ILoadTesterHooks): Promise<ILoadTestResult> {
+  public async loadTest(hooks?: ILoadTesterHooks): Promise<ILoadTestResult> {
     const dbNames = await this._idb.databases();
     if (dbNames.findIndex(i => i.name === LoadTester._DB_NAME) >= 0) {
       const deleteRequest = this._idb.deleteDatabase(LoadTester._DB_NAME);
@@ -203,10 +184,6 @@ export class LoadTester {
 
     if (hooks?.testStarted) {
       hooks.testStarted(this._idb.encryptionModuleId(), this._config.objectStoreConfig.name);
-    }
-
-    if (!quiet) {
-      console.log(`Testing ${this._idb.encryptionModuleId()}`);
     }
 
     let totalBytes = 0;
@@ -273,10 +250,6 @@ export class LoadTester {
     };
 
     db.close();
-
-    if (!quiet) {
-      console.log(`Finished Testing ${this._idb.encryptionModuleId()}`);
-    }
 
     if (hooks?.testFinished) {
       hooks.testFinished(result);

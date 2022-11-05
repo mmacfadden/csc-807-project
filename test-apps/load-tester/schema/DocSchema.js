@@ -176,11 +176,11 @@ export default {
   },
   template: `
     <div class="d-flex flex-fill flex-column">
-    <h1><i class="fa-solid fa-file-code"></i> Document Schemas</h1>
+    <h1><i class="fa-solid fa-file-code"></i> Object Schemas</h1>
     <div class="row flex-fill">
       <div class="col-auto d-flex">
         <div class="flex-fill d-flex flex-column">
-          <label for="config-select" class="form-label">Document Schemas</label>
+          <label for="config-select" class="form-label">Object Schemas</label>
           <select @change="onSelect" class="form-select flex-fill" id="config-select" size="4" aria-label="Select Schema">
             <option v-for="schema in documentSchemas" :value="schema.name" :selected="schema === this.selectedSchema">
               {{ schema.name }}
@@ -231,7 +231,7 @@ export default {
         </div>
         <div class="row flex-fill flex-row">
           <div class="col d-flex flex-column">
-            <label for="config-source" class="form-label">Document Schema</label>
+            <label for="config-source" class="form-label">Object Schema</label>
             <div id="config-source" class="flex-fill"></div>
           </div>
           <div class="col d-flex flex-column">
@@ -258,11 +258,11 @@ export default {
     </div>
     <upload-schema-modal 
         ref="uploadModal"
-        title="Import Document Schemas"
+        title="Import Object Schemas"
         @upload="onUpload"
     >
       <div>
-        <p><strong>Warning: Importing document schemas will replace all existing schema configurations.</strong></p>
+        <p><strong>Warning: Importing Object Schemas will replace all existing schema configurations.</strong></p>
         <p>Select a file to import.</p>
       </div>
     </upload-schema-modal>
