@@ -1,77 +1,48 @@
 import {
   IEncryptionConfig,
   LoadTester,
-  ModuleClearText,
-  ModuleCryptoJsAes256,
   EncryptionConfigManager,
-  ModuleTwoFish,
-  ModuleBlowfish,
-  ModuleCryptoJsTripleDes,
-  ModuleNodeCryptoAes256,
-  ModuleCryptoJsAes128,
-  ModuleNodeCryptoAes128,
-  ModuleRC5,
-  ModuleNodeCryptoChaCha20,
-  ModuleXSalsa20NaCl,
-  ModuleChaCha20,
-  ModuleSM4CBC,
   ILoadTesterHooks,
   ILoadTestResult
 } from "../src";
 import "fake-indexeddb/auto";
+import fs from "fs";
 
-const objectStoreConfig = {
-  name: "Customer",
-  keyPath: "id",
-  schema: {
-    id: {
-      chance: "guid"
-    },
-    firstName: {
-      faker: "name.firstName"
-    },
-    lastName: {
-      faker: "name.lastName"
-    },
-    accountNumber: {
-      faker: "finance.account"
-    },
-    phoneNumber: {
-      faker: "phone.phoneNumber"
-    },
-    biography: {
-      faker: "lorem.paragraphs()"
-    },
-    age: {
-      faker: "datatype.number()"
-    },
-    birthday: {
-      faker: "datatype.datetime()"
-    },
-    arrayData: {
-      faker: "datatype.array()"
-    }
-  }
+
+const testDir  = "./testing/text_5000_all_modules";
+
+export function parseConfig(c: string) {
+  return eval(`(${c})`);
 }
 
-const operationCount = 10;
+export function parseSchema(s: any): any {
+  const {name, enabledByDefault, schema, keyPath} = s;
+  return {
+    name, enabledByDefault, keyPath, schema: parseConfig(schema)
+  };
+}
 
 async function test() {
-  const encryptionConfigs: IEncryptionConfig[] = [
-    await EncryptionConfigManager.generateConfig(ModuleClearText.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes256.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleCryptoJsAes128.MODULE_ID),
-    await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes128.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleNodeCryptoChaCha20.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleTwoFish.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleBlowfish.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleCryptoJsTripleDes.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleRC5.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleChaCha20.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleXSalsa20NaCl.MODULE_ID),
-    // await EncryptionConfigManager.generateConfig(ModuleSM4CBC.MODULE_ID),
-  ];
+  const configFileContents = fs.readFileSync( `${testDir}/test-config.json`, {encoding:'utf8', flag:'r'});
+  const testConfig = JSON.parse(configFileContents);
+
+  // TODO this is common code to the load test app.
+  const moduleParams = {
+    serializationScheme: testConfig.preEncryptionSerialization
+  }
+
+  const encryptionConfigs: IEncryptionConfig[] = [];
+  for (let i = 0; i < testConfig.selectedModules.length; i++) {
+    const moduleConfig = await EncryptionConfigManager.generateConfig(testConfig.selectedModules[i], moduleParams);
+    encryptionConfigs.push(moduleConfig);
+  }
+
+  const schemas = testConfig.selectedSchemas.map(parseSchema).map((s: any) => {
+        const {name, keyPath, schema} = s;
+        return {name, keyPath, schema}
+      }
+  );
+
 
   const hooks: ILoadTesterHooks = {
     testingStarted() {
@@ -90,15 +61,15 @@ async function test() {
 
   const results = await LoadTester.testEncryptionConfigs(
       encryptionConfigs,
-      [objectStoreConfig],
-      operationCount,
+      schemas,
+      testConfig.documentsPerTest,
       indexedDB,
-      hooks
-  );
+      hooks);
 
-  console.log("Writing JSON test results to: load-test-results.json");
-  console.log("Writing CSV test results to: load-test-results.csv\n ");
-  // console.log(JSON.stringify(results));
+  console.log("Writing JSON test results to: testing/results/node.json");
+  const resultJson = JSON.stringify(results, null, "  ");
+  fs.writeFileSync( `${testDir}/results/node.json`, resultJson );
+
 }
 
 test();
