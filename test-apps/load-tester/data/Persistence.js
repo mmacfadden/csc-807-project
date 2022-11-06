@@ -45,7 +45,7 @@ export class Persistence {
       return JSON.parse(data);
     } else {
       const default_config = {
-        preEncryptionSerialization: "json",
+        preEncryptionSerialization: "msgpack",
         documentsPerTest: 30,
         selectedModules: ALL_MODULES,
         selectedSchemas: All_SCHEMAS.filter(v => v.enabledByDefault)

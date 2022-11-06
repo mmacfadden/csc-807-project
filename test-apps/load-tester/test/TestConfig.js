@@ -149,7 +149,6 @@ export default {
             <div class="col-6">
               <label for="docsPerTest" class="form-label">Pre-Encryption Serialization Scheme</label>
               <select class="form-select" aria-label="Pre-Encryption Serialization Scheme" @change="setSerialization">
-                <option value="json" :selected="serializationScheme === 'json'">JSON</option>
                 <option value="bson" :selected="serializationScheme === 'bson'">BSON</option>
                 <option value="msgpack" :selected="serializationScheme === 'msgpack'">Message Pack</option>
               </select>
