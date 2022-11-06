@@ -165,11 +165,18 @@ export class LoadTester {
    *   Callback hooks to get status during testing.
    */
   public async loadTest(hooks?: ILoadTesterHooks): Promise<ILoadTestResult> {
-    const dbNames = await this._idb.databases();
-    if (dbNames.findIndex(i => i.name === LoadTester._DB_NAME) >= 0) {
-      const deleteRequest = this._idb.deleteDatabase(LoadTester._DB_NAME);
-      await RequestUtils.requestToPromise(deleteRequest);
-    }
+    const deleteRequest = this._idb.deleteDatabase(LoadTester._DB_NAME);
+    await RequestUtils.requestToPromise(deleteRequest);
+
+    // We used to check to see if the database exists. However, Firefox does
+    // not implement the "databases()" method.
+    // https://stackoverflow.com/questions/68130115/typeerror-indexeddb-databases-is-not-a-function
+    //
+    // const dbNames = await this._idb.databases();
+    // if (dbNames.findIndex(i => i.name === LoadTester._DB_NAME) >= 0) {
+    //     const deleteRequest = this._idb.deleteDatabase(LoadTester._DB_NAME);
+    //     await RequestUtils.requestToPromise(deleteRequest);
+    // }
 
     const openReq = this._idb.open(LoadTester._DB_NAME);
     openReq.onupgradeneeded = () => {
