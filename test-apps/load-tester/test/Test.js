@@ -127,9 +127,7 @@ export default {
       download_file( "load-test-results.csv", this.resultsCsv);
     },
     onDownloadJson() {
-      const json = JSON.stringify({
-        results: this.results
-      }, null, "  ");
+      const json = JSON.stringify(this.results, null, "  ");
       download_file( "load-test-results.json", json);
     },
     onUploadJsonRequest() {
@@ -137,8 +135,7 @@ export default {
     },
     onUploadJson(file) {
       try {
-        const json = JSON.parse(file);
-        this.results = json.results;
+        this.results = JSON.parse(file);
         this.testingInProgress = false;
         this.testingFinished = true;
       } catch (e) {
