@@ -1,0 +1,26 @@
+{
+  "preEncryptionSerialization": "msgpack",
+  "documentsPerTest": 10,
+  "selectedModules": [
+    "Clear Text Storage",
+    "AES 128 (Crypto JS)",
+    "AES 128 (node-crypto)",
+    "AES 256 (Crypto JS)",
+    "AES 256 (node-crypto)",
+    "Triple DES (Crypto JS)",
+    "Blowfish CBC (egoroof)",
+    "TwoFish (wouldgo)",
+    "RC5 (rc5 npm)",
+    "SM4 CBC (gm-crypto npm)",
+    "XSalsa20 (tweetnacl)",
+    "ChaCha20 (ts-chacha20)"
+  ],
+  "selectedSchemas": [
+    {
+      "name": "Text 5000",
+      "enabledByDefault": false,
+      "keyPath": "id",
+      "schema": "{\n  \"id\": {\n    \"chance\": \"guid\"\n  },\n  \"text\": {\n    \"faker\": \"random.alphaNumeric(5000)\"\n  }\n}"
+    }
+  ]
+}

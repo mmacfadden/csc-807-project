@@ -1,0 +1,1154 @@
+[
+  {
+    "moduleId": "Clear Text",
+    "schemaName": "Text 5000",
+    "operationCount": 10,
+    "reads": [
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 33
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 36
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 32
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 33
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 32
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 31
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 30
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      }
+    ],
+    "writes": [
+      {
+        "docSize": 10084,
+        "timeMs": 65
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 33
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 32
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 37
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 32
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 32
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 32
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 32
+      }
+    ],
+    "averageDocumentSize": 10.084,
+    "totalTimeMs": 695.9999999999982,
+    "averageWriteTimeMs": 36.499999999999815,
+    "averageReadTimeMs": 33.1,
+    "averageReadWriteTimeMs": 69.59999999999982,
+    "avgReadThroughputKbps": 304.65256797583083,
+    "avgWriteThroughputKbps": 276.27397260274114
+  },
+  {
+    "moduleId": "AES 128 (Crypto JS)",
+    "schemaName": "Text 5000",
+    "operationCount": 10,
+    "reads": [
+      {
+        "docSize": 10084,
+        "timeMs": 39
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 32.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 32
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 32
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 45
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 38
+      }
+    ],
+    "writes": [
+      {
+        "docSize": 10084,
+        "timeMs": 42
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 40
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 33
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 33
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 38
+      }
+    ],
+    "averageDocumentSize": 10.084,
+    "totalTimeMs": 712.0000000000018,
+    "averageWriteTimeMs": 35.70000000000018,
+    "averageReadTimeMs": 35.5,
+    "averageReadWriteTimeMs": 71.20000000000019,
+    "avgReadThroughputKbps": 284.056338028169,
+    "avgWriteThroughputKbps": 282.46498599439633
+  },
+  {
+    "moduleId": "AES 128 (node-crypto)",
+    "schemaName": "Text 5000",
+    "operationCount": 10,
+    "reads": [
+      {
+        "docSize": 10084,
+        "timeMs": 51.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 50
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 44.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 45
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 44
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 46
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 45
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 44
+      }
+    ],
+    "writes": [
+      {
+        "docSize": 10084,
+        "timeMs": 56
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 52
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 48
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 46.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 45
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 44.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 48
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 44
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 46
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 46
+      }
+    ],
+    "averageDocumentSize": 10.084,
+    "totalTimeMs": 931.0000000000036,
+    "averageWriteTimeMs": 47.6,
+    "averageReadTimeMs": 45.50000000000036,
+    "averageReadWriteTimeMs": 93.10000000000036,
+    "avgReadThroughputKbps": 221.62637362637187,
+    "avgWriteThroughputKbps": 211.84873949579833
+  },
+  {
+    "moduleId": "AES 256 (Crypto JS)",
+    "schemaName": "Text 5000",
+    "operationCount": 10,
+    "reads": [
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 33
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 33
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 36.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 32.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 37.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 39
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 39
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 38
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 39.00000000000182
+      }
+    ],
+    "writes": [
+      {
+        "docSize": 10084,
+        "timeMs": 38
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 33
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 38
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 38
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 37
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 39
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 39
+      }
+    ],
+    "averageDocumentSize": 10.084,
+    "totalTimeMs": 727.0000000000055,
+    "averageWriteTimeMs": 36.500000000000185,
+    "averageReadTimeMs": 36.200000000000365,
+    "averageReadWriteTimeMs": 72.70000000000054,
+    "avgReadThroughputKbps": 278.5635359115994,
+    "avgWriteThroughputKbps": 276.27397260273835
+  },
+  {
+    "moduleId": "AES 256 (node-crypto)",
+    "schemaName": "Text 5000",
+    "operationCount": 10,
+    "reads": [
+      {
+        "docSize": 10084,
+        "timeMs": 47
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 47
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 48.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 42
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 42
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      }
+    ],
+    "writes": [
+      {
+        "docSize": 10084,
+        "timeMs": 48
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 48
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 50
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 45
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 44
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 42
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 42.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 44
+      }
+    ],
+    "averageDocumentSize": 10.084,
+    "totalTimeMs": 891,
+    "averageWriteTimeMs": 44.999999999999815,
+    "averageReadTimeMs": 44.10000000000018,
+    "averageReadWriteTimeMs": 89.1,
+    "avgReadThroughputKbps": 228.66213151927343,
+    "avgWriteThroughputKbps": 224.0888888888898
+  },
+  {
+    "moduleId": "Triple DES (Crypto JS)",
+    "schemaName": "Text 5000",
+    "operationCount": 10,
+    "reads": [
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 41
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 41.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 42
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 40
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 44.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 39.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 40
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 42
+      }
+    ],
+    "writes": [
+      {
+        "docSize": 10084,
+        "timeMs": 46
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 42
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 40
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 40
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 42
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 42
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 44.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 41
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 40.99999999999818
+      }
+    ],
+    "averageDocumentSize": 10.084,
+    "totalTimeMs": 837.0000000000018,
+    "averageWriteTimeMs": 42.1,
+    "averageReadTimeMs": 41.60000000000018,
+    "averageReadWriteTimeMs": 83.70000000000019,
+    "avgReadThroughputKbps": 242.4038461538451,
+    "avgWriteThroughputKbps": 239.52494061757722
+  },
+  {
+    "moduleId": "Blowfish CBC (egoroof)",
+    "schemaName": "Text 5000",
+    "operationCount": 10,
+    "reads": [
+      {
+        "docSize": 10084,
+        "timeMs": 37
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 37.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 39
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 39
+      }
+    ],
+    "writes": [
+      {
+        "docSize": 10084,
+        "timeMs": 40.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 38
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 36
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 39
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 39
+      }
+    ],
+    "averageDocumentSize": 10.084,
+    "totalTimeMs": 726.9999999999945,
+    "averageWriteTimeMs": 36.69999999999963,
+    "averageReadTimeMs": 35.999999999999815,
+    "averageReadWriteTimeMs": 72.69999999999945,
+    "avgReadThroughputKbps": 280.11111111111256,
+    "avgWriteThroughputKbps": 274.76839237057493
+  },
+  {
+    "moduleId": "TwoFish (wouldgo)",
+    "schemaName": "Text 5000",
+    "operationCount": 10,
+    "reads": [
+      {
+        "docSize": 10084,
+        "timeMs": 38
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 36
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 36
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 36.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 36.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 37
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 38.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 37.00000000000182
+      }
+    ],
+    "writes": [
+      {
+        "docSize": 10084,
+        "timeMs": 43.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 37
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 37
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 39
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 37.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 36
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 38
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 38
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 39
+      }
+    ],
+    "averageDocumentSize": 10.084,
+    "totalTimeMs": 746.0000000000018,
+    "averageWriteTimeMs": 38.09999999999982,
+    "averageReadTimeMs": 36.50000000000036,
+    "averageReadWriteTimeMs": 74.60000000000018,
+    "avgReadThroughputKbps": 276.273972602737,
+    "avgWriteThroughputKbps": 264.67191601049996
+  },
+  {
+    "moduleId": "RC5 (rc5 npm)",
+    "schemaName": "Text 5000",
+    "operationCount": 10,
+    "reads": [
+      {
+        "docSize": 10084,
+        "timeMs": 80
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 77.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 79.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 80
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 80
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 78
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 79
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 73.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 73
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 74
+      }
+    ],
+    "writes": [
+      {
+        "docSize": 10084,
+        "timeMs": 91
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 78.00000000000182
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 77
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 77
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 78
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 77
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 78
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 76.99999999999818
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 74
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 74
+      }
+    ],
+    "averageDocumentSize": 10.084,
+    "totalTimeMs": 1555.0000000000018,
+    "averageWriteTimeMs": 78.1,
+    "averageReadTimeMs": 77.40000000000018,
+    "averageReadWriteTimeMs": 155.50000000000017,
+    "avgReadThroughputKbps": 130.2842377260979,
+    "avgWriteThroughputKbps": 129.11651728553136
+  },
+  {
+    "moduleId": "SM4 CBC (gm-crypto npm)",
+    "schemaName": "Text 5000",
+    "operationCount": 10,
+    "reads": [
+      {
+        "docSize": 10084,
+        "timeMs": 43.99999999999636
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 41
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 41
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 41
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 42
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 41
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 41
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 44
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 42.99999999999636
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 41
+      }
+    ],
+    "writes": [
+      {
+        "docSize": 10084,
+        "timeMs": 48.00000000000364
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 41
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 41
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 44
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 43
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 41.00000000000364
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 41
+      }
+    ],
+    "averageDocumentSize": 10.084,
+    "totalTimeMs": 847,
+    "averageWriteTimeMs": 42.80000000000073,
+    "averageReadTimeMs": 41.899999999999274,
+    "averageReadWriteTimeMs": 84.7,
+    "avgReadThroughputKbps": 240.66825775656744,
+    "avgWriteThroughputKbps": 235.60747663551004
+  },
+  {
+    "moduleId": "XSalsa20 (tweetnacl)",
+    "schemaName": "Text 5000",
+    "operationCount": 10,
+    "reads": [
+      {
+        "docSize": 10084,
+        "timeMs": 37
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 33
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 36
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      }
+    ],
+    "writes": [
+      {
+        "docSize": 10084,
+        "timeMs": 40
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 33.99999999999636
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      }
+    ],
+    "averageDocumentSize": 10.084,
+    "totalTimeMs": 696.9999999999964,
+    "averageWriteTimeMs": 35.09999999999964,
+    "averageReadTimeMs": 34.6,
+    "averageReadWriteTimeMs": 69.69999999999963,
+    "avgReadThroughputKbps": 291.44508670520236,
+    "avgWriteThroughputKbps": 287.2934472934503
+  },
+  {
+    "moduleId": "ChaCha20 (ts-chacha20)",
+    "schemaName": "Text 5000",
+    "operationCount": 10,
+    "reads": [
+      {
+        "docSize": 10084,
+        "timeMs": 36.00000000000364
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 36
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 36
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 44
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 32
+      }
+    ],
+    "writes": [
+      {
+        "docSize": 10084,
+        "timeMs": 39
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 36
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 37
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 36
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 36
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 35
+      },
+      {
+        "docSize": 10084,
+        "timeMs": 34
+      }
+    ],
+    "averageDocumentSize": 10.084,
+    "totalTimeMs": 714.0000000000036,
+    "averageWriteTimeMs": 35.8,
+    "averageReadTimeMs": 35.600000000000364,
+    "averageReadWriteTimeMs": 71.40000000000036,
+    "avgReadThroughputKbps": 283.2584269662892,
+    "avgWriteThroughputKbps": 281.6759776536313
+  }
+]
