@@ -2,7 +2,7 @@
  * The base class of all IndexedDB Encryption modules that facilitate
  * encrypted storage to the HTML5 IndexedDB API.
  */
-export abstract class EncryptionModule {
+export abstract class EncryptionModule<P = any> {
   private readonly _id: string;
 
   /**
@@ -29,22 +29,22 @@ export abstract class EncryptionModule {
    * @param moduleParams
    *   Module specific parameters used to create the encryption secret.
    */
-  public abstract createRandomEncryptionSecret(moduleParams?: any): string;
+  public abstract createRandomEncryptionSecret(moduleParams?: P): string;
 
   /**
    * A helper method that subclasses can override if they need
    * to initialize any data asynchronously before being ready
    * to encrypt / decrypt data.
    */
-  public abstract init(encryptionSecret: string, moduleParams?: any): void;
+  public abstract init(encryptionSecret: string, moduleParams?: P): void;
 
   /**
    * Asynchronously encrypts a JavaScript object.
    *
-   * @param document
+   * @param plainText
    *   The unencrypted data to encrypt.
    */
-  public abstract encrypt(document: any): any;
+  public abstract encrypt(plainText: any): any;
 
   /**
    * Asynchronously decrypts object data.

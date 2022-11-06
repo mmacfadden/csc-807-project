@@ -4,10 +4,16 @@ import {serialize, deserialize} from "bson";
 
 export type SerializationScheme = "msgpack" | "bson";
 
+export interface ISymmetricEncryptionParams {
+  serializationScheme: SerializationScheme;
+}
+
 /**
  * An abstract base class for symmetric key encryption.
  */
-export abstract class SymmetricEncryptionBasedModule extends EncryptionModule {
+export abstract class SymmetricEncryptionBasedModule<P extends ISymmetricEncryptionParams = ISymmetricEncryptionParams> extends EncryptionModule<P> {
+  public static DEFAULT_SERIALIZATION_SCHEME: SerializationScheme = "msgpack";
+
   private readonly _textEncoder: TextEncoder;
   private readonly _textDecoder: TextDecoder;
   private _serializationScheme: SerializationScheme;
@@ -23,10 +29,10 @@ export abstract class SymmetricEncryptionBasedModule extends EncryptionModule {
 
     this._textEncoder = new TextEncoder();
     this._textDecoder = new TextDecoder("utf-8");
-    this._serializationScheme = "msgpack";
+    this._serializationScheme = SymmetricEncryptionBasedModule.DEFAULT_SERIALIZATION_SCHEME;
   }
 
-  public init(encryptionSecret: string, moduleParams?: any) {
+  public init(encryptionSecret: string, moduleParams?: P) {
     const {serializationScheme} = moduleParams || {};
     if (serializationScheme) {
       if (serializationScheme !== "bson" && serializationScheme !== "msgpack") {
@@ -35,6 +41,10 @@ export abstract class SymmetricEncryptionBasedModule extends EncryptionModule {
         this._serializationScheme = serializationScheme;
       }
     }
+  }
+
+  public serializationScheme(): SerializationScheme {
+    return this._serializationScheme;
   }
 
   /**

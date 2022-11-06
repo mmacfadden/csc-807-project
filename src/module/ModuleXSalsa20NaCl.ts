@@ -4,7 +4,7 @@ import {encodeBase64, decodeBase64} from "tweetnacl-util";
 
 /**
  * Implements the XSalsa20 Cipher.  The XSalsa20 is an extension of
- * the Salsa20 Chiper:
+ * the Salsa20 Cipher:
  *   https://en.wikipedia.org/wiki/Salsa20
  *
  * The implementation is provided by the TweetNaCl Javascript library:
@@ -61,12 +61,6 @@ export class ModuleXSalsa20NaCl extends SymmetricEncryptionBasedModule {
   protected _decryptSerializedDocument(cipherText: Uint8Array): Uint8Array {
     const nonce = cipherText.slice(0, secretbox.nonceLength);
     const message = cipherText.slice(secretbox.nonceLength, cipherText.length);
-    const decrypted = secretbox.open(message, nonce, this._key!);
-
-    if (!decrypted) {
-      throw new Error("Could not decrypt message");
-    }
-
-    return decrypted;
+    return secretbox.open(message, nonce, this._key!)!;
   }
 }

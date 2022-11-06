@@ -59,10 +59,10 @@ describe('Encryption Module Correctness', () => {
     });
   });
 
-  // MODULES.forEach(module => {
-  //   it(`${module.moduleId()} Encrypt / Decrypt w/ BSON`, async () => {
-  //     const params = {serializationScheme: "bson"};
-  //     test(module, params);
-  //   });
-  // });
+  MODULES.forEach(module => {
+    it(`${module.moduleId()} Encrypt / Decrypt w/ BSON`, async () => {
+      const params = {serializationScheme: "bson"};
+      test(module, params);
+    });
+  });
 });

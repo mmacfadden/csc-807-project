@@ -61,14 +61,23 @@ export class ModuleRC5 extends SymmetricEncryptionBasedModule {
    */
   protected _encryptSerializedDocument(plainText: Uint8Array): Uint8Array {
     const encrypted = this._rc5!.encrypt(Buffer.from(plainText));
-    return new Uint8Array(encrypted);
+
+    const result = new Uint8Array(encrypted.byteLength + 4);
+    new DataView(result.buffer).setInt32(0, plainText.length);
+    result.set(encrypted, 4);
+
+    return result;
   }
 
   /**
    * @inheritDoc
    */
   protected _decryptSerializedDocument(cipherText: Uint8Array): Uint8Array {
-    const decrypted = this._rc5!.decrypt(Buffer.from(cipherText));
-    return new Uint8Array(decrypted);
+    const ptLen = new DataView(cipherText.buffer).getInt32(0);
+    const encryptedData = new Uint8Array(cipherText.subarray(4));
+
+    const plainText = this._rc5!.decrypt(Buffer.from(encryptedData), {trim: false});
+
+    return new Uint8Array(plainText.subarray(0, ptLen));
   }
 }
