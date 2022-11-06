@@ -94,7 +94,7 @@ export default {
     exportSettings() {
       const settings = Persistence.loadTestConfig();
       const settingsJson = JSON.stringify(settings, null, "  ");
-      download_file("load-test-settings.json", settingsJson);
+      download_file("test-config.json", settingsJson);
     }
   },
   template: `
