@@ -1,6 +1,5 @@
 import {OpeEncryptor} from "../src/ope/OpeEncryptor";
 import {RandomStringGenerator} from "../src";
-import {EndianUtils} from "../src/util/EndianUtils";
 
 const encryptor = new OpeEncryptor("Sx7oMWG3l3mIWuMmlh3ZHYAwitZr6dp+MgZ2Nv8sk7E=");
 
@@ -16,10 +15,7 @@ for(let i = 0; i < 100; i++) {
     const e1 = encryptor.encryptString(str1);
     const e2 = encryptor.encryptString(str2);
 
-    const enc1AsBytes = EndianUtils.ensureBigEndian(e1.buffer);
-    const enc2AsBytes = EndianUtils.ensureBigEndian(e2.buffer);
-
-    const eRel = compareArrays(enc1AsBytes, enc2AsBytes)
+    const eRel = compareArrays(e1.buffer, e2.buffer)
 
     const d1 = encryptor.decryptString(e1);
     const d2 = encryptor.decryptString(e2);

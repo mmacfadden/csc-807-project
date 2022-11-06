@@ -1,4 +1,3 @@
-import {EndianUtils} from "../util/EndianUtils";
 import {OpeEncryptor} from "../ope/OpeEncryptor";
 
 export class EIDBKeyEncryptor {
@@ -55,8 +54,7 @@ export class EIDBKeyEncryptor {
     public encryptSingleKey(key: number | string | Date | BufferSource): Uint8Array {
         if (typeof key === "string") {
             const encryptedKey: Int32Array = this._opeEncryptor.encryptString(key);
-            const bigEndianBuffer = EndianUtils.ensureBigEndian(encryptedKey.buffer);
-            return new Uint8Array(bigEndianBuffer);
+            return new Uint8Array(encryptedKey.buffer);
         } else {
             // FIXME handle other key types.
             throw Error("Unhandled key type");

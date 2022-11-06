@@ -49,17 +49,20 @@ export class OpeEncryptor {
     public encryptString(str: string): Int32Array {
         const bytes = this._textEncoder.encode(str);
         const encrypted: Int32Array = new Int32Array(bytes.length);
+        const view = new DataView(encrypted.buffer);
         bytes.forEach((b, i) => {
-            encrypted[i] = this._ope.encrypt(b);
+            const encryptedValue = this._ope.encrypt(b);
+            view.setInt32(i * 4, encryptedValue, false);
         });
         return encrypted;
     }
 
     public decryptString(cipherText: Int32Array): string {
         const encryptedNumbers = new Int32Array(cipherText.buffer);
+        const view = new DataView(encryptedNumbers.buffer);
         const bytes = new Uint8Array(encryptedNumbers.length);
         for (let i = 0; i < encryptedNumbers.length; i++) {
-            const encNum = encryptedNumbers[i];
+            const encNum = view.getInt32(i * 4, false);
             bytes[i] = this._ope.decrypt(encNum);
         }
         return this._textDecoder.decode(bytes);

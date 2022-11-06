@@ -49,7 +49,10 @@ export default  {
                 const db = req.result;
                 const store =  db.createObjectStore("employees", {keyPath: "id"});
                 defaultData.forEach(e => {
-                    store.add(e);
+                    const req = store.add(e);
+                    req.onerror = () => {
+                        console.error(req.error);
+                    }
                 })
                 console.log("Indexed Database schema installed.");
             }
