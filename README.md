@@ -44,6 +44,7 @@ The project has several TODOs.
 - Find a common cryptographically strong random byte / string generator.
 - Generate a set of documents before running the tests, instead of generating them per test.
 - Update the load tester to actually take a test config file format.
+- Set keys manually.
 
 Additional algorithms to look at:
 - https://en.wikipedia.org/wiki/International_Data_Encryption_Algorithm

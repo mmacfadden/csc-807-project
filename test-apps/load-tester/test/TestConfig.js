@@ -138,7 +138,7 @@ export default {
           </div>
           <div class="mb-3 row">
             <div class="col-6">
-              <label for="docsPerTest" class="form-label">Document Reads/Writes Per Test</label>
+              <label for="docsPerTest" class="form-label">Objects Per Test</label>
               <input type="number"
                      class="form-control"
                      id="docsPerTest"
@@ -171,7 +171,7 @@ export default {
             </div>
             <div class="col-4">
               <div class="row">
-                <h2>Document Schemas</h2>
+                <h2>Object Schemas</h2>
               </div>
               <div class="card">
                 <div class="card-body row">

@@ -52,15 +52,6 @@ export default {
   },
   template: `
     <div class="row">
-      <div class="col-lg-6 col-md-12" v-if="readTimeSeries">
-        <LineChart 
-          :series="readTimeSeries"
-          x-axis="Object Size (kB)"
-          y-axis="Read Time (ms)"
-          title="Read Time vs Object Size"
-        />
-      </div>
-  
       <div class="col-lg-6 col-md-12" v-if="writeTimeSeries">
         <LineChart
             :series="writeTimeSeries"
@@ -69,13 +60,13 @@ export default {
             title="Write Time vs Object Size"
         />
       </div>
-
-      <div class="col-lg-6 col-md-12" v-if="readThroughputSeries">
-        <LineChart
-            :series="readThroughputSeries"
-            x-axis="Object Size (kB)"
-            y-axis="Read Throughput (kBps)"
-            title="Read Throughput vs Object Size"
+    
+      <div class="col-lg-6 col-md-12" v-if="readTimeSeries">
+        <LineChart 
+          :series="readTimeSeries"
+          x-axis="Object Size (kB)"
+          y-axis="Read Time (ms)"
+          title="Read Time vs Object Size"
         />
       </div>
 
@@ -85,6 +76,15 @@ export default {
             x-axis="Object Size (kB)"
             y-axis="Write Throughput (kBps)"
             title="Write Throughput vs Object Size"
+        />
+      </div>
+
+      <div class="col-lg-6 col-md-12" v-if="readThroughputSeries">
+        <LineChart
+            :series="readThroughputSeries"
+            x-axis="Object Size (kB)"
+            y-axis="Read Throughput (kBps)"
+            title="Read Throughput vs Object Size"
         />
       </div>
     </div>

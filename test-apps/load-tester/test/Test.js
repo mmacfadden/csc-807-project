@@ -23,7 +23,7 @@ export default {
     const documentSchemas = Persistence.loadSchemas();
 
     let results = Persistence.loadResults();
-    let testingFinished = false
+    let testingFinished = false;
     if (results !== null) {
       testingFinished = true;
     } else {
@@ -123,6 +123,12 @@ export default {
       this.testingInProgress = false;
 
     },
+    onClearResults() {
+      this.results = [];
+      this.testingFinished = false;
+      this.testingInProgress = false;
+      Persistence.saveResults([]);
+    },
     onDownloadCsv() {
       download_file( "load-test-results.csv", this.resultsCsv);
     },
@@ -167,8 +173,9 @@ export default {
         @download-csv="onDownloadCsv"
         @download-json="onDownloadJson"
         @upload-results="onUploadJsonRequest"
+        @clear="onClearResults"
         :in-progress="testingInProgress"
-        :test-completed="this.resultsCsv"
+        :test-completed="this.testingFinished"
     />
     <h2>Status</h2>
     <status

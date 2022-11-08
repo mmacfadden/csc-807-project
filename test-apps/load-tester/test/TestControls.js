@@ -1,12 +1,15 @@
 export default {
   props: ["inProgress", "testCompleted"],
-  events: ["start", "cancel", "downloadCsv", "downloadJson", "uploadResults"],
+  events: ["start", "cancel", "clear", "downloadCsv", "downloadJson", "uploadResults"],
   methods: {
     onStartTest() {
       this.$emit("start");
     },
     onCancel() {
       this.$emit("cancel");
+    },
+    onClear() {
+      this.$emit("clear");
     },
     onDownloadCsv() {
       this.$emit("downloadCsv");
@@ -34,6 +37,9 @@ export default {
     </button>
     <button class="btn btn-primary icon" @click="onUpload" :disabled="inProgress">
       <i class="fa-solid fa-file-code"></i><i class="fa-solid fa-upload"></i> Upload Results
+    </button>
+    <button class="btn btn-danger icon" @click="onClear" :disabled="!testCompleted">
+      <i class="fa-solid fa-trash"></i> Clear Results
     </button>
     </div>
   `

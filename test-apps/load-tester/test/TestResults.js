@@ -14,7 +14,7 @@ export default {
     <thead>
     <tr>
       <th>Encryption <br />Module</th>
-      <th>Document <br />Schema</th>
+      <th>Object <br />Schema</th>
       <th>Avg Object Size<br/>(kB)</th>
       <th>Object<br />Count</th>
       <th>Total Time<br/>(ms)</th>

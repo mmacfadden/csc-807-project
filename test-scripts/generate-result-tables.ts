@@ -43,7 +43,7 @@ const safariResults =
     JSON.parse(fs.readFileSync( `${testDir}/results/safari.json`, {encoding:'utf8', flag:'r'}));
 
 const edgeResults =
-    JSON.parse(fs.readFileSync( `${testDir}/results/safari.json`, {encoding:'utf8', flag:'r'}));
+    JSON.parse(fs.readFileSync( `${testDir}/results/edge.json`, {encoding:'utf8', flag:'r'}));
 
 function findResultForModule(moduleId: string, schemaName: string, results: ILoadTestResult[]) {
   return results.find(s => s.moduleId === moduleId && s.schemaName === schemaName);
