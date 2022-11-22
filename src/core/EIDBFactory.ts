@@ -12,7 +12,7 @@ export class EIDBFactory implements IDBFactory {
         return new EIDBFactory(delegate, config);
     }
 
-    private _delegate: IDBFactory;
+    private readonly _delegate: IDBFactory;
     private readonly _encryptionModule: EncryptionModule;
     private readonly _valueMapper: EIDBValueMapper;
     private readonly _encryptionConfig: IEncryptionConfig;

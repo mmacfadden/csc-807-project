@@ -3,6 +3,8 @@ import {IEncryptionConfig} from "./IEncryptionConfig";
 import {OpeEncryptor} from "../ope/OpeEncryptor";
 import {EncryptionModuleFactory} from "../module";
 import {RandomStringGenerator} from "../util";
+import {NamespacedStorage} from "./NamespacedStorage";
+import {EncryptionConfigIO} from "./EncryptionConfigIO";
 
 /**
  * Stores and retrieves the encryption configuration for the Encrypted
@@ -26,11 +28,6 @@ export class EncryptionConfigManager {
    * the encryption key from the user's password.
    */
   public static readonly SALT_KEY = "_salt";
-
-  /**
-   * The LocalStorage key suffix that stores the encrypted configuration.
-   */
-  public static readonly CONFIG_KEY = "_config";
 
   /**
    * A convenience method to create a new configuration for a specific
@@ -100,8 +97,7 @@ export class EncryptionConfigManager {
    * @returns True if the config is set, false otherwise.
    */
   public configSet(username: string): boolean {
-    const configKey = this._resolveKey(username, EncryptionConfigManager.CONFIG_KEY);
-    return this._storage.getItem(configKey) !== null;
+    return EncryptionConfigIO.configSetForUser(this._storage, this._storageKeyPrefix, username);
   }
 
   /**
@@ -134,8 +130,14 @@ export class EncryptionConfigManager {
       throw new Error("The newPassword must be a non-empty string");
     }
 
-    const config = this.getConfig(username, currentPassword);
-    this.setConfig(config, username, newPassword);
+    const salt = this._getSaltForUser(username);
+    const currentKey = EncryptionConfigManager._deriveKey(currentPassword, salt);
+    const currentIO = new EncryptionConfigIO(this._storage, this._storageKeyPrefix, username, currentKey);
+    const config = currentIO.getConfig();
+
+    const newKey = EncryptionConfigManager._deriveKey(newPassword, salt);
+    const newIo = new EncryptionConfigIO(this._storage, this._storageKeyPrefix, username, newKey);
+    newIo.setConfig(config);
   }
 
   /**
@@ -153,7 +155,7 @@ export class EncryptionConfigManager {
    * @throws If the password is not correct.
    * @throws If a current configuration is not set for this user.
    */
-  public getConfig(username: string, password: string): IEncryptionConfig {
+  public openConfig(username: string, password: string): EncryptionConfigIO {
     if (!username) {
       throw new Error("The username must be a non-empty string");
     }
@@ -162,88 +164,25 @@ export class EncryptionConfigManager {
       throw new Error("The password must be a non-empty string");
     }
 
-    // First we must retrieve the salt.
-    const saltKey = this._resolveKey(username, EncryptionConfigManager.SALT_KEY);
-    const saltAsBase64 = this._storage.getItem(saltKey);
+    const salt = this._getSaltForUser(username);
+    const key = EncryptionConfigManager._deriveKey(password, salt);
+
+    const configIO = new EncryptionConfigIO(this._storage, this._storageKeyPrefix, username, key);
+    configIO.validate();
+    return configIO;
+  }
+
+  private _getSaltForUser(username: string): CryptoJS.lib.WordArray {
+    const ns = new NamespacedStorage(this._storage, this._storageKeyPrefix, username);
+
+    let saltAsBase64 = ns.getItem(EncryptionConfigManager.SALT_KEY);
+
     if (!saltAsBase64) {
-      throw new Error("Can not decrypt data because the key salt was not present in storage.");
+      const salt = CryptoJS.lib.WordArray.random(128 / 8);
+      saltAsBase64 = CryptoJS.enc.Base64.stringify(salt);
+      ns.setItem(EncryptionConfigManager.SALT_KEY, saltAsBase64);
     }
 
-    const salt = CryptoJS.enc.Base64.parse(saltAsBase64);
-
-    // Now we derive the key with the same salt.
-    const key = EncryptionConfigManager._deriveKey(password, salt);
-
-    // Get the encrypted data and decrypt it.
-    const encryptionStorageKey = this._resolveKey(username, EncryptionConfigManager.CONFIG_KEY);
-    const encryptedConfigData = this._storage.getItem(encryptionStorageKey);
-    if (!encryptedConfigData) {
-      throw new Error("Encryption config is not set.");
-    }
-    const bytes: CryptoJS.lib.WordArray = CryptoJS.AES.decrypt(encryptedConfigData, key);
-    const serializedConfig = bytes.toString(CryptoJS.enc.Utf8);
-
-    try {
-      return JSON.parse(serializedConfig);
-    } catch (e) {
-      throw new Error("Invalid password");
-    }
-  }
-
-  /**
-   * Encrypts and stores the current encryption config.
-   *
-   * @param config
-   *   The encryption config to set.
-   * @param username
-   *    The username to set the config for.
-   * @param password
-   *   The password to used to encrypt the configuration.
-   */
-  public setConfig(config: IEncryptionConfig, username: string, password: string): void {
-    if (!config) {
-      throw new Error("Config must be set");
-    }
-
-    if (!username) {
-      throw new Error("The username must be a non-empty string");
-    }
-
-    if (!password) {
-      throw new Error("The password must be a non-empty string");
-    }
-
-    // Everytime we store the config we will derive a new key by using a new
-    // salt.  This avoids a dictionary attack. But we also have to store the
-    // salt to be able to derive the correct key.
-    const salt = CryptoJS.lib.WordArray.random(128 / 8);
-    const saltAsBase64 = CryptoJS.enc.Base64.stringify(salt);
-    const saltKey = this._resolveKey(username, EncryptionConfigManager.SALT_KEY);
-    this._storage.setItem(saltKey, saltAsBase64);
-
-    // Derive the new key using the password and the salt.
-    const key = EncryptionConfigManager._deriveKey(password, salt);
-
-    // We now use the derived key to encrypt the config and store it.
-    const configData = JSON.stringify(config, null, "");
-    const encryptedConfigData = CryptoJS.AES.encrypt(configData, key).toString();
-    const configKey = this._resolveKey(username, EncryptionConfigManager.CONFIG_KEY)
-    this._storage.setItem(configKey, encryptedConfigData);
-  }
-
-  /**
-   * A helper method to result the user scoped LocalStorage key
-   * with the key prefix.
-   *
-   * @param username
-   *   The username to get the key for.
-   * @param key
-   *   The specific key to get the string for.
-   *
-   * @private
-   */
-  private _resolveKey(username: string, key: string): string {
-    const hash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA512(username));
-    return `${this._storageKeyPrefix}_${key}_${hash}`;
+    return CryptoJS.enc.Base64.parse(saltAsBase64);
   }
 }

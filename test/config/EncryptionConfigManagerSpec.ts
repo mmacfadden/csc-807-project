@@ -24,74 +24,38 @@ describe('EncryptionConfigManager', () => {
     });
   });
 
-  describe('getConfig', () => {
+  describe('openConfig', () => {
     it('throws if the username is not set', () => {
       const storage = new InMemoryStorage();
       const configManager = new EncryptionConfigManager(storage);
-      expect(() => configManager.getConfig(undefined as any as string, "password")).to.throw();
+      expect(() => configManager.openConfig(undefined as any as string, "password")).to.throw();
     });
 
     it('throws if the username is an empty string', () => {
       const storage = new InMemoryStorage();
       const configManager = new EncryptionConfigManager(storage);
-      expect(() => configManager.getConfig("", "password")).to.throw();
+      expect(() => configManager.openConfig("", "password")).to.throw();
     });
 
     it('throws if the password is not set', () => {
       const storage = new InMemoryStorage();
       const configManager = new EncryptionConfigManager(storage);
-      expect(() => configManager.getConfig(user1, undefined as any as string)).to.throw();
+      expect(() => configManager.openConfig(user1, undefined as any as string)).to.throw();
     });
 
     it('throws if the password is an empty string', () => {
       const storage = new InMemoryStorage();
       const configManager = new EncryptionConfigManager(storage);
-      expect(() => configManager.getConfig(user1, "")).to.throw();
-    });
-
-    it('throws if the config is not set', () => {
-      const storage = new InMemoryStorage();
-      const configManager = new EncryptionConfigManager(storage);
-      expect(() => configManager.getConfig(user1, "password")).to.throw();
+      expect(() => configManager.openConfig(user1, "")).to.throw();
     });
 
     it('throws if the password is incorrect', () => {
       const storage = new InMemoryStorage();
       const configManager = new EncryptionConfigManager(storage);
-      configManager.setConfig(CONFIG, user1, "password");
-      expect(() => configManager.getConfig(user1, "wrong")).to.throw();
-    });
-  });
-
-  describe('setConfig', () => {
-    it('throws if the config is not set', () => {
-      const storage = new InMemoryStorage();
-      const configManager = new EncryptionConfigManager(storage);
-      expect(() => configManager.setConfig(undefined as any as IEncryptionConfig, user1,"password")).to.throw();
-    });
-
-    it('throws if the username is not set', () => {
-      const storage = new InMemoryStorage();
-      const configManager = new EncryptionConfigManager(storage);
-      expect(() => configManager.setConfig(CONFIG, undefined as any as string, "password")).to.throw();
-    });
-
-    it('throws if the username is an empty string', () => {
-      const storage = new InMemoryStorage();
-      const configManager = new EncryptionConfigManager(storage);
-      expect(() => configManager.setConfig(CONFIG, "","password")).to.throw();
-    });
-
-    it('throws if the password is not set', () => {
-      const storage = new InMemoryStorage();
-      const configManager = new EncryptionConfigManager(storage);
-      expect(() => configManager.setConfig(CONFIG, user1, undefined as any as string)).to.throw();
-    });
-
-    it('throws if the password is an empty string', () => {
-      const storage = new InMemoryStorage();
-      const configManager = new EncryptionConfigManager(storage);
-      expect(() => configManager.setConfig(CONFIG, user1,"")).to.throw();
+      configManager
+          .openConfig(user1, "password")
+          .setConfig(CONFIG);
+      expect(() => configManager.openConfig(user1, "wrong")).to.throw();
     });
   });
 
@@ -117,17 +81,23 @@ describe('EncryptionConfigManager', () => {
     it('throws if the currentPassword is incorrect', () => {
       const storage = new InMemoryStorage();
       const configManager = new EncryptionConfigManager(storage);
-      configManager.setConfig(CONFIG, user1,"password");
+      configManager
+          .openConfig(user1, "password")
+          .setConfig(CONFIG);
       expect(() => configManager.changePassword(user1,"wrong", "new")).to.throw();
     });
 
     it('Changes the password if the currentPassword is correct.', () => {
       const storage = new InMemoryStorage();
       const configManager = new EncryptionConfigManager(storage);
-      configManager.setConfig(CONFIG, user1,"password");
+      configManager
+          .openConfig(user1, "password")
+          .setConfig(CONFIG);
       configManager.changePassword(user1,"password", "newPassword")
-      const read = configManager.getConfig(user1,"newPassword");
-      expect(read ).to.deep.equal(CONFIG);
+      const read = configManager
+          .openConfig(user1, "newPassword")
+          .getConfig();
+      expect(read).to.deep.equal(CONFIG);
     });
   });
 });
