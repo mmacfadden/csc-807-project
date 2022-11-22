@@ -1,8 +1,8 @@
-// import {EventTarget} from "event-target-shim";
 import {EIDBObjectStore} from "./EIDBObjectStore";
 import {EIDBValueMapper} from "./EIDBValueMapper";
 import {wrapEventWithTarget} from "./EventWrapper";
-import {KeyPathUtil} from "../util/KeyPathUtil";
+import {KeyPathUtil} from "../util";
+import {DatabaseNameUtil} from "../util/DatabaseNameUtil";
 
 export class EIDBDatabase extends EventTarget implements IDBDatabase {
 
@@ -42,7 +42,7 @@ export class EIDBDatabase extends EventTarget implements IDBDatabase {
     }
 
     get name(): string {
-        return this._db.name
+        return DatabaseNameUtil.unprefixName(this._db.name);
     }
     get objectStoreNames(): DOMStringList {
         return this._db.objectStoreNames

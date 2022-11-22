@@ -78,6 +78,7 @@ export default {
       Persistence.reset();
       const config = Persistence.loadTestConfig();
       this.setDataFromConfig(config);
+      this.emitConfig();
     },
     importRequest() {
       this.$refs.uploadModal.show();

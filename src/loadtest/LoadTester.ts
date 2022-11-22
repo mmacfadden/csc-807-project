@@ -165,8 +165,9 @@ export class LoadTester {
    *   Callback hooks to get status during testing.
    */
   public async loadTest(hooks?: ILoadTesterHooks): Promise<ILoadTestResult> {
-    const deleteRequest = this._idb.deleteDatabase(LoadTester._DB_NAME);
-    await RequestUtils.requestToPromise(deleteRequest);
+    // If somehow the database exists, delete it so it will be created.
+    const preDeleteRequest = this._idb.deleteDatabase(LoadTester._DB_NAME);
+    await RequestUtils.requestToPromise(preDeleteRequest);
 
     // We used to check to see if the database exists. However, Firefox does
     // not implement the "databases()" method.
@@ -257,6 +258,9 @@ export class LoadTester {
     };
 
     db.close();
+
+    const postDeleteRequest = this._idb.deleteDatabase(LoadTester._DB_NAME);
+    await RequestUtils.requestToPromise(postDeleteRequest);
 
     if (hooks?.testFinished) {
       hooks.testFinished(result);

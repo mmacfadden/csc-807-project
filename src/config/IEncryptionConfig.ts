@@ -23,4 +23,9 @@ export interface IEncryptionConfig {
    * keys and indices that need to support range queries.
    */
   opeKey: string;
+
+  /**
+   * A unique prefix for database names.
+   */
+  userDbPrefix: string;
 }

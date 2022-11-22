@@ -43,7 +43,6 @@ async function test() {
       }
   );
 
-
   const hooks: ILoadTesterHooks = {
     testingStarted() {
         console.log("Encrypted IndexedDB Load Testing Started\n");

@@ -2,6 +2,7 @@ import * as CryptoJS from 'crypto-js';
 import {IEncryptionConfig} from "./IEncryptionConfig";
 import {OpeEncryptor} from "../ope/OpeEncryptor";
 import {EncryptionModuleFactory} from "../module";
+import {RandomStringGenerator} from "../util";
 
 /**
  * Stores and retrieves the encryption configuration for the Encrypted
@@ -14,8 +15,21 @@ import {EncryptionModuleFactory} from "../module";
  * IndexedDB, the encryption configuration is stored within Local Storage.
  */
 export class EncryptionConfigManager {
+  /**
+   * The default LocalStorage key prefix for all values the
+   * EncryptionConfigManager stores.
+   */
   public static readonly DEFAULT_LOCAL_STORAGE_KEY_PREFIX = "__indexed_db_encryption";
+
+  /**
+   * The LocalStorage key suffix that stores the unique salt used to derive
+   * the encryption key from the user's password.
+   */
   public static readonly SALT_KEY = "_salt";
+
+  /**
+   * The LocalStorage key suffix that stores the encrypted configuration.
+   */
   public static readonly CONFIG_KEY = "_config";
 
   /**
@@ -32,12 +46,14 @@ export class EncryptionConfigManager {
     const opeKey = OpeEncryptor.generateKey();
     const module = EncryptionModuleFactory.createModule(encryptionModuleId);
     const dataSecret = module.createRandomEncryptionSecret(moduleParams);
+    const userDbPrefix = RandomStringGenerator.generate(15);
 
     return {
       moduleId: encryptionModuleId,
       moduleParams: moduleParams,
       dataSecret,
-      opeKey
+      opeKey,
+      userDbPrefix
     }
   }
 
@@ -76,12 +92,15 @@ export class EncryptionConfigManager {
   }
 
   /**
-   * Determines if the config is currently set.
+   * Determines if the config is set for a given user.
+   *
+   * @param username
+   *   The username to check if the config is set for.
    *
    * @returns True if the config is set, false otherwise.
    */
-  public configSet(): boolean {
-    const configKey = this._storageKeyPrefix + EncryptionConfigManager.CONFIG_KEY;
+  public configSet(username: string): boolean {
+    const configKey = this._resolveKey(username, EncryptionConfigManager.CONFIG_KEY);
     return this._storage.getItem(configKey) !== null;
   }
 
@@ -90,6 +109,8 @@ export class EncryptionConfigManager {
    * the encryption configuration to be re-encrypted using a new key derived
    * from the user's new password.
    *
+   * @param username
+   *   The username to change the password for.
    * @param currentPassword
    *   The currently set password.
    * @param newPassword
@@ -100,35 +121,49 @@ export class EncryptionConfigManager {
    * @throws If the currentPassword is not correct.
    * @throws If a current configuration is not set.
    */
-  public changePassword(currentPassword: string, newPassword: string): void {
-    if (!currentPassword || !newPassword) {
-      throw new Error("Both the currentPassword and newPassword must be non-empty strings");
+  public changePassword(username: string, currentPassword: string, newPassword: string): void {
+    if (!username) {
+      throw new Error("The username must be a non-empty string");
     }
 
-    const key = this.getConfig(currentPassword);
-    this.setConfig(key, newPassword);
+    if (!currentPassword) {
+      throw new Error("The currentPassword must be a non-empty string");
+    }
+
+    if (!newPassword) {
+      throw new Error("The newPassword must be a non-empty string");
+    }
+
+    const config = this.getConfig(username, currentPassword);
+    this.setConfig(config, username, newPassword);
   }
 
   /**
    * Gets the current configuration using the user's password to decrypt
    * the stored configuration.
    *
+   * @param username
+   *   The username of the user to get the config for.
    * @param password
-   *   The current user password.
+   *   The user's password.
    *
-   * @returns The current encryption config.
+   * @returns The current encryption config for the user.
    *
    * @throws If password is anything other than a non-empty string.
    * @throws If the password is not correct.
-   * @throws If a current configuration is not set.
+   * @throws If a current configuration is not set for this user.
    */
-  public getConfig(password: string): IEncryptionConfig {
+  public getConfig(username: string, password: string): IEncryptionConfig {
+    if (!username) {
+      throw new Error("The username must be a non-empty string");
+    }
+
     if (!password) {
       throw new Error("The password must be a non-empty string");
     }
 
     // First we must retrieve the salt.
-    const saltKey = this._storageKeyPrefix + EncryptionConfigManager.SALT_KEY;
+    const saltKey = this._resolveKey(username, EncryptionConfigManager.SALT_KEY);
     const saltAsBase64 = this._storage.getItem(saltKey);
     if (!saltAsBase64) {
       throw new Error("Can not decrypt data because the key salt was not present in storage.");
@@ -140,7 +175,7 @@ export class EncryptionConfigManager {
     const key = EncryptionConfigManager._deriveKey(password, salt);
 
     // Get the encrypted data and decrypt it.
-    const encryptionStorageKey = this._storageKeyPrefix + EncryptionConfigManager.CONFIG_KEY;
+    const encryptionStorageKey = this._resolveKey(username, EncryptionConfigManager.CONFIG_KEY);
     const encryptedConfigData = this._storage.getItem(encryptionStorageKey);
     if (!encryptedConfigData) {
       throw new Error("Encryption config is not set.");
@@ -160,12 +195,18 @@ export class EncryptionConfigManager {
    *
    * @param config
    *   The encryption config to set.
+   * @param username
+   *    The username to set the config for.
    * @param password
    *   The password to used to encrypt the configuration.
    */
-  public setConfig(config: IEncryptionConfig, password: string): void {
+  public setConfig(config: IEncryptionConfig, username: string, password: string): void {
     if (!config) {
       throw new Error("Config must be set");
+    }
+
+    if (!username) {
+      throw new Error("The username must be a non-empty string");
     }
 
     if (!password) {
@@ -177,7 +218,8 @@ export class EncryptionConfigManager {
     // salt to be able to derive the correct key.
     const salt = CryptoJS.lib.WordArray.random(128 / 8);
     const saltAsBase64 = CryptoJS.enc.Base64.stringify(salt);
-    this._storage.setItem(this._storageKeyPrefix + EncryptionConfigManager.SALT_KEY, saltAsBase64);
+    const saltKey = this._resolveKey(username, EncryptionConfigManager.SALT_KEY);
+    this._storage.setItem(saltKey, saltAsBase64);
 
     // Derive the new key using the password and the salt.
     const key = EncryptionConfigManager._deriveKey(password, salt);
@@ -185,6 +227,23 @@ export class EncryptionConfigManager {
     // We now use the derived key to encrypt the config and store it.
     const configData = JSON.stringify(config, null, "");
     const encryptedConfigData = CryptoJS.AES.encrypt(configData, key).toString();
-    this._storage.setItem(this._storageKeyPrefix + EncryptionConfigManager.CONFIG_KEY, encryptedConfigData);
+    const configKey = this._resolveKey(username, EncryptionConfigManager.CONFIG_KEY)
+    this._storage.setItem(configKey, encryptedConfigData);
+  }
+
+  /**
+   * A helper method to result the user scoped LocalStorage key
+   * with the key prefix.
+   *
+   * @param username
+   *   The username to get the key for.
+   * @param key
+   *   The specific key to get the string for.
+   *
+   * @private
+   */
+  private _resolveKey(username: string, key: string): string {
+    const hash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA512(username));
+    return `${this._storageKeyPrefix}_${key}_${hash}`;
   }
 }

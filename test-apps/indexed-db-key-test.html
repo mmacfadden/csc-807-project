@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script>
+  let db = null;
+  const objectStoreName = "employee";
+  const databaseName = "key-test";
+
+  // Let us open our database
+  const DBOpenRequest = window.indexedDB.open(databaseName, 1);
+
+  DBOpenRequest.onsuccess = (event) => {
+    test(DBOpenRequest.result);
+  };
+
+  DBOpenRequest.onupgradeneeded = (event) => {
+    const db = event.target.result;
+
+    db.onerror = (event) => {
+      console.log(db.error);
+    };
+
+    const req = db.createObjectStore(objectStoreName, { keyPath: ["prop1", "prop2"] });
+    req.onerror = () => {
+      console.log(req.error);
+    }
+
+    req.onsuccess = () => {
+      console.log("object store created");
+    }
+
+    console.log("upgraded");
+  };
+
+  function test(db) {
+    // Create a new item to add in to the object store
+    const newItem = { prop1: "A", prop2s: "B" };
+
+    // open a read/write db transaction, ready for adding the data
+    const transaction = db.transaction([objectStoreName], "readwrite");
+
+    // report on the success of the transaction completing, when everything is done
+    transaction.oncomplete = () => {
+      console.log("Tx Complete");
+    };
+
+    transaction.onerror = (event) => {
+      console.log(transaction.error);
+    };
+
+    // create an object store on the transaction
+    const objectStore = transaction.objectStore(objectStoreName);
+    // make a request to add our newItem object to the object store
+    const objectStoreRequest = objectStore.add(newItem, { prop1: "A", prop2: "B" });
+
+    objectStoreRequest.onsuccess = () => {
+      console.log("object stored");
+    }
+  }
+</script>
+</body>
+</html>
