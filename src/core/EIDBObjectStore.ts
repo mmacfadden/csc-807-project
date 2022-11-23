@@ -8,6 +8,7 @@ import {MutableIDBRequest} from "./MutableIDBRequest";
 import {OpeEncryptor} from "../ope/OpeEncryptor";
 import {EIDBKeyEncryptor} from "./EIDBKeyEncryptor";
 import {EIDBObjectStoreConfig} from "../config/EIDBObjectStoreConfig";
+import {KeyPathUtil} from "../util";
 
 export class EIDBObjectStore implements IDBObjectStore {
     private readonly _store: IDBObjectStore;
@@ -148,7 +149,6 @@ export class EIDBObjectStore implements IDBObjectStore {
     }
 
     private _encrypt(value: any): IEncryptedDocument {
-
         const keys = this._extractAndEncryptKeys(value, this._config.getKeyPath());
         const encryptedValue = this._encryptionModule.encrypt(value);
         return {
@@ -206,7 +206,7 @@ export class EIDBObjectStore implements IDBObjectStore {
                 curSourceVal = source[prop];
 
                 if (i === pathComponents.length - 1) {
-                    target[`k${k}`] = this._keyEncryptor.encryptKey(curSourceVal);
+                    target[KeyPathUtil.getKey(k)] = this._keyEncryptor.encryptKey(curSourceVal);
                     break;
                 }
 

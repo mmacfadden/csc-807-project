@@ -8,13 +8,17 @@ export class KeyPathUtil {
           return null;
         } else if (Array.isArray(keyPath)) {
           return keyPath
-              .map((k,i) => `k${i}`)
+              .map((k,i) => KeyPathUtil.getKey(i))
               .map(KeyPathUtil.wrapStringKeyPath);
         } else if (typeof keyPath === "string") {
-          return KeyPathUtil.wrapStringKeyPath("k0");
+          return KeyPathUtil.wrapStringKeyPath(KeyPathUtil.getKey(0));
         } else {
           throw Error("Invalid key path: " + keyPath)
         }
+    }
+
+    public static getKey(keyNum: number): string {
+      return `k${keyNum}`;
     }
 
     public static wrapStringKeyPath(keyPath: string): string {
