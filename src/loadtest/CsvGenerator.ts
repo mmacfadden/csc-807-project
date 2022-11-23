@@ -33,28 +33,28 @@ export class CsvGenerator {
     }
 
     const data = results
-      .map(row => {
-        const {
-          moduleId,
-          operationCount,
-          totalTimeMs,
-          averageReadTimeMs,
-          averageWriteTimeMs,
-          averageReadWriteTimeMs,
-          avgReadThroughputKbps,
-          avgWriteThroughputKbps
-        } = row
-        return [
-          moduleId,
-          operationCount,
-          totalTimeMs,
-          averageReadTimeMs,
-          averageWriteTimeMs,
-          averageReadWriteTimeMs,
-          avgReadThroughputKbps,
-          avgWriteThroughputKbps
-        ].join(",");
-      });
+        .map(row => {
+          const {
+            moduleId,
+            operationCount,
+            totalTimeMs,
+            averageReadTimeMs,
+            averageWriteTimeMs,
+            averageReadWriteTimeMs,
+            avgReadThroughputKbps,
+            avgWriteThroughputKbps
+          } = row
+          return [
+            moduleId,
+            operationCount,
+            totalTimeMs,
+            averageReadTimeMs,
+            averageWriteTimeMs,
+            averageReadWriteTimeMs,
+            avgReadThroughputKbps,
+            avgWriteThroughputKbps
+          ].join(",");
+        });
 
     data.unshift(CsvGenerator.HEADERS.join(","));
 

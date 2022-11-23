@@ -1,19 +1,19 @@
 import {expect} from 'chai';
 import {
   EncryptionModuleFactory,
-  ModuleClearText,
-  ModuleTwoFish,
   ModuleBlowfish,
-  ModuleCryptoJsTripleDes,
+  ModuleChaCha20,
+  ModuleClearText,
   ModuleCryptoJsAes128,
   ModuleCryptoJsAes256,
+  ModuleCryptoJsTripleDes,
   ModuleNodeCryptoAes128,
   ModuleNodeCryptoAes256,
-  ModuleRC5,
   ModuleNodeCryptoChaCha20,
-  ModuleXSalsa20NaCl,
-  ModuleChaCha20,
-  ModuleSM4CBC
+  ModuleRC5,
+  ModuleSM4CBC,
+  ModuleTwoFish,
+  ModuleXSalsa20NaCl
 } from '../../src';
 
 describe('EncryptionModuleFactory', () => {

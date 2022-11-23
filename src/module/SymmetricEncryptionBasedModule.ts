@@ -1,6 +1,6 @@
 import {EncryptionModule} from "./EncryptionModule";
-import {encode, decode} from "@msgpack/msgpack";
-import {serialize, deserialize} from "bson";
+import {decode, encode} from "@msgpack/msgpack";
+import {deserialize, serialize} from "bson";
 
 export type SerializationScheme = "msgpack" | "bson";
 

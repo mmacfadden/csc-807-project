@@ -1,4 +1,4 @@
-import {twofish, ITwoFish} from "twofish";
+import {ITwoFish, twofish} from "twofish";
 import {SymmetricEncryptionBasedModule} from "./SymmetricEncryptionBasedModule";
 import {RandomStringGenerator} from "../util";
 

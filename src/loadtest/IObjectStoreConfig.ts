@@ -1,9 +1,9 @@
 export interface IObjectStoreConfig {
 
-    name: string;
+  name: string;
 
-    schema: object;
+  schema: object;
 
-    keyPath: string | string[];
-    
+  keyPath: string | string[];
+
 }

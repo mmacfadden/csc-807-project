@@ -1,8 +1,6 @@
 import {ModuleNodeCrypto} from "./ModuleNodeCrypto";
 
 
-
-
 /**
  * This module uses the CryptoJS library to implement ChaCha20
  * encryption.  More information on Node Crypto can be found at:

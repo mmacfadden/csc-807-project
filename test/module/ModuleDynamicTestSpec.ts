@@ -1,19 +1,19 @@
 import {expect} from 'chai';
 import {
-  ModuleClearText,
-  ModuleTwoFish,
+  EncryptionModule,
   ModuleBlowfish,
-  ModuleCryptoJsTripleDes,
+  ModuleChaCha20,
+  ModuleClearText,
   ModuleCryptoJsAes128,
   ModuleCryptoJsAes256,
+  ModuleCryptoJsTripleDes,
   ModuleNodeCryptoAes128,
   ModuleNodeCryptoAes256,
-  ModuleRC5,
   ModuleNodeCryptoChaCha20,
-  ModuleXSalsa20NaCl,
-  ModuleChaCha20,
+  ModuleRC5,
   ModuleSM4CBC,
-  EncryptionModule
+  ModuleTwoFish,
+  ModuleXSalsa20NaCl
 } from '../../src/';
 
 const MODULES = [
@@ -51,6 +51,7 @@ function test(module: EncryptionModule, params: any) {
   const decrypted = module.decrypt(cypherText);
   expect(decrypted).to.deep.eq(TEST_DOCUMENT);
 }
+
 describe('Encryption Module Correctness', () => {
   MODULES.forEach(module => {
     it(`${module.moduleId()} Encrypt / Decrypt w/ Message Pack`, async () => {

@@ -34,7 +34,7 @@ export class Timing {
     const endMark = Timing._READ_END + i;
     globalThis.performance.mark(Timing._READ_END + i);
     const measure = globalThis.performance.measure(
-      Timing._READ, Timing._READ_START + i, endMark);
+        Timing._READ, Timing._READ_START + i, endMark);
 
     return measure.duration;
   }
@@ -60,7 +60,7 @@ export class Timing {
     const endMark = Timing._WRITE_END + i;
     globalThis.performance.mark(Timing._WRITE_END + i);
     const measure = globalThis.performance.measure(
-      Timing._WRITE, Timing._WRITE_START + i, endMark);
+        Timing._WRITE, Timing._WRITE_START + i, endMark);
 
     return measure.duration;
   }
@@ -96,7 +96,7 @@ export class Timing {
   private static _getTotal(name: string): number {
     let total = 0;
     const entries = globalThis.performance.getEntriesByName(name);
-    for(const e of entries) {
+    for (const e of entries) {
       total += e.duration
     }
 

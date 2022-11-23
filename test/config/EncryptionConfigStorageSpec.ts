@@ -74,7 +74,7 @@ describe('EncryptionConfigStorage', () => {
     it('throws if the wrong password is wrong', () => {
       const storage = new InMemoryStorage();
       new EncryptionConfigStorage(storage, user1)
-        .open(password, () => DEFAULT_CONFIG);
+          .open(password, () => DEFAULT_CONFIG);
 
       expect(() => {
         new EncryptionConfigStorage(storage, user1)

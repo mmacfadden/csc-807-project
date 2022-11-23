@@ -1,4 +1,4 @@
-import {EIDBFactory, IDocIoRecord, IEncryptionConfigData, EncryptionConfig, ObjectSizeCalculator} from "../";
+import {EIDBFactory, EncryptionConfig, IDocIoRecord, IEncryptionConfigData, ObjectSizeCalculator} from "../";
 import {Timing} from "./Timing";
 import {ILoadTesterHooks} from "./ILoadTesterHooks";
 import {ILoadTestResult} from "./ILoadTestResult";
@@ -282,19 +282,19 @@ export class LoadTester {
   }
 
   private _extractValueFromDocument(doc: any, path: string): any {
-      const pathComponents = path.split(".");
-      let curSourceVal = doc;
+    const pathComponents = path.split(".");
+    let curSourceVal = doc;
 
-      for (let i = 0; i < pathComponents.length; i++) {
-        const prop = pathComponents[i];
-        curSourceVal = curSourceVal[prop];
-        if (curSourceVal === undefined || curSourceVal === null) {
-          throw new Error("Unable to extract key from document");
-        }
-
-        if (i === pathComponents.length - 1) {
-          return curSourceVal;
-        }
+    for (let i = 0; i < pathComponents.length; i++) {
+      const prop = pathComponents[i];
+      curSourceVal = curSourceVal[prop];
+      if (curSourceVal === undefined || curSourceVal === null) {
+        throw new Error("Unable to extract key from document");
       }
+
+      if (i === pathComponents.length - 1) {
+        return curSourceVal;
+      }
+    }
   }
 }

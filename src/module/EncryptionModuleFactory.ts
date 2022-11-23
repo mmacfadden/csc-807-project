@@ -1,18 +1,18 @@
 import {
   EncryptionModule,
   ModuleBlowfish,
+  ModuleChaCha20,
   ModuleClearText,
   ModuleCryptoJsAes128,
   ModuleCryptoJsAes256,
   ModuleCryptoJsTripleDes,
-  ModuleNodeCryptoAes256,
   ModuleNodeCryptoAes128,
+  ModuleNodeCryptoAes256,
   ModuleNodeCryptoChaCha20,
   ModuleRC5,
-  ModuleXSalsa20NaCl,
-  ModuleChaCha20,
   ModuleSM4CBC,
-  ModuleTwoFish
+  ModuleTwoFish,
+  ModuleXSalsa20NaCl
 } from "./";
 
 /**

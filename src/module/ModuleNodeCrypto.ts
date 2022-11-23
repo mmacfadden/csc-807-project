@@ -62,7 +62,7 @@ export abstract class ModuleNodeCrypto extends SymmetricEncryptionBasedModule {
     this._ivLen = 12;
     this._algo = algo;
     this._keyLen = keyLen;
-    this._cipherOptions = { authTagLength: 16 };
+    this._cipherOptions = {authTagLength: 16};
   }
 
   /**

@@ -1,6 +1,6 @@
 import {SymmetricEncryptionBasedModule} from "./SymmetricEncryptionBasedModule";
-import {secretbox, randomBytes} from "tweetnacl";
-import {encodeBase64, decodeBase64} from "tweetnacl-util";
+import {randomBytes, secretbox} from "tweetnacl";
+import {decodeBase64, encodeBase64} from "tweetnacl-util";
 
 /**
  * Implements the XSalsa20 Cipher.  The XSalsa20 is an extension of

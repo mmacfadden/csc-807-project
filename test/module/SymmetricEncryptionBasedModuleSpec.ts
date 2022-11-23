@@ -5,6 +5,7 @@ class TestModule extends SymmetricEncryptionBasedModule {
   constructor(moduleId: string) {
     super(moduleId);
   }
+
   protected _decryptSerializedDocument(ciphertext: Uint8Array): Uint8Array {
     return new Uint8Array();
   }

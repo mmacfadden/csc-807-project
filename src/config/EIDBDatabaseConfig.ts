@@ -3,7 +3,7 @@ import {EIDBObjectStoreConfig} from "./EIDBObjectStoreConfig";
 
 export class EIDBDatabaseConfig {
   private readonly _config: IDatabaseConfigData;
-  private readonly _update:  () => void
+  private readonly _update: () => void
 
   constructor(config: IDatabaseConfigData, update: () => void) {
     this._config = config;

@@ -79,7 +79,7 @@ export abstract class ModuleCryptoJs extends SymmetricEncryptionBasedModule {
     const iv = CryptoJS.lib.WordArray.create(ciphertextWords.words.slice(0, ivLen));
     ciphertextWords.words.splice(0, ivLen);
     ciphertextWords.sigBytes -= this._ivBytes;
-    const params =  CryptoJS.lib.CipherParams.create({ ciphertext: ciphertextWords });
+    const params = CryptoJS.lib.CipherParams.create({ciphertext: ciphertextWords});
     const ptWords = this._decrypt(params, this._key!, iv);
     return CryptoJsUtils.convertWordArrayToUint8Array(ptWords);
   }

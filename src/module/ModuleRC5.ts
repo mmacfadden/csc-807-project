@@ -1,6 +1,6 @@
 import {SymmetricEncryptionBasedModule} from "./SymmetricEncryptionBasedModule";
 
-import RC5  from "rc5";
+import RC5 from "rc5";
 import {RandomStringGenerator} from "../util";
 
 // TODO evaluate the number of rounds.
@@ -51,7 +51,7 @@ export class ModuleRC5 extends SymmetricEncryptionBasedModule {
   /**
    * @inheritDoc
    */
-  public init(encryptionSecret: string, moduleParams?: any): void  {
+  public init(encryptionSecret: string, moduleParams?: any): void {
     super.init(encryptionSecret, moduleParams);
     this._rc5 = new RC5(encryptionSecret, this._blockSize, this._rounds);
   }

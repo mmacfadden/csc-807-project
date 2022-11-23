@@ -1,7 +1,6 @@
 import {OpeEncryptor} from "../../src/ope/OpeEncryptor";
 import CryptoJS from "crypto-js";
 import {expect} from 'chai';
-import {OPE} from "../../src/ope/OPE";
 
 describe('OpeEncryptor', () => {
   describe('generateKey', () => {

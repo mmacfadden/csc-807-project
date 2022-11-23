@@ -29,14 +29,14 @@ export interface IEncryptionConfigData {
    */
   userDbPrefix: string;
 
-  databases: {[key: string]: IDatabaseConfigData}
+  databases: { [key: string]: IDatabaseConfigData }
 }
 
 export interface IDatabaseConfigData {
-  objectStores: {[key: string]: IObjectStoreConfigData}
+  objectStores: { [key: string]: IObjectStoreConfigData }
 }
 
 export interface IObjectStoreConfigData {
   keyPath: string | string[] | null;
-  indices: {[key: string]: string | string[]}
+  indices: { [key: string]: string | string[] }
 }

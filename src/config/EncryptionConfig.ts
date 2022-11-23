@@ -27,7 +27,7 @@ export class EncryptionConfig {
   /**
    * The module specific data secret used to encrypt the data.
    */
-  dataSecret(): string{
+  dataSecret(): string {
     return this._config.dataSecret;
   }
 
@@ -35,14 +35,14 @@ export class EncryptionConfig {
    * The key used for Order Preserving Encryption that is used for encrypting
    * keys and indices that need to support range queries.
    */
-  opeKey(): string{
+  opeKey(): string {
     return this._config.opeKey;
   }
 
   /**
    * A unique prefix for database names.
    */
-  userDbPrefix(): string{
+  userDbPrefix(): string {
     return this._config.userDbPrefix;
   }
 
