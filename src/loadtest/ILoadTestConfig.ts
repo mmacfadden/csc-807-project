@@ -1,4 +1,4 @@
-import {IEncryptionConfig} from "../config";
+import {IEncryptionConfigData} from "../config";
 import {IObjectStoreConfig} from "./IObjectStoreConfig";
 
 /**
@@ -8,7 +8,7 @@ export interface ILoadTestConfig {
   /**
    * The encryption configuration to use for the test.
    */
-  encryptionConfig: IEncryptionConfig;
+  encryptionConfig: IEncryptionConfigData;
 
   /**
    * The number of read / write operations to conduct.

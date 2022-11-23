@@ -1,3 +1,3 @@
-export * from "./IEncryptionConfig";
-export * from "./EncryptionConfigManager";
-export * from "./EncryptionConfigIO";
+export * from "./IEncryptionConfigData";
+export * from "./EncryptionConfigStorage";
+export * from "./EncryptionConfig";

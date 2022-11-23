@@ -1,4 +1,4 @@
-import {EIDBFactory, IDocIoRecord, IEncryptionConfig, ObjectSizeCalculator} from "../";
+import {EIDBFactory, IDocIoRecord, IEncryptionConfigData, EncryptionConfig, ObjectSizeCalculator} from "../";
 import {Timing} from "./Timing";
 import {ILoadTesterHooks} from "./ILoadTesterHooks";
 import {ILoadTestResult} from "./ILoadTestResult";
@@ -44,7 +44,7 @@ export class LoadTester {
    *
    * @returns A string array of all test results in CSV format.
    */
-  public static async testEncryptionConfigs(encryptionConfigs: IEncryptionConfig[],
+  public static async testEncryptionConfigs(encryptionConfigs: IEncryptionConfigData[],
                                             objectStoreConfigs: IObjectStoreConfig[],
                                             operationCount: number,
                                             indexedDb: IDBFactory,
@@ -154,7 +154,9 @@ export class LoadTester {
       throw new Error("indexedDb must be defined");
     }
 
-    this._idb = EIDBFactory.create(indexedDb, config.encryptionConfig);
+    const encryptionConfig = new EncryptionConfig(config.encryptionConfig);
+
+    this._idb = EIDBFactory.create(indexedDb, encryptionConfig);
     this._idb.initEncryption();
   }
 

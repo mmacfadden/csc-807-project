@@ -1,9 +1,7 @@
-const {EncryptionConfigManager, ModuleNodeCryptoAes256} = EncryptedIndexedDB;
+const {EncryptionConfigStorage, ModuleNodeCryptoAes256} = EncryptedIndexedDB;
 
 export class AuthenticationManager {
     static CREDENTIALS_KEY = "_demo_credentials";
-    static SESSION_ENCRYPTION_CONFIG = "_encryption_config";
-    static SESSION_USERNAME = "_demo_username";
 
     static _DEMO_USERNAME1 = "user1";
     static _DEMO_USERNAME2 = "user2";
@@ -11,14 +9,10 @@ export class AuthenticationManager {
 
     constructor(storageKeyPrefix) {
         this._loggedInUser = null;
-        this._encryptionConfigManager = new EncryptionConfigManager(window.localStorage);
+        this._encryptionConfigStorage = null;
         this._encryptionConfig = null;
 
-        if (storageKeyPrefix) {
-            this._storageKeyPrefix = storageKeyPrefix;
-        } else {
-            this._storageKeyPrefix = EncryptionConfigManager.DEFAULT_LOCAL_STORAGE_KEY_PREFIX;
-        }
+        this._storageKeyPrefix = storageKeyPrefix;
     }
 
     async validateCredentials(username, password) {
@@ -40,19 +34,17 @@ export class AuthenticationManager {
         const valid = storedCredentials && storedPassword === credentials.pass;
 
         if (valid) {
-            if (!this._encryptionConfigManager.configSet(username)) {
-                const encryptionConfig = await EncryptionConfigManager.generateConfig(ModuleNodeCryptoAes256.MODULE_ID);
-                this._encryptionConfigManager.setConfig(encryptionConfig, username, password);
-            }
+            this._encryptionConfigStorage = new EncryptionConfigStorage(
+                window.localStorage,
+                username,
+                window.sessionStorage,
+                this._storageKeyPrefix
+            );
 
-            this._encryptionConfig = this._encryptionConfigManager.getConfig(username, password);
+            this._encryptionConfigStorage.open(password,
+                () => EncryptionConfigStorage.generateDefaultConfig(ModuleNodeCryptoAes256.MODULE_ID));
+            this._encryptionConfig = this._encryptionConfigStorage.getConfig();
             this._loggedInUser = username;
-
-            const sessionStorageConfigKey = this._storageKeyPrefix + AuthenticationManager.SESSION_ENCRYPTION_CONFIG;
-            sessionStorage.setItem(sessionStorageConfigKey, JSON.stringify(this._encryptionConfig));
-
-            const sessionStorageUsernameKey = this._storageKeyPrefix + AuthenticationManager.SESSION_USERNAME;
-            sessionStorage.setItem(sessionStorageUsernameKey, username);
         }
 
         return valid;
@@ -82,10 +74,8 @@ export class AuthenticationManager {
     }
 
     async changePassword(currentPassword, newPassword) {
-        const sessionStorageUsernameKey = this._storageKeyPrefix + AuthenticationManager.SESSION_USERNAME;
-        const username = sessionStorage.getItem(sessionStorageUsernameKey);
-        this._encryptionConfigManager.changePassword(username, currentPassword, newPassword);
-        return await this._setCredentials(username, newPassword);
+        this._encryptionConfigStorage.changePassword(currentPassword, newPassword);
+        return await this._setCredentials(this._loggedInUser, newPassword);
     }
 
     async init() {
@@ -98,12 +88,12 @@ export class AuthenticationManager {
                 AuthenticationManager._DEMO_USERNAME2, AuthenticationManager._DEMO_PASSWORD);
         }
 
-        const usernameKey = this._storageKeyPrefix + AuthenticationManager.SESSION_USERNAME;
-        const encryptionConfigKey = this._storageKeyPrefix + AuthenticationManager.SESSION_ENCRYPTION_CONFIG;
-        this._loggedInUser = sessionStorage.getItem(usernameKey);
-        const config = sessionStorage.getItem(encryptionConfigKey);
-        if (config) {
-            this._encryptionConfig = JSON.parse(config);
+        this._encryptionConfigStorage = EncryptionConfigStorage.restoreFromSession(
+            window.localStorage, window.sessionStorage, this._storageKeyPrefix)
+
+        if (this._encryptionConfigStorage) {
+            this._loggedInUser = this._encryptionConfigStorage.username();
+            this._encryptionConfig = this._encryptionConfigStorage.getConfig();
         }
     }
 

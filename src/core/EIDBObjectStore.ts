@@ -8,18 +8,22 @@ import {MutableIDBRequest} from "./MutableIDBRequest";
 import {KeyPathUtil} from "../util/";
 import {OpeEncryptor} from "../ope/OpeEncryptor";
 import {EIDBKeyEncryptor} from "./EIDBKeyEncryptor";
+import {EIDBObjectStoreConfig} from "../config/EIDBObjectStoreConfig";
 
 export class EIDBObjectStore implements IDBObjectStore {
     private readonly _store: IDBObjectStore;
     private readonly _valueMapper: EIDBValueMapper;
     private readonly _encryptionModule: EncryptionModule;
     private readonly _keyEncryptor: EIDBKeyEncryptor;
+    private readonly _config: EIDBObjectStoreConfig;
 
     constructor(store: IDBObjectStore,
+                config: EIDBObjectStoreConfig,
                 encryptionModule: EncryptionModule,
                 opeEncryptor: OpeEncryptor,
                 valueMapper: EIDBValueMapper) {
         this._store = store;
+        this._config = config;
         this._valueMapper = valueMapper;
         this._encryptionModule = encryptionModule;
         this._keyEncryptor = new EIDBKeyEncryptor(opeEncryptor);
@@ -61,18 +65,9 @@ export class EIDBObjectStore implements IDBObjectStore {
         return new EIDBRequest(this._store.count(query), this._valueMapper);
     }
 
-    public createIndex(name: string, keyPath: string | string[], options?: IDBIndexParameters): IDBIndex {
-        const idx = this._store.createIndex(name, keyPath, options);
-        return this._valueMapper.indexMapper.map(idx);
-    }
-
     public delete(query: IDBValidKey | IDBKeyRange): IDBRequest<undefined> {
         const key = this._keyEncryptor.encryptKeyOrRange(query)!;
         return new EIDBRequest(this._store.delete(key), this._valueMapper);
-    }
-
-    public deleteIndex(name: string): void {
-        this._store.deleteIndex(name);
     }
 
     public get(query: IDBValidKey | IDBKeyRange): IDBRequest {
@@ -117,6 +112,17 @@ export class EIDBObjectStore implements IDBObjectStore {
 
     public getKey(query: IDBValidKey | IDBKeyRange): IDBRequest<IDBValidKey | undefined> {
         return new EIDBRequest(this._store.getKey(query), this._valueMapper);
+    }
+
+    public createIndex(name: string, keyPath: string | string[], options?: IDBIndexParameters): IDBIndex {
+        this._config.createIndex(name, keyPath);
+        const idx = this._store.createIndex(name, keyPath, options);
+        return this._valueMapper.indexMapper.map(idx);
+    }
+
+    public deleteIndex(name: string): void {
+        this._config.removeIndex(name);
+        this._store.deleteIndex(name);
     }
 
     public index(name: string): EIDBIndex {

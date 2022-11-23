@@ -3,16 +3,19 @@ import {EIDBValueMapper} from "./EIDBValueMapper";
 import {wrapEventWithTarget} from "./EventWrapper";
 import {KeyPathUtil} from "../util";
 import {DatabaseNameUtil} from "../util/DatabaseNameUtil";
+import {EIDBDatabaseConfig} from "../config/EIDBDatabaseConfig";
 
 export class EIDBDatabase extends EventTarget implements IDBDatabase {
 
     private readonly _db: IDBDatabase;
     private readonly _valueMapper: EIDBValueMapper;
+    private readonly _config: EIDBDatabaseConfig;
 
-    constructor(db: IDBDatabase, valueMapper: EIDBValueMapper) {
+    constructor(db: IDBDatabase, config: EIDBDatabaseConfig, valueMapper: EIDBValueMapper) {
         super();
         this._db = db;
         this._valueMapper= valueMapper;
+        this._config = config;
         this._bindEvents();
     }
 
@@ -69,17 +72,22 @@ export class EIDBDatabase extends EventTarget implements IDBDatabase {
     }
 
     createObjectStore(name: string, options?: IDBObjectStoreParameters): EIDBObjectStore {
+        const originalKeyPath = options?.keyPath;
+
         // TODO deep clone
         if (options?.keyPath) {
             options.keyPath = KeyPathUtil.wrapKeyPath(options.keyPath);
         }
 
+        this._config.addObjectStoreConfig(name, originalKeyPath || null);
+
         const store = this._db.createObjectStore(name, options);
-        return this._valueMapper.objectStoreMapper.map(store);
+        return this._valueMapper.objectStoreMapper.map(store, this);
     }
 
     deleteObjectStore(name: string): void {
-        this._db.deleteObjectStore(name)
+        this._config.deleteObjectStoreConfig(name);
+        this._db.deleteObjectStore(name);
     }
 
     transaction(storeNames: string | string[], mode?: IDBTransactionMode, options?: IDBTransactionOptions): IDBTransaction {

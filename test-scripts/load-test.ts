@@ -1,13 +1,12 @@
 import {
-  IEncryptionConfig,
+  IEncryptionConfigData,
   LoadTester,
-  EncryptionConfigManager,
+  EncryptionConfigStorage,
   ILoadTesterHooks,
   ILoadTestResult
 } from "../src";
 import "fake-indexeddb/auto";
 import fs from "fs";
-
 
 const testDir  = "./testing/text_5000_all_modules";
 
@@ -31,9 +30,9 @@ async function test() {
     serializationScheme: testConfig.preEncryptionSerialization
   }
 
-  const encryptionConfigs: IEncryptionConfig[] = [];
+  const encryptionConfigs: IEncryptionConfigData[] = [];
   for (let i = 0; i < testConfig.selectedModules.length; i++) {
-    const moduleConfig = await EncryptionConfigManager.generateConfig(testConfig.selectedModules[i], moduleParams);
+    const moduleConfig = await EncryptionConfigStorage.generateDefaultConfig(testConfig.selectedModules[i], moduleParams);
     encryptionConfigs.push(moduleConfig);
   }
 

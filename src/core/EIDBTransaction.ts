@@ -42,7 +42,8 @@ export class EIDBTransaction extends EventTarget implements IDBTransaction {
 
     objectStore(name: string): IDBObjectStore {
         const store = this._tx.objectStore(name);
-        return this._valueMapper.objectStoreMapper.map(store);
+        return this._valueMapper.objectStoreMapper.map(store,
+            this._valueMapper.dbMapper.map(this._tx.db));
     }
 
     onabort(_: Event): any {

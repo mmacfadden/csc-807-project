@@ -2,7 +2,7 @@
  * Represents the configuration that defines how data will be encrypted
  * within IndexedDB.
  */
-export interface IEncryptionConfig {
+export interface IEncryptionConfigData {
   /**
    * The module id of the encryption module to use.
    */
@@ -28,4 +28,15 @@ export interface IEncryptionConfig {
    * A unique prefix for database names.
    */
   userDbPrefix: string;
+
+  databases: {[key: string]: IDatabaseConfigData}
+}
+
+export interface IDatabaseConfigData {
+  objectStores: {[key: string]: IObjectStoreConfigData}
+}
+
+export interface IObjectStoreConfigData {
+  keyPath: string | string[] | null;
+  indices: {[key: string]: string | string[]}
 }
