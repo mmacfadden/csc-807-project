@@ -33,17 +33,17 @@ describe('EncryptionConfigStorage', () => {
       new EncryptionConfigStorage(storage, user1);
     });
 
-    it('throw if storage is not set', () => {
+    it('throws if storage is not set', () => {
       expect(() => {
         new EncryptionConfigStorage(null as any as Storage, user1);
-      });
+      }).to.throw();
     });
 
-    it('throw if username is not set', () => {
+    it('throws if username is not set', () => {
       const storage = new InMemoryStorage();
       expect(() => {
         new EncryptionConfigStorage(storage, null as any as string);
-      });
+      }).to.throw();
     });
   });
 
@@ -82,10 +82,91 @@ describe('EncryptionConfigStorage', () => {
       }).to.throw();
     });
 
+    it('throws if the password is not set', () => {
+      const storage = new InMemoryStorage();
+      expect(() => {
+        new EncryptionConfigStorage(storage, user1)
+            .open("", () => DEFAULT_CONFIG);
+      }).to.throw();
+    });
+  });
 
+  describe('getConfig', () => {
+    it('throws if not open', () => {
+      const storage = new InMemoryStorage();
+      expect(() => {
+        new EncryptionConfigStorage(storage, user1).getConfig();
+      }).to.throw();
+    });
+  });
+
+  describe('username', () => {
+    it('returns the correct username', () => {
+      const storage = new InMemoryStorage();
+      const cs = new EncryptionConfigStorage(storage, user1);
+      expect(cs.username()).to.eq(user1);
+    });
+  });
+
+  describe('close', () => {
+    it('throws if not open', () => {
+      const storage = new InMemoryStorage();
+      const cs = new EncryptionConfigStorage(storage, user1);
+
+      expect(() => {
+        cs.close();
+      }).to.throw();
+    });
+
+    it('closes if open', () => {
+      const storage = new InMemoryStorage();
+      const cs = new EncryptionConfigStorage(storage, user1);
+      cs.open(password, () => DEFAULT_CONFIG);
+      expect(cs.isOpen()).to.be.true;
+      cs.close();
+      expect(cs.isOpen()).to.be.false;
+    });
   });
 
   describe('changePassword', () => {
+    it('throws if the new password is not set', () => {
+      const storage = new InMemoryStorage();
+      const cs = new EncryptionConfigStorage(storage, user1);
+      cs.open(password, () => DEFAULT_CONFIG);
 
+      expect(() => {
+        cs.changePassword(password, "");
+      }).to.throw();
+    });
+
+    it('throws if the current password is not set', () => {
+      const storage = new InMemoryStorage();
+      const cs = new EncryptionConfigStorage(storage, user1);
+      cs.open(password, () => DEFAULT_CONFIG);
+
+      expect(() => {
+        cs.changePassword("", "newPassword");
+      }).to.throw();
+    });
+
+    it('throws if the current password is incorrect', () => {
+      const storage = new InMemoryStorage();
+      const cs = new EncryptionConfigStorage(storage, user1);
+      cs.open(password, () => DEFAULT_CONFIG);
+
+      expect(() => {
+        cs.changePassword("wrong", "new");
+      }).to.throw();
+    });
+
+    it('change the password if the current password is correct', () => {
+      const storage = new InMemoryStorage();
+      const cs = new EncryptionConfigStorage(storage, user1);
+      cs.open(password, () => DEFAULT_CONFIG);
+      cs.changePassword(password, "newPassword");
+
+      new EncryptionConfigStorage(storage, user1)
+          .open("newPassword", () => DEFAULT_CONFIG);
+    });
   });
 });

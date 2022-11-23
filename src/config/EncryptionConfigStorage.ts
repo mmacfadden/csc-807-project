@@ -54,11 +54,6 @@ export class EncryptionConfigStorage {
     return CryptoJS.enc.Base64.stringify(keyAsWordArray);
   }
 
-  public static configSetForUser(storage: Storage, storageKeyPrefix: string, username: string): boolean {
-    const ns = new NamespacedStorage(storage, storageKeyPrefix, username);
-    return ns.hasItem(EncryptionConfigStorage.LOCAL_CONFIG_KEY);
-  }
-
   public static restoreFromSession(
       localStorage: Storage,
       sessionStorage: Storage,
@@ -74,11 +69,6 @@ export class EncryptionConfigStorage {
     } else {
       return null;
     }
-  }
-
-  public static clearSession(sessionStorage: Storage, storageKeyPrefix: string) {
-    new NamespacedStorage(sessionStorage, storageKeyPrefix, null)
-        .removeItem(EncryptionConfigStorage.SESSION_USERNAME);
   }
 
   /**
@@ -119,16 +109,16 @@ export class EncryptionConfigStorage {
       throw new Error("The localStorage must be defined");
     }
 
+    if (!username) {
+      throw new Error("The username must be a non-empty string");
+    }
+    this._username = username;
+
     if (!storageKeyPrefix) {
       this._storageKeyPrefix = EncryptionConfigStorage.DEFAULT_LOCAL_STORAGE_KEY_PREFIX;
     } else {
       this._storageKeyPrefix = storageKeyPrefix;
     }
-
-    if (!username) {
-      throw new Error("The username must be a non-empty string");
-    }
-    this._username = username;
 
     this._localStorage = new NamespacedStorage(localStorage, this._storageKeyPrefix, username);
 
@@ -176,24 +166,41 @@ export class EncryptionConfigStorage {
     this._setConfigFromData(configData);
   }
 
-  private _loadConfigData(encryptionKey: string): IEncryptionConfigData {
-    let encryptedConfigData = this._localStorage.getItem(EncryptionConfigStorage.LOCAL_CONFIG_KEY);
-    const bytes: CryptoJS.lib.WordArray = CryptoJS.AES.decrypt(encryptedConfigData!, encryptionKey);
-    const configJson = bytes.toString(CryptoJS.enc.Utf8);
-    try {
-      return JSON.parse(configJson);
-    } catch (e) {
-      throw new Error("Invalid password");
-    }
+  /**
+   * Determines if the config is set for a given user.
+   *
+   * @returns True if the config is set, false otherwise.
+   */
+  public isOpen(): boolean {
+    return this._config !== null;
+  }
+
+  /**
+   * Gets the current configuration using the user's password to decrypt
+   * the stored configuration.
+   *
+   * @returns The current encryption config for the user.
+   *
+   * @throws If password is anything other than a non-empty string.
+   * @throws If the password is not correct.
+   * @throws If a current configuration is not set for this user.
+   */
+  public getConfig(): EncryptionConfig {
+    this._assertOpen();
+    return this._config!;
   }
 
   public close(): void {
+    this._assertOpen();
     this._config = null;
     this._encryptionKey = null;
 
     if (this._sessionStorage) {
       this._sessionStorage.removeItem(EncryptionConfigStorage.SESSION_ENCRYPTION_CONFIG);
       this._sessionStorage.removeItem(EncryptionConfigStorage.SESSION_ENCRYPTION_KEY);
+
+      new NamespacedStorage(sessionStorage, this._storageKeyPrefix, null)
+          .removeItem(EncryptionConfigStorage.SESSION_USERNAME);
     }
   }
 
@@ -232,28 +239,17 @@ export class EncryptionConfigStorage {
     this._writeConfig(this._config!.toJSON());
   }
 
-  /**
-   * Determines if the config is set for a given user.
-   *
-   * @returns True if the config is set, false otherwise.
-   */
-  public isOpen(): boolean {
-    return this._config !== null;
-  }
+  private _loadConfigData(encryptionKey: string): IEncryptionConfigData {
+    let encryptedConfigData = this._localStorage.getItem(EncryptionConfigStorage.LOCAL_CONFIG_KEY);
+    const bytes: CryptoJS.lib.WordArray = CryptoJS.AES.decrypt(encryptedConfigData!, encryptionKey);
+    const configJson = bytes.toString(CryptoJS.enc.Utf8);
+    this._writeConfigToSession(configJson);
 
-  /**
-   * Gets the current configuration using the user's password to decrypt
-   * the stored configuration.
-   *
-   * @returns The current encryption config for the user.
-   *
-   * @throws If password is anything other than a non-empty string.
-   * @throws If the password is not correct.
-   * @throws If a current configuration is not set for this user.
-   */
-  public getConfig(): EncryptionConfig {
-    this._assertOpen();
-    return this._config!;
+    try {
+      return JSON.parse(configJson);
+    } catch (e) {
+      throw new Error("Invalid password");
+    }
   }
 
   private _setConfigFromData(config: IEncryptionConfigData): void {
@@ -273,6 +269,11 @@ export class EncryptionConfigStorage {
     const encryptedConfigData = CryptoJS.AES.encrypt(configJson, this._encryptionKey!).toString();
     this._localStorage.setItem(EncryptionConfigStorage.LOCAL_CONFIG_KEY, encryptedConfigData);
 
+    this._writeConfigToSession(configJson);
+
+  }
+
+  private _writeConfigToSession(configJson: string): void {
     if (this._sessionStorage) {
       this._sessionStorage.setItem(EncryptionConfigStorage.SESSION_ENCRYPTION_CONFIG, configJson);
       this._sessionStorage.setItem(EncryptionConfigStorage.SESSION_ENCRYPTION_KEY, this._encryptionKey!);

@@ -37,11 +37,12 @@ export default {
       </div>
       <form>
         <div class="description-box">
-          You may log in to this demo application with the following credentials:
+          You may log in to this demo application as one of the following two users:
           <ul>
-            <li><strong>Username</strong>: user</li>
-            <li><strong>Password</strong>: password</li>
+            <li><strong>john</strong> : password </li>
+            <li><strong>matt</strong> : password</li>
           </ul>
+          <i>Note: You may change the password for the users, but the new passwords will not be shown here.</i>
         </div>
         <div class="mb-3">
           <label for="username" class="form-label">Username</label>
