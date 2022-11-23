@@ -39,8 +39,8 @@ export default {
         <div class="description-box">
           You may log in to this demo application as one of the following two users:
           <ul>
-            <li><strong>john</strong> : password </li>
-            <li><strong>matt</strong> : password</li>
+            <li><strong>jim</strong> : password </li>
+            <li><strong>tim</strong> : password</li>
           </ul>
           <i>Note: You may change the password for the users, but the new passwords will not be shown here.</i>
         </div>

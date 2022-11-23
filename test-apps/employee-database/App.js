@@ -37,6 +37,20 @@ export default  {
         this.toast = new bootstrap.Toast(toastElement);
     },
     methods: {
+        reset() {
+            window.localStorage.clear();
+            window.sessionStorage.clear();
+            indexedDB.databases().then(dbs => {
+                dbs.forEach(db => {
+                    indexedDB.deleteDatabase(db.name);
+                });
+
+                setTimeout(() => {
+                    location.reload();
+                }, 0);
+            });
+
+        },
         async onLogin() {
             console.log("User Logged In");
             this.user = this.authManager.getLoggedInUserName();
@@ -93,6 +107,9 @@ export default  {
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/about">About</router-link>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" @click="reset" href="#">Reset</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" target="_blank" href="https://github.com/mmacfadden/csc-807-project">GitHub</a>

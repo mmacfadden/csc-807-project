@@ -5,7 +5,6 @@ import {EIDBValueMapper} from "./EIDBValueMapper";
 import {EncryptionModule} from "../module";
 import {IEncryptedDocument} from "./IEncryptedDocument";
 import {MutableIDBRequest} from "./MutableIDBRequest";
-import {KeyPathUtil} from "../util/";
 import {OpeEncryptor} from "../ope/OpeEncryptor";
 import {EIDBKeyEncryptor} from "./EIDBKeyEncryptor";
 import {EIDBObjectStoreConfig} from "../config/EIDBObjectStoreConfig";
@@ -38,7 +37,7 @@ export class EIDBObjectStore implements IDBObjectStore {
     }
 
     public get keyPath(): string | string[] {
-        return KeyPathUtil.unwrapKeyPath(this._store.keyPath);
+        return this._config.getKeyPath()!;
     }
 
     public get name(): string {
@@ -149,10 +148,11 @@ export class EIDBObjectStore implements IDBObjectStore {
     }
 
     private _encrypt(value: any): IEncryptedDocument {
-        const key = this._extractAndEncryptKeys(value, this.keyPath);
+
+        const keys = this._extractAndEncryptKeys(value, this._config.getKeyPath());
         const encryptedValue = this._encryptionModule.encrypt(value);
         return {
-            key,
+            keys,
             indices: [],
             value: encryptedValue
         };
@@ -186,29 +186,29 @@ export class EIDBObjectStore implements IDBObjectStore {
         return result;
     }
 
-    private _extractAndEncryptKeys(source: any, path: string | string[]): any {
+    private _extractAndEncryptKeys(source: any, path: string | string[] | null): any {
+        if (path === null) {
+            return null;
+        }
+
         if (!Array.isArray(path)) {
             path = [path];
         }
 
         const target: any = {};
 
-        path.forEach(p => {
+        path.forEach((p, k) => {
             const pathComponents = p.split(".");
             let curSourceVal = source;
-            let curTargetVal = target;
+
             for (let i = 0; i < pathComponents.length; i++) {
                 const prop = pathComponents[i];
                 curSourceVal = source[prop];
 
                 if (i === pathComponents.length - 1) {
-                    target[prop] = this._keyEncryptor.encryptKey(curSourceVal);
+                    target[`k${k}`] = this._keyEncryptor.encryptKey(curSourceVal);
                     break;
-                } else if (target[prop] === undefined) {
-                    target[prop] = {};
                 }
-
-                curTargetVal = target[prop];
 
                 if (curSourceVal === undefined || curSourceVal === null) {
                     throw new Error("Unable to extract key from document");

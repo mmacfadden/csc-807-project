@@ -3,8 +3,8 @@ const {EncryptionConfigStorage, ModuleNodeCryptoAes256} = EncryptedIndexedDB;
 export class AuthenticationManager {
     static CREDENTIALS_KEY = "_demo_credentials";
 
-    static _DEMO_USERNAME1 = "user1";
-    static _DEMO_USERNAME2 = "user2";
+    static _DEMO_USERNAME1 = "jim";
+    static _DEMO_USERNAME2 = "tim";
     static _DEMO_PASSWORD = "password";
 
     constructor(storageKeyPrefix) {

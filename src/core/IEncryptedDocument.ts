@@ -1,5 +1,5 @@
 export interface IEncryptedDocument {
-    key: any;
+    keys: any;
     indices: any[];
     value: string | Uint8Array;
 }
