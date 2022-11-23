@@ -1,4 +1,4 @@
-import {assert} from "./errors";
+import {assert} from "../util/assert";
 
 export class PRNG {
   public coins: Iterator<number>;

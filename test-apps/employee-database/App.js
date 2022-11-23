@@ -56,7 +56,6 @@ export default  {
             this.user = this.authManager.getLoggedInUserName();
 
             this.indexedDb = new EIDBFactory(window.indexedDB, this.authManager.getEncryptionConfig());
-            this.indexedDb.initEncryption();
 
             const req = this.indexedDb.open("employees", 1);
             req.onupgradeneeded = () => {

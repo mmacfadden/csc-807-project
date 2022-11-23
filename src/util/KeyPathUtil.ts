@@ -17,8 +17,12 @@ export class KeyPathUtil {
     }
   }
 
-  public static getKey(keyNum: number): string {
-    return `k${keyNum}`;
+  public static getKey(keyIndex: number): string {
+    if (keyIndex < 0) {
+      throw new Error("keyIndex must be >= 0");
+    }
+
+    return `k${keyIndex}`;
   }
 
   public static wrapStringKeyPath(keyPath: string): string {

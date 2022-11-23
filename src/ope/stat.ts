@@ -1,6 +1,6 @@
 import {HGD} from "./HGD";
 import {ValueRange} from "./ValueRange";
-import {assert} from "./errors";
+import {assert} from "../util/assert";
 
 /**Z
  * Get a sample from the hypergeometric distribution, using the provided bit list as a source of randomness

@@ -1,4 +1,4 @@
-import {assert} from "./errors";
+import {assert} from "../util/assert";
 
 /**
  * Convert one byte to a list of bits

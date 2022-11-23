@@ -1,7 +1,7 @@
 import * as CryptoJS from "crypto-js";
 
 import {str_to_bitstring} from "./util";
-import {assert} from "./errors";
+import {assert} from "../util/assert";
 import {sample_hgd, sample_uniform} from "./stat";
 import {ValueRange} from "./ValueRange";
 import {CryptoJsUtils} from "../util/CryptoJsUtils";

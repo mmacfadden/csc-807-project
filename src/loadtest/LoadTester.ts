@@ -156,8 +156,7 @@ export class LoadTester {
 
     const encryptionConfig = new EncryptionConfig(config.encryptionConfig);
 
-    this._idb = EIDBFactory.create(indexedDb, encryptionConfig);
-    this._idb.initEncryption();
+    this._idb = new EIDBFactory(indexedDb, encryptionConfig);
   }
 
   /**
@@ -169,7 +168,7 @@ export class LoadTester {
   public async loadTest(hooks?: ILoadTesterHooks): Promise<ILoadTestResult> {
     // If somehow the database exists, delete it so it will be created.
     const preDeleteRequest = this._idb.deleteDatabase(LoadTester._DB_NAME);
-    await RequestUtils.requestToPromise(preDeleteRequest);
+    await RequestUtils.toPromise(preDeleteRequest);
 
     // We used to check to see if the database exists. However, Firefox does
     // not implement the "databases()" method.
@@ -190,7 +189,7 @@ export class LoadTester {
       );
     }
 
-    const db = await RequestUtils.requestToPromise(openReq);
+    const db = await RequestUtils.toPromise(openReq);
 
     if (hooks?.testStarted) {
       hooks.testStarted(this._idb.encryptionModuleId(), this._config.objectStoreConfig.name);
@@ -212,19 +211,19 @@ export class LoadTester {
       totalBytes += docSize;
 
       Timing.writeStart(i);
-      await RequestUtils.requestToPromise(store.add(doc));
+      await RequestUtils.toPromise(store.add(doc));
       const readTime = Timing.writeEnd(i);
       writes.push({docSize, timeMs: readTime});
 
       Timing.readStart(i);
       const key = this._extractKeyFromDocument(doc);
-      await RequestUtils.requestToPromise(store.get(key));
+      await RequestUtils.toPromise(store.get(key));
       const writeTime = Timing.readEnd(i);
       reads.push({docSize, timeMs: writeTime});
 
       // Clear the store to make sure we don't have any id conflicts. This does not
       // need to be part of the timing.
-      await RequestUtils.requestToPromise(store.clear());
+      await RequestUtils.toPromise(store.clear());
 
       if (hooks?.documentCompleted) {
         hooks.documentCompleted(i + 1);
@@ -262,7 +261,7 @@ export class LoadTester {
     db.close();
 
     const postDeleteRequest = this._idb.deleteDatabase(LoadTester._DB_NAME);
-    await RequestUtils.requestToPromise(postDeleteRequest);
+    await RequestUtils.toPromise(postDeleteRequest);
 
     if (hooks?.testFinished) {
       hooks.testFinished(result);
