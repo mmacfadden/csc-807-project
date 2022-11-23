@@ -4,16 +4,16 @@ export class NamespacedStorage {
 
   private readonly _storage: Storage;
   private readonly _storageKeyPrefix: string;
-  private readonly _username: string;
+  private readonly _username: string | null;
 
-  constructor(storage: Storage, storageKeyPrefix: string, username: string) {
+  constructor(storage: Storage, storageKeyPrefix: string, username: string | null) {
     this._storage = storage;
     if (!storage) {
       throw new Error("The storage must be defined");
     }
 
     this._storageKeyPrefix = storageKeyPrefix;
-    this._username = username;
+    this._username = username || null;
   }
 
   public hasItem(key: string): boolean {
@@ -47,8 +47,12 @@ export class NamespacedStorage {
    *
    * @private
    */
-  private _resolveKey(username: string, key: string): string {
-    const hash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA512(username));
-    return `${this._storageKeyPrefix}_${key}_${hash}`;
+  private _resolveKey(username: string | null, key: string): string {
+    if (username) {
+      const hash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA512(username));
+      return `${this._storageKeyPrefix}_${key}_${hash}`;
+    } else {
+      return `${this._storageKeyPrefix}_${key}`;
+    }
   }
 }

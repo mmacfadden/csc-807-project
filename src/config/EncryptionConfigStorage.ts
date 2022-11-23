@@ -62,8 +62,11 @@ export class EncryptionConfigStorage {
   public static restoreFromSession(
       localStorage: Storage,
       sessionStorage: Storage,
-      storageKeyPrefix?: string): EncryptionConfigStorage | null {
-    const username = sessionStorage.getItem(EncryptionConfigStorage.SESSION_USERNAME);
+      storageKeyPrefix: string): EncryptionConfigStorage | null {
+
+    const username = new NamespacedStorage(sessionStorage, storageKeyPrefix, null)
+        .getItem(EncryptionConfigStorage.SESSION_USERNAME);
+
     if (username) {
       const storage = new EncryptionConfigStorage(localStorage, username, sessionStorage, storageKeyPrefix);
       storage._attemptRestoreFromSession();
@@ -71,6 +74,11 @@ export class EncryptionConfigStorage {
     } else {
       return null;
     }
+  }
+
+  public static clearSession(sessionStorage: Storage, storageKeyPrefix: string) {
+    new NamespacedStorage(sessionStorage, storageKeyPrefix, null)
+        .removeItem(EncryptionConfigStorage.SESSION_USERNAME);
   }
 
   /**
@@ -125,7 +133,7 @@ export class EncryptionConfigStorage {
     this._localStorage = new NamespacedStorage(localStorage, this._storageKeyPrefix, username);
 
     if (sessionStorage) {
-      this._sessionStorage = new NamespacedStorage(sessionStorage, this._storageKeyPrefix, username);
+      this._sessionStorage = new NamespacedStorage(sessionStorage, this._storageKeyPrefix, null);
     } else {
       this._sessionStorage = null;
     }
@@ -181,7 +189,12 @@ export class EncryptionConfigStorage {
 
   public close(): void {
     this._config = null;
-    this._encryptionKey = null
+    this._encryptionKey = null;
+
+    if (this._sessionStorage) {
+      this._sessionStorage.removeItem(EncryptionConfigStorage.SESSION_ENCRYPTION_CONFIG);
+      this._sessionStorage.removeItem(EncryptionConfigStorage.SESSION_ENCRYPTION_KEY);
+    }
   }
 
   /**
@@ -263,7 +276,6 @@ export class EncryptionConfigStorage {
     if (this._sessionStorage) {
       this._sessionStorage.setItem(EncryptionConfigStorage.SESSION_ENCRYPTION_CONFIG, configJson);
       this._sessionStorage.setItem(EncryptionConfigStorage.SESSION_ENCRYPTION_KEY, this._encryptionKey!);
-      this._sessionStorage.setItem(EncryptionConfigStorage.SESSION_USERNAME, this._username);
     }
   }
 

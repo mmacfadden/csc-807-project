@@ -12,7 +12,7 @@ export class AuthenticationManager {
         this._encryptionConfigStorage = null;
         this._encryptionConfig = null;
 
-        this._storageKeyPrefix = storageKeyPrefix;
+        this._storageKeyPrefix = storageKeyPrefix || EncryptionConfigStorage.DEFAULT_LOCAL_STORAGE_KEY_PREFIX;
     }
 
     async validateCredentials(username, password) {
@@ -54,11 +54,10 @@ export class AuthenticationManager {
         this._loggedInUser = null;
         this._encryptionConfig = null;
 
-        const sessionStorageUsernameKey = this._storageKeyPrefix + AuthenticationManager.SESSION_USERNAME;
-        sessionStorage.removeItem(sessionStorageUsernameKey);
-
-        const sessionStorageConfigKey = this._storageKeyPrefix + AuthenticationManager.SESSION_ENCRYPTION_CONFIG;
-        sessionStorage.removeItem(sessionStorageConfigKey);
+        if (this._encryptionConfigStorage) {
+            this._encryptionConfigStorage.close();
+            EncryptionConfigStorage.clearSession(window.sessionStorage, this._storageKeyPrefix);
+        }
     }
 
     isAuthenticated() {
