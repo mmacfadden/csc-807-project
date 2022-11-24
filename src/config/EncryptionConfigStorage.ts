@@ -57,7 +57,11 @@ export class EncryptionConfigStorage {
   public static restoreFromSession(
       localStorage: Storage,
       sessionStorage: Storage,
-      storageKeyPrefix: string): EncryptionConfigStorage | null {
+      storageKeyPrefix?: string): EncryptionConfigStorage | null {
+
+    if (!storageKeyPrefix) {
+      storageKeyPrefix = EncryptionConfigStorage.DEFAULT_LOCAL_STORAGE_KEY_PREFIX;
+    }
 
     const username = new NamespacedStorage(sessionStorage, storageKeyPrefix, null)
         .getItem(EncryptionConfigStorage.SESSION_USERNAME);
@@ -157,11 +161,18 @@ export class EncryptionConfigStorage {
     this._encryptionKey = EncryptionConfigStorage._deriveKey(password, salt);
 
     let configData = this._localStorage.hasItem(EncryptionConfigStorage.LOCAL_CONFIG_KEY) ?
-        this._loadConfigData(this._encryptionKey) : (() => {
+        this._loadConfigData(this._encryptionKey) :
+        (() => {
           const data = defaultConfig();
           this._writeConfig(data);
           return data;
         })();
+
+    if (this._sessionStorage) {
+      new NamespacedStorage(this._sessionStorage.rawStorage(), this._storageKeyPrefix, null)
+          .setItem(EncryptionConfigStorage.SESSION_USERNAME, this._username);
+    }
+
 
     this._setConfigFromData(configData);
   }
@@ -199,7 +210,7 @@ export class EncryptionConfigStorage {
       this._sessionStorage.removeItem(EncryptionConfigStorage.SESSION_ENCRYPTION_CONFIG);
       this._sessionStorage.removeItem(EncryptionConfigStorage.SESSION_ENCRYPTION_KEY);
 
-      new NamespacedStorage(sessionStorage, this._storageKeyPrefix, null)
+      new NamespacedStorage(this._sessionStorage.rawStorage(), this._storageKeyPrefix, null)
           .removeItem(EncryptionConfigStorage.SESSION_USERNAME);
     }
   }
@@ -242,11 +253,12 @@ export class EncryptionConfigStorage {
   private _loadConfigData(encryptionKey: string): IEncryptionConfigData {
     let encryptedConfigData = this._localStorage.getItem(EncryptionConfigStorage.LOCAL_CONFIG_KEY);
     const bytes: CryptoJS.lib.WordArray = CryptoJS.AES.decrypt(encryptedConfigData!, encryptionKey);
-    const configJson = bytes.toString(CryptoJS.enc.Utf8);
-    this._writeConfigToSession(configJson);
 
     try {
-      return JSON.parse(configJson);
+      const configJson = bytes.toString(CryptoJS.enc.Utf8);
+      const parsed = JSON.parse(configJson);
+      this._writeConfigToSession(configJson);
+      return parsed;
     } catch (e) {
       throw new Error("Invalid password");
     }
@@ -270,7 +282,6 @@ export class EncryptionConfigStorage {
     this._localStorage.setItem(EncryptionConfigStorage.LOCAL_CONFIG_KEY, encryptedConfigData);
 
     this._writeConfigToSession(configJson);
-
   }
 
   private _writeConfigToSession(configJson: string): void {

@@ -9,7 +9,11 @@ export class NamespacedStorage {
   constructor(storage: Storage, storageKeyPrefix: string, username: string | null) {
     this._storage = storage;
     if (!storage) {
-      throw new Error("The storage must be defined");
+      throw new Error("The storage must be defined.");
+    }
+
+    if (!storageKeyPrefix) {
+      throw new Error("The storageKeyPrefix must be defined.");
     }
 
     this._storageKeyPrefix = storageKeyPrefix;
@@ -17,21 +21,45 @@ export class NamespacedStorage {
   }
 
   public hasItem(key: string): boolean {
+    if (!key) {
+      throw new Error("key must be defined");
+    }
+
     const resolvedKey = this._resolveKey(this._username, key);
     return this._storage.getItem(resolvedKey) !== null;
   }
 
+  public rawStorage(): Storage {
+    return this._storage;
+  }
+
   public getItem(key: string): string | null {
+    if (!key) {
+      throw new Error("key must be defined");
+    }
+
     const resolvedKey = this._resolveKey(this._username, key);
     return this._storage.getItem(resolvedKey);
   }
 
   public setItem(key: string, value: string): void {
+    if (!key) {
+      throw new Error("key must be defined");
+    }
+
+    if (!value) {
+      throw new Error("value must be defined");
+    }
+
     const resolvedKey = this._resolveKey(this._username, key);
     this._storage.setItem(resolvedKey, value);
   }
 
   public removeItem(key: string): void {
+    if (!key) {
+      throw new Error("key must be defined");
+    }
+
     const resolvedKey = this._resolveKey(this._username, key);
     this._storage.removeItem(resolvedKey);
   }

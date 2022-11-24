@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {EncryptionConfigStorage, IEncryptionConfigData} from '../../src/';
+import {EncryptionConfigStorage, IEncryptionConfigData, ModuleClearText} from '../../src/';
 import {InMemoryStorage} from "../../src/test/InMemoryStorage";
 
 const DEFAULT_CONFIG: IEncryptionConfigData = {
@@ -26,7 +26,6 @@ const user1 = "user1";
 const password = "password";
 
 describe('EncryptionConfigStorage', () => {
-
   describe('constructor', () => {
     it('Not throw with valid parameters', () => {
       const storage = new InMemoryStorage();
@@ -73,8 +72,9 @@ describe('EncryptionConfigStorage', () => {
 
     it('throws if the wrong password is wrong', () => {
       const storage = new InMemoryStorage();
-      new EncryptionConfigStorage(storage, user1)
-          .open(password, () => DEFAULT_CONFIG);
+      const cs = new EncryptionConfigStorage(storage, user1);
+      cs.open(password, () => DEFAULT_CONFIG);
+      cs.close();
 
       expect(() => {
         new EncryptionConfigStorage(storage, user1)
@@ -168,5 +168,76 @@ describe('EncryptionConfigStorage', () => {
       new EncryptionConfigStorage(storage, user1)
           .open("newPassword", () => DEFAULT_CONFIG);
     });
+  });
+
+  describe('generateDefaultConfig', () => {
+    it('generate a config with the correct module id', () => {
+      const data = EncryptionConfigStorage.generateDefaultConfig(ModuleClearText.MODULE_ID);
+      expect(data.moduleId).to.eq(ModuleClearText.MODULE_ID);
+    });
+
+    it('generate a valid config', () => {
+      const data = EncryptionConfigStorage.generateDefaultConfig(ModuleClearText.MODULE_ID);
+      expect(data.moduleId).to.eq(ModuleClearText.MODULE_ID);
+      expect(data.dataSecret).to.be.a("string");
+      expect(data.opeKey).to.be.a("string");
+      expect(data.userDbPrefix).to.be.a("string");
+      expect(data.databases).to.be.a("object");
+      expect(data.moduleParams).to.be.undefined;
+    });
+
+    it('generate a config with module params if passed', () => {
+      const params = {"key": "value"};
+      const data = EncryptionConfigStorage.generateDefaultConfig(ModuleClearText.MODULE_ID, params);
+      expect(data.moduleParams).to.deep.eq(params);
+    });
+
+    it('throw for an invalid module id', () => {
+      expect(() => {
+        EncryptionConfigStorage.generateDefaultConfig("none");
+      }).to.throw();
+    });
+  });
+
+  describe('sessionStorage', () => {
+    it('not throw with session storage passed in.', () => {
+      const localStorage = new InMemoryStorage();
+      const sessionStorage = new InMemoryStorage();
+      const cs = new EncryptionConfigStorage(localStorage, user1, sessionStorage);
+      expect(cs.username()).to.eq(user1);
+    });
+
+    it('Save and restore config from session', () => {
+      const localStorage = new InMemoryStorage();
+      const sessionStorage = new InMemoryStorage();
+      const cs = new EncryptionConfigStorage(localStorage, user1, sessionStorage);
+
+      cs.open("password", () => DEFAULT_CONFIG);
+      const config = cs.getConfig();
+
+      const restored = EncryptionConfigStorage.restoreFromSession(localStorage, sessionStorage);
+
+      expect(restored?.getConfig().toJSON()).to.deep.eq(config.toJSON());
+    });
+
+    it('return null if no session data exists', () => {
+      const localStorage = new InMemoryStorage();
+      const sessionStorage = new InMemoryStorage();
+      const restored = EncryptionConfigStorage.restoreFromSession(localStorage, sessionStorage);
+      expect(restored).to.be.null;
+    });
+  });
+
+  it('close removes session', () => {
+    const localStorage = new InMemoryStorage();
+    const sessionStorage = new InMemoryStorage();
+    const cs = new EncryptionConfigStorage(localStorage, user1, sessionStorage);
+
+    cs.open("password", () => DEFAULT_CONFIG);
+    const config = cs.getConfig();
+
+    cs.close();
+
+    expect(EncryptionConfigStorage.restoreFromSession(localStorage, sessionStorage)).to.be.null;
   });
 });
