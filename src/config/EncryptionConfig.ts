@@ -6,8 +6,16 @@ export class EncryptionConfig {
   private readonly _update: ((config: IEncryptionConfigData) => void) | undefined
 
   constructor(config: IEncryptionConfigData, update?: (config: IEncryptionConfigData) => void) {
+    if (!config) {
+      throw new Error("config must be define");
+    }
     this._config = config;
-    this._update = update;
+
+    if (!update) {
+      this._update = () => {};
+    } else {
+      this._update = update;
+    }
   }
 
   /**

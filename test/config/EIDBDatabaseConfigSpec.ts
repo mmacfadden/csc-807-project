@@ -65,6 +65,16 @@ describe('EIDBDatabaseConfig', () => {
       config.addObjectStoreConfig("store2", "key2");
       expect(update.called).to.be.true
     });
+
+    it('child store calls updated', () => {
+      const defaultConfig = createConfig();
+      const update = sinon.spy();
+      const config = new EIDBDatabaseConfig(defaultConfig, update);
+      const storeConfig = config.getObjectStoreConfig("store");
+      expect(update.called).to.be.false;
+      storeConfig.createIndex("index", "id");
+      expect(update.called).to.be.true;
+    });
   });
 
   describe('deleteObjectStoreConfig', () => {

@@ -18,7 +18,7 @@ const DEFAULT_CONFIG: IEncryptionConfigData = {
       }
     }
   }
-}
+};
 
 Object.freeze(DEFAULT_CONFIG);
 
@@ -216,6 +216,19 @@ describe('EncryptionConfigStorage', () => {
       const config = cs.getConfig();
 
       const restored = EncryptionConfigStorage.restoreFromSession(localStorage, sessionStorage);
+
+      expect(restored?.getConfig().toJSON()).to.deep.eq(config.toJSON());
+    });
+
+    it('Save and restore config from session with a prefix set', () => {
+      const localStorage = new InMemoryStorage();
+      const sessionStorage = new InMemoryStorage();
+      const cs = new EncryptionConfigStorage(localStorage, user1, sessionStorage, "prefix");
+
+      cs.open("password", () => DEFAULT_CONFIG);
+      const config = cs.getConfig();
+
+      const restored = EncryptionConfigStorage.restoreFromSession(localStorage, sessionStorage, "prefix");
 
       expect(restored?.getConfig().toJSON()).to.deep.eq(config.toJSON());
     });

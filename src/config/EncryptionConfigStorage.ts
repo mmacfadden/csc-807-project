@@ -142,14 +142,12 @@ export class EncryptionConfigStorage {
   }
 
   private _attemptRestoreFromSession(): void {
-    if (this._sessionStorage) {
       const configJson: IEncryptionConfigData =
-          JSON.parse(this._sessionStorage.getItem(EncryptionConfigStorage.SESSION_ENCRYPTION_CONFIG)!);
+          JSON.parse(this._sessionStorage!.getItem(EncryptionConfigStorage.SESSION_ENCRYPTION_CONFIG)!);
       this._setConfigFromData(configJson);
 
       this._encryptionKey =
-          this._sessionStorage.getItem(EncryptionConfigStorage.SESSION_ENCRYPTION_KEY);
-    }
+          this._sessionStorage!.getItem(EncryptionConfigStorage.SESSION_ENCRYPTION_KEY);
   }
 
   public open(password: string, defaultConfig: () => IEncryptionConfigData): void {
