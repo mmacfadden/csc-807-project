@@ -36,7 +36,7 @@ export class EncryptionConfig {
    * The module id of the encryption module to use.
    */
   keyEncryption(): KeyEncryptionStrategy {
-    return "none";
+    return this._config.keyEncryption;
   }
 
   /**

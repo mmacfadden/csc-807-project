@@ -8,6 +8,8 @@ import {EncryptionConfig} from "../config";
 import {NoOpKeyEncryptor} from "./NoOpKeyEncryptor";
 import {OPEKeyEncryptor} from "./OPEKeyEncryptor";
 import {EIDBKeyEncryptor} from "./EIDBKeyEncryptor";
+import {SymmetricKeyEncryptor} from "./SymmetricKeyEncryptor";
+import {Sha512KeyEncryptor} from "./Sha512KeyEncryptor";
 
 export class EIDBFactory implements IDBFactory {
 
@@ -47,6 +49,12 @@ export class EIDBFactory implements IDBFactory {
         break;
       case "ope":
         keyEncryptor = new OPEKeyEncryptor(new OpeEncryptor(config.opeKey()));
+        break;
+      case "symmetric":
+        keyEncryptor = new SymmetricKeyEncryptor();
+        break;
+      case "hash":
+        keyEncryptor = new Sha512KeyEncryptor();
         break;
     }
 
