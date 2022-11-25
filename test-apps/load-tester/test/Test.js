@@ -14,7 +14,7 @@ import {download_file} from "../util/file_utils.js";
 const {
   LoadTester,
   CsvGenerator,
-  EncryptionConfigManager
+  EncryptionConfigStorage
 } = EncryptedIndexedDB;
 
 export default {
@@ -94,7 +94,7 @@ export default {
       try {
         const encryptionConfigs = [];
         for (let i = 0; i < this.testConfig.selectedModules.length; i++) {
-          const moduleConfig = await EncryptionConfigManager.generateConfig(this.testConfig.selectedModules[i], moduleParams);
+          const moduleConfig = await EncryptionConfigStorage.generateDefaultConfig(this.testConfig.selectedModules[i], moduleParams);
           encryptionConfigs.push(moduleConfig);
         }
 
