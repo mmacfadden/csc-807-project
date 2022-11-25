@@ -69,13 +69,13 @@ async function test(operationCount) {
 
 
   depthSeries.sort((a, b) => a[0] - b[0]);
-  renderChart("depthChart", "Object Depth vs. Time", "depth", depthSeries);
+  renderChart("depthChart", "Object Depth vs. Time", "Object Depth", depthSeries);
 
   breadthSeries.sort((a, b) => a[0] - b[0]);
-  renderChart("breadthChart", "Object Breadth vs. Time", "breadth", breadthSeries);
+  renderChart("breadthChart", "Object Breadth vs. Time", "Object Breadth", breadthSeries);
 
   valueSeries.sort((a, b) => a[0] - b[0]);
-  renderChart("valueChart", "Value Size vs. Time", "valueSize", valueSeries);
+  renderChart("valueChart", "Value Size vs. Time", "Value Size (Bytes)", valueSeries);
 }
 
 const objectStoreName = "test";
@@ -142,7 +142,7 @@ function renderChart(id, title, xAxisLabel, data) {
     },
     yAxis: {
       title: {
-        text: 'time (ms)'
+        text: 'Avg Read-Write Time (ms)'
       }
     },
 
@@ -152,21 +152,18 @@ function renderChart(id, title, xAxisLabel, data) {
       }
     },
 
-    legend: {
-      layout: 'vertical',
-      align: 'right',
-      verticalAlign: 'middle'
-    },
-
     plotOptions: {
       series: {
         label: {
-          connectorAllowed: false
+          enabled: false
         }
       }
     },
-
+    legend: {
+      enabled: false
+    },
     series: [{
+      name: xAxisLabel,
       data
     }],
 
@@ -184,7 +181,6 @@ function renderChart(id, title, xAxisLabel, data) {
         }
       }]
     }
-
   });
 }
 
