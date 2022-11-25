@@ -5,6 +5,9 @@ import {EncryptionModule, EncryptionModuleFactory} from "../module";
 import {OpeEncryptor} from "../ope/OpeEncryptor";
 import {DatabaseNameUtil} from "../util/DatabaseNameUtil";
 import {EncryptionConfig} from "../config";
+import {NoOpKeyEncryptor} from "./NoOpKeyEncryptor";
+import {OPEKeyEncryptor} from "./OPEKeyEncryptor";
+import {EIDBKeyEncryptor} from "./EIDBKeyEncryptor";
 
 export class EIDBFactory implements IDBFactory {
 
@@ -36,9 +39,19 @@ export class EIDBFactory implements IDBFactory {
     this._delegate = delegate;
     this._encryptionConfig = config;
     this._encryptionModule = EncryptionModuleFactory.createModule(config.moduleId());
-    const opeEncryptor = new OpeEncryptor(config.opeKey());
+
+    let keyEncryptor: EIDBKeyEncryptor;
+    switch (this._encryptionConfig.keyEncryption()) {
+      case "none":
+        keyEncryptor = new NoOpKeyEncryptor();
+        break;
+      case "ope":
+        keyEncryptor = new OPEKeyEncryptor(new OpeEncryptor(config.opeKey()));
+        break;
+    }
+
     this._valueMapper = new EIDBValueMapper(
-        this._encryptionConfig, this._encryptionModule, opeEncryptor);
+        this._encryptionConfig, this._encryptionModule, keyEncryptor!);
 
     this._encryptionModule.init(
         this._encryptionConfig.dataSecret(),

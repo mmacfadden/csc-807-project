@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {EIDBFactory, EncryptionConfig, ModuleClearText, RequestUtils} from '../../src/';
+import {EIDBFactory, EncryptionConfig, KeyEncryptionStrategy, ModuleClearText, RequestUtils} from '../../src/';
 import "fake-indexeddb/auto";
 import {IDBFactory} from "fake-indexeddb";
 
@@ -11,6 +11,7 @@ function createConfig(overrides?: any) {
     dataSecret: "secret",
     opeKey: "a key",
     userDbPrefix: "prefix",
+    keyEncryption: "none" as KeyEncryptionStrategy,
     databases: {
       "dbName": {
         objectStores: {
@@ -26,6 +27,7 @@ function createConfig(overrides?: any) {
   if (overrides) {
     config = {...config, ...overrides};
   }
+
   return new EncryptionConfig(config)
 }
 

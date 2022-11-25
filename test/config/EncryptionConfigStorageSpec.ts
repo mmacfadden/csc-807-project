@@ -8,6 +8,7 @@ const DEFAULT_CONFIG: IEncryptionConfigData = {
   dataSecret: "secret",
   opeKey: "a key",
   userDbPrefix: "prefix",
+  keyEncryption: "none",
   databases: {
     "dbName": {
       objectStores: {

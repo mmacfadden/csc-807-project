@@ -6,9 +6,9 @@ import {EIDBCursor} from "./EIDBCursor";
 import {EIDBTransaction} from "./EIDBTransaction";
 import {IDBCursorWithValue} from "fake-indexeddb";
 import {EncryptionModule} from "../module";
-import {OpeEncryptor} from "../ope/OpeEncryptor";
 import {EncryptionConfig} from "../config";
 import {DatabaseNameUtil} from "../util/DatabaseNameUtil";
+import {EIDBKeyEncryptor} from "./EIDBKeyEncryptor";
 
 export type ValueMapper<S, D> = (source: S) => D;
 
@@ -26,13 +26,13 @@ export class EIDBValueMapper {
   constructor(
       encryptionConfig: EncryptionConfig,
       encryptionModule: EncryptionModule,
-      opeEncryptor: OpeEncryptor) {
-    this.dbMapper = new DatabaseMapper(this, encryptionModule, opeEncryptor, encryptionConfig);
-    this.objectStoreMapper = new ObjectStoreMapper(this, encryptionModule, opeEncryptor, encryptionConfig);
-    this.transactionMapper = new TransactionMapper(this, encryptionModule, opeEncryptor, encryptionConfig);
-    this.cursorMapper = new CursorMapper(this, encryptionModule, opeEncryptor, encryptionConfig);
-    this.cursorWithValueMapper = new CursorWithValueMapper(this, encryptionModule, opeEncryptor, encryptionConfig);
-    this.indexMapper = new IndexMapper(this, encryptionModule, opeEncryptor, encryptionConfig);
+      keyEncryptor: EIDBKeyEncryptor) {
+    this.dbMapper = new DatabaseMapper(this, encryptionModule, keyEncryptor, encryptionConfig);
+    this.objectStoreMapper = new ObjectStoreMapper(this, encryptionModule, keyEncryptor, encryptionConfig);
+    this.transactionMapper = new TransactionMapper(this, encryptionModule, keyEncryptor, encryptionConfig);
+    this.cursorMapper = new CursorMapper(this, encryptionModule, keyEncryptor, encryptionConfig);
+    this.cursorWithValueMapper = new CursorWithValueMapper(this, encryptionModule, keyEncryptor, encryptionConfig);
+    this.indexMapper = new IndexMapper(this, encryptionModule, keyEncryptor, encryptionConfig);
     this.encryptionConfig = encryptionConfig;
   }
 
@@ -56,17 +56,17 @@ export abstract class CachedValueMapper<From extends object, To, Parent = undefi
   private readonly _map: WeakMap<From, To>;
   protected readonly _mapper: EIDBValueMapper;
   protected readonly _encryptionModule: EncryptionModule;
-  protected readonly _opeEncryptor: OpeEncryptor;
+  protected readonly _keyEncryptor: EIDBKeyEncryptor;
   protected readonly _encryptionConfig: EncryptionConfig;
 
   constructor(mapper: EIDBValueMapper,
               encryptionModule: EncryptionModule,
-              opeEncryptor: OpeEncryptor,
+              keyEncryptor: EIDBKeyEncryptor,
               encryptionConfig: EncryptionConfig) {
     this._mapper = mapper;
     this._encryptionModule = encryptionModule;
     this._map = new WeakMap<From, To>();
-    this._opeEncryptor = opeEncryptor;
+    this._keyEncryptor = keyEncryptor;
     this._encryptionConfig = encryptionConfig;
   }
 
@@ -111,7 +111,7 @@ export class ObjectStoreMapper extends CachedValueMapper<IDBObjectStore, EIDBObj
   protected _createValue(source: IDBObjectStore, parent: EIDBDatabase): EIDBObjectStore {
     const dbConfig = this._encryptionConfig.getDatabaseConfig(parent.name);
     const config = dbConfig.getObjectStoreConfig(source.name)
-    return new EIDBObjectStore(source, config, this._encryptionModule, this._opeEncryptor, this._mapper);
+    return new EIDBObjectStore(source, config, this._encryptionModule, this._keyEncryptor, this._mapper);
   }
 }
 

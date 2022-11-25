@@ -1,11 +1,6 @@
-import {OpeEncryptor} from "../ope/OpeEncryptor";
 
-export class EIDBKeyEncryptor {
-  private _opeEncryptor: OpeEncryptor;
 
-  constructor(opeEncryptor: OpeEncryptor) {
-    this._opeEncryptor = opeEncryptor;
-  }
+export abstract class EIDBKeyEncryptor {
 
   public encryptKeyOrRange(query?: IDBValidKey | IDBKeyRange | null): IDBValidKey | IDBKeyRange | undefined {
     if (query === null || query === undefined) {
@@ -51,14 +46,5 @@ export class EIDBKeyEncryptor {
     }
   }
 
-  public encryptSingleKey(key: number | string | Date | BufferSource): Uint8Array {
-    if (typeof key === "string") {
-      const encryptedKey: Int32Array = this._opeEncryptor.encryptString(key);
-      return new Uint8Array(encryptedKey.buffer);
-    } else {
-      // FIXME handle other key types.
-      throw Error("Unhandled key type");
-    }
-
-  }
+  public abstract encryptSingleKey(key: number | string | Date | BufferSource): any;
 }

@@ -29,8 +29,12 @@ export interface IEncryptionConfigData {
    */
   userDbPrefix: string;
 
+  keyEncryption: KeyEncryptionStrategy;
+
   databases: { [key: string]: IDatabaseConfigData }
 }
+
+export type KeyEncryptionStrategy = "none" | "ope" | "symmetric";
 
 export interface IDatabaseConfigData {
   objectStores: { [key: string]: IObjectStoreConfigData }

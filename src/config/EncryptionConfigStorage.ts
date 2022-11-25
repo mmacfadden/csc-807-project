@@ -97,6 +97,7 @@ export class EncryptionConfigStorage {
       dataSecret,
       opeKey,
       userDbPrefix,
+      keyEncryption: "none",
       databases: {}
     }
   }

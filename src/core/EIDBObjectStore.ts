@@ -5,7 +5,6 @@ import {EIDBValueMapper} from "./EIDBValueMapper";
 import {EncryptionModule} from "../module";
 import {IEncryptedDocument} from "./IEncryptedDocument";
 import {MutableIDBRequest} from "./MutableIDBRequest";
-import {OpeEncryptor} from "../ope/OpeEncryptor";
 import {EIDBKeyEncryptor} from "./EIDBKeyEncryptor";
 import {EIDBObjectStoreConfig} from "../config/EIDBObjectStoreConfig";
 import {KeyPathUtil} from "../util";
@@ -20,13 +19,13 @@ export class EIDBObjectStore implements IDBObjectStore {
   constructor(store: IDBObjectStore,
               config: EIDBObjectStoreConfig,
               encryptionModule: EncryptionModule,
-              opeEncryptor: OpeEncryptor,
+              keyEncryptor: EIDBKeyEncryptor,
               valueMapper: EIDBValueMapper) {
     this._store = store;
     this._config = config;
     this._valueMapper = valueMapper;
     this._encryptionModule = encryptionModule;
-    this._keyEncryptor = new EIDBKeyEncryptor(opeEncryptor);
+    this._keyEncryptor = keyEncryptor;
   }
 
   public get autoIncrement(): boolean {

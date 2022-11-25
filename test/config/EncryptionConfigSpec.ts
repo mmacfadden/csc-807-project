@@ -10,6 +10,7 @@ function createConfig(): IEncryptionConfigData {
     dataSecret: "secret",
     opeKey: "a key",
     userDbPrefix: "prefix",
+    keyEncryption: "none",
     databases: {
       "dbName": {
         objectStores: {

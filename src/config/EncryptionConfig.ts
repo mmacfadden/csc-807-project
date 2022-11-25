@@ -1,4 +1,4 @@
-import {IEncryptionConfigData} from "./IEncryptionConfigData";
+import {IEncryptionConfigData, KeyEncryptionStrategy} from "./IEncryptionConfigData";
 import {EIDBDatabaseConfig} from "./EIDBDatabaseConfig";
 
 export class EncryptionConfig {
@@ -30,6 +30,13 @@ export class EncryptionConfig {
    */
   moduleParams(): any {
     return this._config.moduleParams;
+  }
+
+  /**
+   * The module id of the encryption module to use.
+   */
+  keyEncryption(): KeyEncryptionStrategy {
+    return "none";
   }
 
   /**
