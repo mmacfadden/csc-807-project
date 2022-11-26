@@ -192,7 +192,6 @@ export class OPE {
       // Convert the data to a list of bits
       const bits = str_to_bitstring(encrypted_bytes);
       for (const bit of bits) {
-
         yield bit;
       }
     }
