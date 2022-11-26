@@ -1,6 +1,8 @@
 import {OpeEncryptor} from "../src/ope/OpeEncryptor";
 import {RandomStringGenerator} from "../src";
 
+const start = performance.now();
+
 const encryptor = new OpeEncryptor("Sx7oMWG3l3mIWuMmlh3ZHYAwitZr6dp+MgZ2Nv8sk7E=");
 
 for(let i = 0; i < 100; i++) {
@@ -38,6 +40,8 @@ for(let i = 0; i < 100; i++) {
         //console.log("correct");
     }
 }
+
+console.log(performance.now() - start);
 
 function compareArrays(bufferA: ArrayBuffer, bufferB: ArrayBuffer): number {
     const a = new Uint8Array(bufferA);

@@ -136,7 +136,8 @@ export class OPE {
     const in_edge = in_range.start - 1;                                 // d
     const out_edge = out_range.start - 1;                               // r
     const mid = out_edge + Math.round(Math.ceil(out_size / 2.0));    // y
-    assert(in_size <= out_size)
+    assert(in_size <= out_size);
+
     if (in_range.size() == 1) {
       const in_range_min = in_range.start
       const coins = this.tape_gen(in_range_min)
@@ -147,6 +148,7 @@ export class OPE {
         throw new Error('Invalid ciphertext');
       }
     }
+
     const coins = this.tape_gen(mid)
     const x = sample_hgd(in_range, out_range, mid, coins);
 
@@ -157,6 +159,7 @@ export class OPE {
       in_range = new ValueRange(x + 1, in_edge + in_size);
       out_range = new ValueRange(mid + 1, out_edge + out_size);
     }
+
     return this.decrypt_recursive(ciphertext, in_range, out_range);
   }
 
