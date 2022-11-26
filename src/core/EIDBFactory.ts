@@ -47,9 +47,11 @@ export class EIDBFactory implements IDBFactory {
       case "none":
         keyEncryptor = new NoOpKeyEncryptor();
         break;
+
       case "ope":
         keyEncryptor = new OPEKeyEncryptor(new OpeEncryptor(config.opeKey()));
         break;
+
       case "symmetric":
         const keyConfig = this._encryptionConfig.symmetricKeyEncryptionKey();
         if (!keyConfig) {
@@ -57,6 +59,7 @@ export class EIDBFactory implements IDBFactory {
         }
         keyEncryptor = new SymmetricKeyEncryptor(keyConfig);
         break;
+
       case "hash":
         keyEncryptor = new Sha512KeyEncryptor();
         break;

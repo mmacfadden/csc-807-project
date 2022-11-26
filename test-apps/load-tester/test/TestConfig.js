@@ -11,13 +11,17 @@ export default {
   data() {
     const {
       serializationScheme,
+      keyEncryptionScheme,
       documentsPerTest,
       selectedModuleMap,
       selectedSchemaMap
     } = this.configToData(this.config);
 
+    console.log(keyEncryptionScheme);
+
     return {
       serializationScheme,
+      keyEncryptionScheme,
       documentsPerTest,
       selectedModuleMap,
       selectedSchemaMap
@@ -27,6 +31,7 @@ export default {
     configToData(config) {
       return {
         serializationScheme: config.preEncryptionSerialization,
+        keyEncryptionScheme: config.keyEncryptionScheme,
         documentsPerTest: config.documentsPerTest,
         selectedModuleMap: new Map(this.modules.map(m => [m, config.selectedModules.includes(m)])),
         selectedSchemaMap: new Map(this.schemas.map(s => [s.name, config.selectedSchemas.find(o => o.name === s.name) !== undefined])),
@@ -52,10 +57,15 @@ export default {
       this.serializationScheme = e.target.value;
       this.emitConfig();
     },
+    setKeyEncryption(e) {
+      this.keyEncryptionScheme = e.target.value;
+      this.emitConfig();
+    },
     emitConfig() {
       const update = {
         preEncryptionSerialization: this.serializationScheme,
         documentsPerTest: this.documentsPerTest,
+        keyEncryptionScheme: this.keyEncryptionScheme,
         selectedModules: this.modules.filter(m => this.selectedModuleMap.get(m)),
         selectedSchemas: this.schemas.filter(s => this.selectedSchemaMap.get(s.name))
       }
@@ -138,7 +148,7 @@ export default {
             </div>
           </div>
           <div class="mb-3 row">
-            <div class="col-6">
+            <div class="col-4">
               <label for="docsPerTest" class="form-label">Objects Per Test</label>
               <input type="number"
                      class="form-control"
@@ -147,11 +157,20 @@ export default {
                      @change="updateDocsPerTest"
               />
             </div>
-            <div class="col-6">
+            <div class="col-4">
               <label for="docsPerTest" class="form-label">Pre-Encryption Serialization Scheme</label>
               <select class="form-select" aria-label="Pre-Encryption Serialization Scheme" @change="setSerialization">
                 <option value="bson" :selected="serializationScheme === 'bson'">BSON</option>
                 <option value="msgpack" :selected="serializationScheme === 'msgpack'">Message Pack</option>
+              </select>
+            </div>
+            <div class="col-4">
+              <label for="keyEncryption" class="form-label">Key Encryption Scheme</label>
+              <select class="form-select" aria-label="Key Encryption Scheme" @change="setKeyEncryption">
+                <option value="none" :selected="keyEncryptionScheme === 'none'">None</option>
+                <option value="ope" :selected="keyEncryptionScheme === 'ope'">OPE</option>
+                <option value="hash" :selected="keyEncryptionScheme === 'hash'">Hash</option>
+                <option value="symmetric" :selected="keyEncryptionScheme === 'symmetric'">Symmetric</option>
               </select>
             </div>
           </div>

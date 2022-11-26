@@ -95,6 +95,7 @@ export default {
         const encryptionConfigs = [];
         for (let i = 0; i < this.testConfig.selectedModules.length; i++) {
           const moduleConfig = await EncryptionConfigStorage.generateDefaultConfig(this.testConfig.selectedModules[i], moduleParams);
+          moduleConfig.keyEncryption = this.testConfig.keyEncryptionScheme;
           encryptionConfigs.push(moduleConfig);
         }
 

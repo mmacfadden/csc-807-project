@@ -46,6 +46,7 @@ export class Persistence {
     } else {
       const default_config = {
         preEncryptionSerialization: "msgpack",
+        keyEncryptionScheme: "hash",
         documentsPerTest: 30,
         selectedModules: ALL_MODULES,
         selectedSchemas: All_SCHEMAS.filter(v => v.enabledByDefault)

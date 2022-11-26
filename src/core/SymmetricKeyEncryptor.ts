@@ -24,7 +24,6 @@ export class SymmetricKeyEncryptor extends EIDBKeyEncryptor {
   public encryptSingleKey(key: number | string | Date | BufferSource): any {
     const encodedKey = CryptoJsUtils.convertUint8ArrayToWordArray(encode(key));
     const ct = CryptoJS.AES.encrypt(encodedKey, this._key, {iv: this._iv});
-    console.log(ct);
     return CryptoJsUtils.convertWordArrayToUint8Array(ct.ciphertext);
   }
 }
