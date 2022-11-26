@@ -20,13 +20,13 @@ export class HGD {
   }
 
   public static hypergeometric_hyp(prng: PRNG, good: number, bad: number, sample: number) {
-    const d1 = bad + good - sample
-    const d2 = Math.min(bad, good)
+    const d1 = bad + good - sample;
+    const d2 = Math.min(bad, good);
 
-    let Y = d2
-    let K = sample
+    let Y = d2;
+    let K = sample;
     while (Y > 0.0) {
-      const U = prng.draw()
+      const U = prng.draw();
       Y -= Math.round(Math.floor(U + Y / (d1 + K)));
       K -= 1;
       if (K == 0) {
@@ -36,7 +36,7 @@ export class HGD {
     }
     let Z = Math.round(d2 - Y)
     if (good > bad) {
-      Z = sample - Z
+      Z = sample - Z;
     }
 
     return Z;
@@ -75,7 +75,6 @@ export class HGD {
       Y = prng.draw();
       W = d6 + d8 * (Y - 0.5) / X;
 
-
       // fast rejection:
       if (W < 0.0 || W >= d11) {
         continue;
@@ -88,10 +87,12 @@ export class HGD {
       if ((X * (4.0 - X) - 3.0) <= T) {
         break;
       }
+
       // fast rejection:
       if (X * (X - T) >= 1) {
         continue;
       }
+
       // acceptance:
       if (2.0 * Math.log(X) <= T) {
         break;
@@ -102,6 +103,7 @@ export class HGD {
     if (good > bad) {
       Z = m - Z;
     }
+
     // another fix from rv.py to allow sample to exceed popsize/2
     if (m < sample) {
       Z = good - Z;

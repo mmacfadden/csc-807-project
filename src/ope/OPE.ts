@@ -14,6 +14,7 @@ const DEFAULT_OUT_RANGE_END = 2 ** 31 - 1;
 export class OPE {
 
 
+
   /**
    * """Generate random key for ope cipher.
    * Parameters
@@ -40,16 +41,20 @@ export class OPE {
     return new TextEncoder().encode(random_key);
   }
 
-  public readonly key: Uint8Array;
+  public readonly key: CryptoJS.lib.WordArray;
   private readonly out_range: ValueRange;
   private readonly in_range: ValueRange;
+  private _zeros: CryptoJS.lib.WordArray;
 
   constructor(key: Uint8Array, inRange?: ValueRange, outRange?: ValueRange) {
     if (!(key instanceof Uint8Array)) {
       throw new Error(`key: expected Uint8Array, but got: ${typeof (key)}`)
     }
 
-    this.key = key;
+    this.key = CryptoJsUtils.convertUint8ArrayToWordArray(key);
+
+    // # Use AES in the CTR mode to generate a pseudo-random bit string
+    this._zeros = CryptoJS.lib.WordArray.create([0, 0, 0, 0]);
 
     if (!inRange) {
       inRange = new ValueRange(DEFAULT_IN_RANGE_START, DEFAULT_IN_RANGE_END);
@@ -167,36 +172,61 @@ export class OPE {
    * """Return a bit string, generated from the given data string"""
    * @param input
    */
-  public* tape_gen(input: number): Generator<number> {
+  public tape_gen(input: number): Iterator<number> {
     const data = CryptoJS.enc.Utf8.parse(input.toString())
 
     // Derive a key from data
-    const keyAsWordArray = CryptoJsUtils.convertUint8ArrayToWordArray(this.key);
-    const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, keyAsWordArray);
+    const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, this.key);
     hmac.update(data);
 
     const digest = hmac.finalize();
 
-    assert(digest.sigBytes == 32, "The hmac digest must be 32 bytes");
-
-    // # Use AES in the CTR mode to generate a pseudo-random bit string
-    const zeros = CryptoJS.lib.WordArray.create([0, 0, 0, 0]);
-
     const aesEncryptor = CryptoJS.algo.AES.createEncryptor(digest, {
       mode: CryptoJS.mode.CTR,
-      iv: zeros,
+      iv: this._zeros,
       padding: CryptoJS.pad.NoPadding
     });
 
-    while (true) {
-      const encrypted_words = aesEncryptor.process(zeros);
-      const encrypted_bytes = CryptoJsUtils.convertWordArrayToUint8Array(encrypted_words);
+    return new BitIterator(aesEncryptor, this._zeros);
+  }
+}
 
-      // Convert the data to a list of bits
-      const bits = str_to_bitstring(encrypted_bytes);
-      for (const bit of bits) {
-        yield bit;
+class BitIterator implements Iterator<number>{
+  private _bits: number[];
+  private _bitIndex = 0;
+  private _aesEncryptor: any;
+  private readonly _zeros: any;
+
+  constructor(aesEncryptor: any, zeros: CryptoJS.lib.WordArray) {
+    this._aesEncryptor = aesEncryptor;
+    this._bits = [];
+    this._zeros = zeros;
+  }
+
+  next(): IteratorResult<number> {
+    if (this._bitIndex >= this._bits.length) {
+      const encrypted_words = this._aesEncryptor.process(this._zeros);
+
+      this._bits = [];
+      for (let i = 0x0; i < encrypted_words.sigBytes; i++) {
+        const byte = encrypted_words.words[i >>> 0x2] >>> 0x18 - i % 0x4 * 0x8 & 0xff;
+
+        this._bits.push(byte >> 7 & 1);
+        this._bits.push(byte >> 6 & 1);
+        this._bits.push(byte >> 5 & 1);
+        this._bits.push(byte >> 4 & 1);
+        this._bits.push(byte >> 3 & 1);
+        this._bits.push(byte >> 2 & 1);
+        this._bits.push(byte >> 1 & 1);
+        this._bits.push(byte >> 0 & 1);
       }
+
+      this._bitIndex = 0;
     }
+
+    return {
+      done: false,
+      value: this._bits[this._bitIndex++]
+    };
   }
 }
