@@ -27,9 +27,8 @@ export function sample_hgd(in_range: ValueRange, out_range: ValueRange, nsample:
   if (in_sample_num == 0) {
     return in_range.start;
   } else {
-    const in_sample = in_range.start + in_sample_num - 1
     // assert(in_range.contains(in_sample))
-    return in_sample;
+    return in_range.start + in_sample_num - 1;
   }
 
 }

@@ -20,7 +20,7 @@ export class PRNG {
       }
     }
 
-    assert(bits.length == 32);
+    // assert(bits.length == 32);
 
     let out: number = 0;
     for (const b of bits) {
@@ -30,7 +30,7 @@ export class PRNG {
     }
 
     const res = out / (2 ** 32 - 1);
-    assert(res >= 0 && res <= 1, "result must be between 0 and 1: " + res);
+    // assert(res >= 0 && res <= 1, "result must be between 0 and 1: " + res);
     return res;
   }
 }

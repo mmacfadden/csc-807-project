@@ -1,6 +1,30 @@
 import {PRNG} from "./PRNG";
 
 export class HGD {
+
+  static D1 = 1.7155277699214135;
+  static D2 = 0.8989161620588988;
+
+  static  a = [
+    0.08333333333333333,
+    -0.002777777777777778,
+    0.0007936507936507937,
+    -0.0005952380952380952,
+    0.0008417508417508418,
+    -0.001917526917526918,
+    0.00641025641025641,
+    -0.02955065359477124,
+    0.1796443723688307,
+    -1.3924322169059
+  ];
+
+  static {
+    Object.freeze(HGD.a);
+  }
+
+  static xp = 2 * Math.PI;
+  static logXp = Math.log(HGD.xp);
+
   /**
    * Random variates from the hypergeometric distribution.
    *
@@ -34,6 +58,7 @@ export class HGD {
       }
 
     }
+
     let Z = Math.round(d2 - Y)
     if (good > bad) {
       Z = sample - Z;
@@ -42,9 +67,9 @@ export class HGD {
     return Z;
   }
 
+
   public static hypergeometric_hrua(prng: PRNG, good: number, bad: number, sample: number) {
-    const D1 = 1.7155277699214135;
-    const D2 = 0.8989161620588988;
+
     // long mingoodbad, maxgoodbad, popsize, m, d9;
     // double d4, d5, d6, d7, d8, d10, d11;
     // long Z;
@@ -64,7 +89,7 @@ export class HGD {
     const d5 = 1.0 - d4;
     const d6 = m * d4 + 0.5;
     const d7 = Math.sqrt((popsize - m) * sample * d4 * d5 / (popsize - 1) + 0.5);
-    const d8 = D1 * d7 + D2;
+    const d8 = HGD.D1 * d7 + HGD.D2;
     const d9 = Number(Math.floor((m + 1) * (mingoodbad + 1) / (popsize + 2)));
     const d10 = HGD.loggam(d9 + 1) + HGD.loggam(mingoodbad - d9 + 1) + HGD.loggam(m - d9 + 1) + HGD.loggam(maxgoodbad - m + d9 + 1);
     const d11 = Math.min(Math.min(m, mingoodbad) + 1.0, Math.floor(d6 + 16 * d7));
@@ -113,18 +138,7 @@ export class HGD {
   }
 
   public static loggam(x: number) {
-    let gl, gl0, xp;
-    const a = [
-      0.08333333333333333,
-      -0.002777777777777778,
-      0.0007936507936507937,
-      -0.0005952380952380952,
-      0.0008417508417508418,
-      -0.001917526917526918,
-      0.00641025641025641,
-      -0.02955065359477124,
-      0.1796443723688307,
-      -1.3924322169059];
+    let gl, gl0;
 
     let x0 = x;
     let n = 0;
@@ -139,15 +153,15 @@ export class HGD {
     }
 
     const x2 = 1.0 / (x0 * x0);
-    xp = 2 * Math.PI;
-    gl0 = a[9];
+
+    gl0 = HGD.a[9];
 
     for (let k = 8; k > -1; k--) {
       gl0 = gl0 * x2;
-      gl0 += a[k];
+      gl0 += HGD.a[k];
     }
 
-    gl = gl0 / x0 + 0.5 * Math.log(xp) + (x0 - 0.5) * Math.log(x0) - x0;
+    gl = gl0 / x0 + 0.5 * HGD.logXp + (x0 - 0.5) * Math.log(x0) - x0;
 
     if (x <= 7.0) {
       for (let k = 1; k < n + 1; k++) {

@@ -17,8 +17,6 @@ export default {
       selectedSchemaMap
     } = this.configToData(this.config);
 
-    console.log(keyEncryptionScheme);
-
     return {
       serializationScheme,
       keyEncryptionScheme,

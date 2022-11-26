@@ -1,7 +1,4 @@
 import * as CryptoJS from "crypto-js";
-
-import {str_to_bitstring} from "./util";
-import {assert} from "../util/assert";
 import {sample_hgd, sample_uniform} from "./stat";
 import {ValueRange} from "./ValueRange";
 import {CryptoJsUtils} from "../util/CryptoJsUtils";
@@ -12,8 +9,6 @@ const DEFAULT_OUT_RANGE_START = 0;
 const DEFAULT_OUT_RANGE_END = 2 ** 31 - 1;
 
 export class OPE {
-
-
 
   /**
    * """Generate random key for ope cipher.
@@ -44,13 +39,9 @@ export class OPE {
   public readonly key: CryptoJS.lib.WordArray;
   private readonly out_range: ValueRange;
   private readonly in_range: ValueRange;
-  private _zeros: CryptoJS.lib.WordArray;
+  private readonly _zeros: CryptoJS.lib.WordArray;
 
   constructor(key: Uint8Array, inRange?: ValueRange, outRange?: ValueRange) {
-    if (!(key instanceof Uint8Array)) {
-      throw new Error(`key: expected Uint8Array, but got: ${typeof (key)}`)
-    }
-
     this.key = CryptoJsUtils.convertUint8ArrayToWordArray(key);
 
     // # Use AES in the CTR mode to generate a pseudo-random bit string
@@ -77,10 +68,6 @@ export class OPE {
    * @param plaintext
    */
   public encrypt(plaintext: number): number {
-    if (typeof (plaintext) !== "number") {
-      throw new Error('Plaintext must be an integer value');
-    }
-
     if (!this.in_range.contains(plaintext)) {
       throw new Error('Plaintext is not within the input range')
     }
@@ -89,14 +76,13 @@ export class OPE {
   }
 
   public encrypt_recursive(plaintext: number, in_range: ValueRange, out_range: ValueRange): number {
-
     const in_size = in_range.size()       // M
     const out_size = out_range.size()    // N
     const in_edge = in_range.start - 1    // d
     const out_edge = out_range.start - 1  // r
     const mid = out_edge + Math.round(Math.ceil(out_size / 2.0))  // y
 
-    assert(in_size <= out_size);
+    //assert(in_size <= out_size);
 
     if (in_range.size() == 1) {
       const coins = this.tape_gen(plaintext);
@@ -124,9 +110,6 @@ export class OPE {
    * @param ciphertext
    */
   public decrypt(ciphertext: number) {
-    if (typeof (ciphertext) !== "number") {
-      throw new Error('Ciphertext must be an integer value')
-    }
     if (!this.out_range.contains(ciphertext)) {
       throw new Error('Ciphertext is not within the output range')
     }
@@ -134,21 +117,20 @@ export class OPE {
     return this.decrypt_recursive(ciphertext, this.in_range, this.out_range);
   }
 
-
   public decrypt_recursive(ciphertext: number, in_range: ValueRange, out_range: ValueRange): number {
     const in_size = in_range.size();                                    // M
     const out_size = out_range.size();                                  // N
     const in_edge = in_range.start - 1;                                 // d
     const out_edge = out_range.start - 1;                               // r
     const mid = out_edge + Math.round(Math.ceil(out_size / 2.0));    // y
-    assert(in_size <= out_size);
+    // assert(in_size <= out_size);
 
     if (in_range.size() == 1) {
       const in_range_min = in_range.start
       const coins = this.tape_gen(in_range_min)
       const sampled_ciphertext = sample_uniform(out_range, coins)
-      if (sampled_ciphertext == ciphertext) {
-        return in_range_min
+      if (sampled_ciphertext === ciphertext) {
+        return in_range_min;
       } else {
         throw new Error('Invalid ciphertext');
       }
