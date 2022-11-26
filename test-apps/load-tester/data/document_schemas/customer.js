@@ -5,7 +5,7 @@ export const MOCK_CUSTOMER =
   keyPath: "id",
   schema: `{
   "id": {
-    "chance": "guid"
+    "faker": "random.alphaNumeric(10)"
   },
   "firstName": {
     "faker": "name.firstName"

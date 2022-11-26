@@ -4,7 +4,7 @@ export const TEXT_5000 = {
   keyPath: "id",
   schema: `{
   "id": {
-    "chance": "guid"
+    "faker": "random.alphaNumeric(10)"
   },
   "text": {
     "faker": "random.alphaNumeric(5000)"

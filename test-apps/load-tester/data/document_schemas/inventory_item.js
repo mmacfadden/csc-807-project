@@ -6,7 +6,7 @@ export const INVENTORY_ITEM =
   schema: `
 {
   "sku": {
-    "chance": "guid"
+    "faker": "random.alphaNumeric(10)"
   },
   "description": {
     "faker": "random.words(53)"
