@@ -31,6 +31,8 @@ export interface IEncryptionConfigData {
 
   keyEncryption: KeyEncryptionStrategy;
 
+  symmetricKeyEncryptionKey?: string;
+
   databases: { [key: string]: IDatabaseConfigData }
 }
 

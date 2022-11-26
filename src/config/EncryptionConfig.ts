@@ -40,6 +40,13 @@ export class EncryptionConfig {
   }
 
   /**
+   * The module id of the encryption module to use.
+   */
+  symmetricKeyEncryptionKey(): string | undefined {
+    return this._config.symmetricKeyEncryptionKey;
+  }
+
+  /**
    * The module specific data secret used to encrypt the data.
    */
   dataSecret(): string {

@@ -5,6 +5,7 @@ import {EncryptionConfig} from "./EncryptionConfig";
 import {OpeEncryptor} from "../ope/OpeEncryptor";
 import {RandomStringGenerator} from "../util";
 import {EncryptionModuleFactory} from "../module";
+import {SymmetricKeyEncryptor} from "../core/SymmetricKeyEncryptor";
 
 
 /**
@@ -98,6 +99,7 @@ export class EncryptionConfigStorage {
       opeKey,
       userDbPrefix,
       keyEncryption: "symmetric",
+      symmetricKeyEncryptionKey: SymmetricKeyEncryptor.generateConfig(),
       databases: {}
     }
   }

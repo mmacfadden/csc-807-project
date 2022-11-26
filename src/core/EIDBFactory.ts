@@ -51,7 +51,11 @@ export class EIDBFactory implements IDBFactory {
         keyEncryptor = new OPEKeyEncryptor(new OpeEncryptor(config.opeKey()));
         break;
       case "symmetric":
-        keyEncryptor = new SymmetricKeyEncryptor();
+        const keyConfig = this._encryptionConfig.symmetricKeyEncryptionKey();
+        if (!keyConfig) {
+          throw new Error("Invalid symmetricKeyEncryptionKey: " + config);
+        }
+        keyEncryptor = new SymmetricKeyEncryptor(keyConfig);
         break;
       case "hash":
         keyEncryptor = new Sha512KeyEncryptor();
