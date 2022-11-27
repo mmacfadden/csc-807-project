@@ -1,12 +1,27 @@
-import {assert} from "../util/assert";
-
+/**
+ * A pseudorandom number generator that
+ * generates a value between 0 and 1.
+ */
 export class PRNG {
   public coins: Iterator<number>;
 
+  /**
+   * Creates a new random number generator using a coin
+   * iterator.
+   *
+   * @param coins
+   *   A iterator that supplies bits.
+   */
   constructor(coins: Iterator<number>) {
     this.coins = coins;
   }
 
+  /**
+   * Draws a random number.
+   *
+   * @returns
+   *  A number between 0 and 1.
+   */
   public draw(): number {
     const bits: number[] = [];
     bits.length = 32;

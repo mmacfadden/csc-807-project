@@ -1,5 +1,3 @@
-
-
 export abstract class EIDBKeyEncryptor {
 
   public encryptKeyOrRange(query?: IDBValidKey | IDBKeyRange | null): IDBValidKey | IDBKeyRange | undefined {
@@ -13,33 +11,25 @@ export abstract class EIDBKeyEncryptor {
   }
 
   public encryptKeyRange(keyRange: IDBKeyRange): IDBKeyRange {
-    let encryptedRange;
-
     if (keyRange.lower !== undefined && keyRange.upper === undefined) {
       const lower = this.encryptKey(keyRange.lower);
-      encryptedRange = IDBKeyRange.lowerBound(lower, keyRange.lowerOpen);
+      return IDBKeyRange.lowerBound(lower, keyRange.lowerOpen);
     } else if (keyRange.lower === undefined && keyRange.upper !== undefined) {
       const upper = this.encryptKey(keyRange.upper);
-      encryptedRange = IDBKeyRange.upperBound(upper, keyRange.upperOpen);
+      return IDBKeyRange.upperBound(upper, keyRange.upperOpen);
     } else if (keyRange.lower !== undefined && keyRange.upper !== undefined) {
       const lower = this.encryptKey(keyRange.lower);
       const upper = this.encryptKey(keyRange.upper);
-      encryptedRange = IDBKeyRange.bound(lower, upper, keyRange.lowerOpen, keyRange.upperOpen);
+      return IDBKeyRange.bound(lower, upper, keyRange.lowerOpen, keyRange.upperOpen);
     } else {
-      encryptedRange = keyRange;
+      throw new Error("either the upper or lower bound must be set.");
     }
-
-    return encryptedRange;
   }
 
   public encryptKey(key: IDBValidKey): IDBValidKey {
     if (Array.isArray(key)) {
       return key.map((k: IDBValidKey) => {
-        if (Array.isArray(k)) {
-          return this.encryptKey(k);
-        } else {
-          return this.encryptSingleKey(k);
-        }
+        return this.encryptKey(k);
       });
     } else {
       return this.encryptSingleKey(key);

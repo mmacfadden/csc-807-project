@@ -35,6 +35,8 @@ describe('EncryptionConfig', () => {
       expect(config.opeKey()).to.eq(defaultConfig.opeKey);
       expect(config.userDbPrefix()).to.eq(defaultConfig.userDbPrefix);
       expect(config.moduleParams()).to.deep.eq(defaultConfig.moduleParams);
+      expect(config.keyEncryption()).to.deep.eq(defaultConfig.keyEncryption);
+      expect(config.symmetricKeyEncryptionKey()).to.deep.eq(defaultConfig.symmetricKeyEncryptionKey);
 
       expect(config.toJSON()).to.deep.eq(defaultConfig);
     });
