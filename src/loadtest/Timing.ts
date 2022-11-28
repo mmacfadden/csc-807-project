@@ -29,6 +29,9 @@ export class Timing {
    *
    * @param i
    *   The unique sequential id of the read operation.
+   *
+   * @returns
+   *   The duration of the read operation.
    */
   public static readEnd(i: number): number {
     const endMark = Timing._READ_END + i;
