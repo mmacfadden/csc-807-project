@@ -173,12 +173,12 @@ describe('EncryptionConfigStorage', () => {
 
   describe('generateDefaultConfig', () => {
     it('generate a config with the correct module id', () => {
-      const data = EncryptionConfigStorage.generateDefaultConfig(ModuleClearText.MODULE_ID);
+      const data = EncryptionConfigStorage.generateDefaultConfigData(ModuleClearText.MODULE_ID);
       expect(data.moduleId).to.eq(ModuleClearText.MODULE_ID);
     });
 
     it('generate a valid config', () => {
-      const data = EncryptionConfigStorage.generateDefaultConfig(ModuleClearText.MODULE_ID);
+      const data = EncryptionConfigStorage.generateDefaultConfigData(ModuleClearText.MODULE_ID);
       expect(data.moduleId).to.eq(ModuleClearText.MODULE_ID);
       expect(data.dataSecret).to.be.a("string");
       expect(data.opeKey).to.be.a("string");
@@ -189,13 +189,13 @@ describe('EncryptionConfigStorage', () => {
 
     it('generate a config with module params if passed', () => {
       const params = {"key": "value"};
-      const data = EncryptionConfigStorage.generateDefaultConfig(ModuleClearText.MODULE_ID, params);
+      const data = EncryptionConfigStorage.generateDefaultConfigData(ModuleClearText.MODULE_ID, params);
       expect(data.moduleParams).to.deep.eq(params);
     });
 
     it('throw for an invalid module id', () => {
       expect(() => {
-        EncryptionConfigStorage.generateDefaultConfig("none");
+        EncryptionConfigStorage.generateDefaultConfigData("none");
       }).to.throw();
     });
   });

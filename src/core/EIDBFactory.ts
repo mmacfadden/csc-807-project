@@ -6,10 +6,11 @@ import {OpeEncryptor} from "../ope/OpeEncryptor";
 import {DatabaseNameUtil} from "../util/DatabaseNameUtil";
 import {EncryptionConfig} from "../config";
 import {NoOpKeyEncryptor} from "./NoOpKeyEncryptor";
-import {OPEKeyEncryptor} from "./OPEKeyEncryptor";
+import {OpeKeyEncryptor} from "./OpeKeyEncryptor";
 import {EIDBKeyEncryptor} from "./EIDBKeyEncryptor";
 import {SymmetricKeyEncryptor} from "./SymmetricKeyEncryptor";
 import {Sha512KeyEncryptor} from "./Sha512KeyEncryptor";
+import {EIDBDatabase} from "./EIDBDatabase";
 
 export class EIDBFactory implements IDBFactory {
 
@@ -17,6 +18,7 @@ export class EIDBFactory implements IDBFactory {
   private readonly _encryptionModule: EncryptionModule;
   private readonly _valueMapper: EIDBValueMapper;
   private readonly _encryptionConfig: EncryptionConfig;
+  private readonly _dbMapper: (d: IDBDatabase) => EIDBDatabase;
 
   /**
    * Creates a new EIDBFactory that wraps a normal Indexed
@@ -49,7 +51,7 @@ export class EIDBFactory implements IDBFactory {
         break;
 
       case "ope":
-        keyEncryptor = new OPEKeyEncryptor(new OpeEncryptor(config.opeKey()));
+        keyEncryptor = new OpeKeyEncryptor(new OpeEncryptor(config.opeKey()));
         break;
 
       case "symmetric":
@@ -67,6 +69,8 @@ export class EIDBFactory implements IDBFactory {
 
     this._valueMapper = new EIDBValueMapper(
         this._encryptionConfig, this._encryptionModule, keyEncryptor!);
+
+    this._dbMapper = (d: IDBDatabase) => this._valueMapper.dbMapper.map(d);
 
     this._encryptionModule.init(
         this._encryptionConfig.dataSecret(),
@@ -112,7 +116,7 @@ export class EIDBFactory implements IDBFactory {
       this._encryptionConfig.addDatabaseConfig(name);
     }
     const request = this._delegate.open(prefixedName, version);
-    return new EIDBOpenDBRequest(request, this._valueMapper, (d: IDBDatabase) => this._valueMapper.dbMapper.map(d));
+    return new EIDBOpenDBRequest(request, this._valueMapper, this._dbMapper);
   }
 
   /**
@@ -123,10 +127,7 @@ export class EIDBFactory implements IDBFactory {
     // TODO ideally these would both happen together.
     this._encryptionConfig.removeDatabaseConfig(name);
     const request = this._delegate.deleteDatabase(prefixedName);
-    return new EIDBOpenDBRequest(
-        request,
-        this._valueMapper,
-        (d: IDBDatabase) => this._valueMapper.dbMapper.map(d));
+    return new EIDBOpenDBRequest(request, this._valueMapper, this._dbMapper);
   }
 
   /**

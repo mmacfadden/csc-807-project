@@ -46,15 +46,20 @@ export class OpeEncryptor {
     return this._ope.decrypt(cipherText[0]);
   }
 
+  public encryptDate(date: Date): Int32Array {
+    const encrypted: Int32Array = new Int32Array(1);
+    encrypted[0] = this._ope.encrypt(date.getDate());
+    return encrypted;
+  }
+
   public encryptString(str: string): Int32Array {
     const bytes = this._textEncoder.encode(str);
-    const encrypted: Int32Array = new Int32Array(bytes.length);
-    const view = new DataView(encrypted.buffer);
-    bytes.forEach((b, i) => {
-      const encryptedValue = this._ope.encrypt(b);
-      view.setInt32(i * 4, encryptedValue, false);
-    });
-    return encrypted;
+    return this._encryptBytes(bytes)
+  }
+
+  public encryptBuffer(buffer: ArrayBuffer): Int32Array {
+    const bytes = new Uint8Array(buffer);
+    return this._encryptBytes(bytes)
   }
 
   public decryptString(cipherText: Int32Array): string {
@@ -66,5 +71,15 @@ export class OpeEncryptor {
       bytes[i] = this._ope.decrypt(encNum);
     }
     return this._textDecoder.decode(bytes);
+  }
+
+  private _encryptBytes(bytes: Uint8Array): Int32Array {
+    const encrypted: Int32Array = new Int32Array(bytes.byteLength);
+    const view = new DataView(encrypted.buffer);
+    bytes.forEach((b, i) => {
+      const encryptedValue = this._ope.encrypt(b);
+      view.setInt32(i * 4, encryptedValue, false);
+    });
+    return encrypted;
   }
 }

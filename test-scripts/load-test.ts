@@ -32,7 +32,7 @@ async function test() {
 
   const encryptionConfigs: IEncryptionConfigData[] = [];
   for (let i = 0; i < testConfig.selectedModules.length; i++) {
-    const moduleConfig = await EncryptionConfigStorage.generateDefaultConfig(testConfig.selectedModules[i], moduleParams);
+    const moduleConfig = await EncryptionConfigStorage.generateDefaultConfigData(testConfig.selectedModules[i], moduleParams);
     encryptionConfigs.push(moduleConfig);
   }
 

@@ -6,6 +6,7 @@ import {OpeEncryptor} from "../ope/OpeEncryptor";
 import {RandomStringGenerator} from "../util";
 import {EncryptionModuleFactory} from "../module";
 import {SymmetricKeyEncryptor} from "../core/SymmetricKeyEncryptor";
+import {EIDBFactory} from "../core";
 
 
 /**
@@ -85,8 +86,11 @@ export class EncryptionConfigStorage {
    *
    * @param moduleParams
    *   Optional module specific parameters.
+   *
+   * @returns
+   *   The JSON representation of a configuration.
    */
-  public static generateDefaultConfig(encryptionModuleId: string, moduleParams?: any): IEncryptionConfigData {
+  public static generateDefaultConfigData(encryptionModuleId: string, moduleParams?: any): IEncryptionConfigData {
     const opeKey = OpeEncryptor.generateKey();
     const module = EncryptionModuleFactory.createModule(encryptionModuleId);
     const dataSecret = module.createRandomEncryptionSecret(moduleParams);
@@ -102,6 +106,10 @@ export class EncryptionConfigStorage {
       symmetricKeyEncryptionKey: SymmetricKeyEncryptor.generateConfig(),
       databases: {}
     }
+  }
+
+  public static generateDefaultConfig(encryptionModuleId: string, moduleParams?: any, update?: (config: IEncryptionConfigData) => void): EncryptionConfig {
+    return new EncryptionConfig(EncryptionConfigStorage.generateDefaultConfigData(encryptionModuleId, moduleParams), update)
   }
 
   private readonly _storageKeyPrefix: string;
