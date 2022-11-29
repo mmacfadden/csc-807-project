@@ -1,4 +1,3 @@
-// import {EventTarget} from "event-target-shim";
 import {EIDBValueMapper} from "./EIDBValueMapper";
 import {IDBTransaction} from "fake-indexeddb";
 

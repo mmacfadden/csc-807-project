@@ -102,7 +102,7 @@ export class EncryptionConfigStorage {
       dataSecret,
       opeKey,
       userDbPrefix,
-      keyEncryption: "symmetric",
+      keyEncryption: "none",
       symmetricKeyEncryptionKey: SymmetricKeyEncryptor.generateConfig(),
       databases: {}
     }

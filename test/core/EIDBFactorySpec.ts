@@ -1,5 +1,4 @@
 import {expect} from 'chai';
-import sinon from "sinon";
 import "fake-indexeddb/auto";
 import {IDBFactory} from "fake-indexeddb";
 import {EIDBFactory, EncryptionConfig, EncryptionConfigStorage, ModuleClearText, RequestUtils} from "../../src";

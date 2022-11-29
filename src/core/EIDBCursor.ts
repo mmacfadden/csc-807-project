@@ -8,7 +8,10 @@ export class EIDBCursor implements IDBCursor {
 
   constructor(cursor: IDBCursor, mapper: EIDBValueMapper) {
     this._cursor = cursor;
-    this.request = new EIDBRequest(cursor.request, mapper);
+    // FIXME remove the OR when the PR is merged and released:
+    //  https://github.com/dumbmatter/fakeIndexedDB/pull/79
+    const request = cursor.request || (cursor as any)._request;
+    this.request = new EIDBRequest(request, mapper);
     this._mapper = mapper;
   }
 

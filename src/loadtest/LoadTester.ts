@@ -222,8 +222,8 @@ export class LoadTester {
       // need to be part of the timing.
       await RequestUtils.toPromise(store.clear());
 
-      if (hooks?.documentCompleted) {
-        hooks.documentCompleted(i + 1);
+      if (hooks?.objectCompleted) {
+        hooks.objectCompleted(i + 1);
       }
     }
 

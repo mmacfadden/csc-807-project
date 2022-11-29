@@ -24,7 +24,7 @@ export class EIDBDatabase extends EventTarget implements IDBDatabase {
   }
 
   public get objectStoreNames(): DOMStringList {
-    return this._db.objectStoreNames
+    return this._db.objectStoreNames;
   }
 
   public get version(): number {
@@ -72,23 +72,19 @@ export class EIDBDatabase extends EventTarget implements IDBDatabase {
 
   private _bindEvents(): void {
     this._db.onversionchange = (ev: IDBVersionChangeEvent) => {
-      const proxy = wrapEventWithTarget(ev, this);
-      this.onversionchange(proxy);
+      this.onversionchange(wrapEventWithTarget(ev, this));
     };
 
     this._db.onabort = (ev: Event) => {
-      const proxy = wrapEventWithTarget(ev, this);
-      this.onabort(proxy);
+      this.onabort(wrapEventWithTarget(ev, this));
     };
 
     this._db.onclose = (ev: Event) => {
-      const proxy = wrapEventWithTarget(ev, this);
-      this.onclose(proxy);
+      this.onclose(wrapEventWithTarget(ev, this));
     };
 
     this._db.onerror = (ev: Event) => {
-      const proxy = wrapEventWithTarget(ev, this);
-      this.onerror(proxy);
+      this.onerror(wrapEventWithTarget(ev, this));
     };
 
     // TODO bind the general event listener stuff as well, we need to

@@ -22,7 +22,7 @@ export interface ILoadTesterHooks {
   testStarted?: (module: string, schema: string) => void;
 
 
-  documentCompleted?: (num: number) => void;
+  objectCompleted?: (num: number) => void;
 
   /**
    * Indicates that a test run has finished.

@@ -76,8 +76,12 @@ export class EIDBObjectStore implements IDBObjectStore {
     getReq.onsuccess = () => {
       const encryptedDoc = <IEncryptedDocument>getReq.result;
       try {
-        const v = this._encryptionModule.decrypt(encryptedDoc.value)
-        result.succeed(v);
+        if (encryptedDoc) {
+          const v = this._encryptionModule.decrypt(encryptedDoc.value)
+          result.succeed(v);
+        } else {
+          result.succeed(encryptedDoc);
+        }
       } catch (e) {
         result.fail(e as DOMException);
       }
@@ -131,11 +135,8 @@ export class EIDBObjectStore implements IDBObjectStore {
 
   public openCursor(query?: IDBValidKey | IDBKeyRange | null, direction?: IDBCursorDirection): IDBRequest<IDBCursorWithValue | null> {
     const resultMapper = (c: any) => this._valueMapper.cursorWithValueMapper.mapNullable(c);
-    return new EIDBRequest(
-        this._store.openCursor(query, direction),
-        this._valueMapper,
-        resultMapper
-    );
+    const request = this._store.openCursor(query, direction);
+    return new EIDBRequest(request, this._valueMapper, resultMapper);
   }
 
   public openKeyCursor(query?: IDBValidKey | IDBKeyRange | null, direction?: IDBCursorDirection): IDBRequest<IDBCursor | null> {
