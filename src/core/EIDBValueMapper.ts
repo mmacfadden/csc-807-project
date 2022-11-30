@@ -9,6 +9,7 @@ import {EncryptionModule} from "../module";
 import {EncryptionConfig} from "../config";
 import {DatabaseNameUtil} from "../util/DatabaseNameUtil";
 import {EIDBKeyEncryptor} from "./EIDBKeyEncryptor";
+import {EIDBEncryptor} from "./EIDBEncryptor";
 
 export type ValueMapper<S, D> = (source: S) => D;
 
@@ -51,7 +52,7 @@ export class EIDBValueMapper {
   }
 }
 
-export abstract class CachedValueMapper<From extends object, To, Parent = undefined> {
+export abstract class CachedValueMapper<From extends object, To, Options = undefined> {
 
   private readonly _map: WeakMap<From, To>;
   protected readonly _mapper: EIDBValueMapper;
@@ -70,29 +71,29 @@ export abstract class CachedValueMapper<From extends object, To, Parent = undefi
     this._encryptionConfig = encryptionConfig;
   }
 
-  public map(source: From, parent?: Parent): To {
+  public map(source: From, options?: Options): To {
     if (!source) {
       return source;
     }
 
     let result = this._map.get(source);
     if (!result) {
-      result = this._createValue(source, parent);
+      result = this._createValue(source, options);
       this._map.set(source, result);
     }
 
     return result;
   }
 
-  public mapNullable(source: From | null): To | null {
+  public mapNullable(source: From | null, options?: Options): To | null {
     if (source == null) {
       return null;
     } else {
-      return this.map(source);
+      return this.map(source, options);
     }
   }
 
-  protected abstract _createValue(source: From, parent?: Parent): To;
+  protected abstract _createValue(source: From, parent?: Options): To;
 }
 
 export class DatabaseMapper extends CachedValueMapper<IDBDatabase, EIDBDatabase> {
@@ -110,8 +111,9 @@ export class DatabaseMapper extends CachedValueMapper<IDBDatabase, EIDBDatabase>
 export class ObjectStoreMapper extends CachedValueMapper<IDBObjectStore, EIDBObjectStore, EIDBDatabase> {
   protected _createValue(source: IDBObjectStore, parent: EIDBDatabase): EIDBObjectStore {
     const dbConfig = this._encryptionConfig.getDatabaseConfig(parent.name);
-    const config = dbConfig.getObjectStoreConfig(source.name)
-    return new EIDBObjectStore(source, config, this._encryptionModule, this._keyEncryptor, this._mapper);
+    const config = dbConfig.getObjectStoreConfig(source.name);
+    const encryptor = new EIDBEncryptor(this._encryptionModule, config.getKeyPath(), this._keyEncryptor);
+    return new EIDBObjectStore(source, config,  encryptor, this._mapper);
   }
 }
 
@@ -121,15 +123,17 @@ export class TransactionMapper extends CachedValueMapper<IDBTransaction, EIDBTra
   }
 }
 
-export class CursorMapper extends CachedValueMapper<IDBCursor, EIDBCursor> {
-  protected _createValue(source: IDBCursor): EIDBCursor {
-    return new EIDBCursor(source, this._mapper);
+export class CursorMapper extends CachedValueMapper<IDBCursor, EIDBCursor, string | string[] | null> {
+  protected _createValue(source: IDBCursor, keyPath: string | string[] | null): EIDBCursor {
+    const encryptor = new EIDBEncryptor(this._encryptionModule, keyPath, this._keyEncryptor);
+    return new EIDBCursor(source, encryptor, this._mapper);
   }
 }
 
-export class CursorWithValueMapper extends CachedValueMapper<IDBCursorWithValue, EIDBCursorWithValue> {
-  protected _createValue(source: IDBCursorWithValue): EIDBCursorWithValue {
-    return new EIDBCursorWithValue(source, this._mapper, this._encryptionModule);
+export class CursorWithValueMapper extends CachedValueMapper<IDBCursorWithValue, EIDBCursorWithValue, string | string[] | null> {
+  protected _createValue(source: IDBCursorWithValue, keyPath: string | string[] | null): EIDBCursorWithValue {
+    const encryptor = new EIDBEncryptor(this._encryptionModule, keyPath, this._keyEncryptor);
+    return new EIDBCursorWithValue(source, this._mapper, encryptor);
   }
 }
 

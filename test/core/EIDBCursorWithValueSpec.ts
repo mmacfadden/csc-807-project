@@ -135,23 +135,23 @@ describe('EIDBCursor', () => {
 
   describe('update', () => {
     it("updates the current object", async () => {
-      // const db = await createDbAndStore();
-      // const tx = db.transaction(OBJECT_STORE_NAME, "readwrite");
-      // const store = tx.objectStore(OBJECT_STORE_NAME);
-      //
-      // await addValues(tx, store);
-      //
-      // const cursor = await RequestUtils.toPromise(store.openCursor());
-      // expect(cursor!.primaryKey).to.deep.eq(VALUE_1.id);
-      // const updateData = cursor!.value;
-      // updateData.name = "new name";
-      //
-      // await RequestUtils.toPromise(cursor!.update(updateData));
-      //
-      // const result = await RequestUtils.toPromise(store.get(VALUE_1.id));
-      // expect(result).to.deep.eq(updateData);
-      //
-      // db.close();
+      const db = await createDbAndStore();
+      const tx = db.transaction(OBJECT_STORE_NAME, "readwrite");
+      const store = tx.objectStore(OBJECT_STORE_NAME);
+
+      await addValues(tx, store);
+
+      const cursor = await RequestUtils.toPromise(store.openCursor());
+      expect(cursor!.primaryKey).to.deep.eq(VALUE_1.id);
+      const updateData = cursor!.value;
+      updateData.name = "new name";
+
+      await RequestUtils.toPromise(cursor!.update(updateData));
+
+      const result = await RequestUtils.toPromise(store.get(VALUE_1.id));
+      expect(result).to.deep.eq(updateData);
+
+      db.close();
     });
   });
 });

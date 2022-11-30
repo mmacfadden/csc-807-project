@@ -31,4 +31,7 @@ export class SymmetricKeyEncryptor extends EIDBKeyEncryptor {
     const ct = CryptoJS.AES.encrypt(encodedKey, this._key, {iv: this._iv});
     return CryptoJsUtils.convertWordArrayToUint8Array(ct.ciphertext);
   }
+
+  decryptSingleKey(key: any): any {
+  }
 }

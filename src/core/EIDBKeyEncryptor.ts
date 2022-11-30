@@ -37,4 +37,6 @@ export abstract class EIDBKeyEncryptor {
   }
 
   public abstract encryptSingleKey(key: number | string | Date | BufferSource): any;
+
+  public abstract decryptSingleKey(key: any): any;
 }

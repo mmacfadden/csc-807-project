@@ -9,7 +9,6 @@ import {NoOpKeyEncryptor} from "./NoOpKeyEncryptor";
 import {OpeKeyEncryptor} from "./OpeKeyEncryptor";
 import {EIDBKeyEncryptor} from "./EIDBKeyEncryptor";
 import {SymmetricKeyEncryptor} from "./SymmetricKeyEncryptor";
-import {Sha512KeyEncryptor} from "./Sha512KeyEncryptor";
 import {EIDBDatabase} from "./EIDBDatabase";
 
 export class EIDBFactory implements IDBFactory {
@@ -60,10 +59,6 @@ export class EIDBFactory implements IDBFactory {
           throw new Error("Invalid symmetricKeyEncryptionKey: " + config);
         }
         keyEncryptor = new SymmetricKeyEncryptor(keyConfig);
-        break;
-
-      case "hash":
-        keyEncryptor = new Sha512KeyEncryptor();
         break;
     }
 

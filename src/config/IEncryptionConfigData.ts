@@ -36,7 +36,7 @@ export interface IEncryptionConfigData {
   databases: { [key: string]: IDatabaseConfigData }
 }
 
-export type KeyEncryptionStrategy = "none" | "ope" | "symmetric" | "hash";
+export type KeyEncryptionStrategy = "none" | "ope" | "symmetric";
 
 export interface IDatabaseConfigData {
   objectStores: { [key: string]: IObjectStoreConfigData }

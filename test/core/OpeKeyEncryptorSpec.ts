@@ -22,7 +22,7 @@ describe('OpeKeyEncryptor', () => {
       const value = "a string";
       const encrypted = p.encryptSingleKey(value);
       expect(encrypted).to.not.eq(value);
-      expect(encrypted instanceof Uint8Array).to.be.true;
+      expect(encrypted instanceof Int32Array).to.be.true;
     });
 
     it( "encrypts a number", () => {
@@ -31,7 +31,7 @@ describe('OpeKeyEncryptor', () => {
       const value = 10;
       const encrypted = p.encryptSingleKey(value);
       expect(encrypted).to.not.eq(value);
-      expect(encrypted instanceof Uint8Array).to.be.true;
+      expect(encrypted instanceof Int32Array).to.be.true;
     });
 
     it( "encrypts a date", () => {
@@ -40,7 +40,7 @@ describe('OpeKeyEncryptor', () => {
       const value = new Date();
       const encrypted = p.encryptSingleKey(value);
       expect(encrypted).to.not.eq(value);
-      expect(encrypted instanceof Uint8Array).to.be.true;
+      expect(encrypted instanceof Int32Array).to.be.true;
     });
 
     it( "encrypts a buffer", () => {
@@ -49,7 +49,7 @@ describe('OpeKeyEncryptor', () => {
       const value = Uint8Array.of(1, 2, 3)
       const encrypted = p.encryptSingleKey(value.buffer);
       expect(encrypted).to.not.deep.eq(value);
-      expect(encrypted instanceof Uint8Array).to.be.true;
+      expect(encrypted instanceof Int32Array).to.be.true;
     });
 
     it( "encrypts a buffer source", () => {
@@ -58,14 +58,7 @@ describe('OpeKeyEncryptor', () => {
       const value = Uint8Array.of(1, 2, 3)
       const encrypted = p.encryptSingleKey(value);
       expect(encrypted).to.not.deep.eq(value);
-      expect(encrypted instanceof Uint8Array).to.be.true;
-    });
-
-    it( "throws for an unknown key type", () => {
-      const ope = new OpeEncryptor(KEY);
-      const p = new OpeKeyEncryptor(ope);
-
-      expect (() => p.encryptSingleKey(false as any as number)).to.throw();
+      expect(encrypted instanceof Int32Array).to.be.true;
     });
   });
 });

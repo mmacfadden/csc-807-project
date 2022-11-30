@@ -2,30 +2,25 @@ import {EIDBRequest} from "./EIDBRequest";
 import {EIDBIndex} from "./EIDBIndex";
 import {EIDBTransaction} from "./EIDBTransaction";
 import {EIDBValueMapper} from "./EIDBValueMapper";
-import {EncryptionModule} from "../module";
-import {IEncryptedDocument} from "./IEncryptedDocument";
+import {IEncryptedObject} from "./IEncryptedObject";
 import {MutableIDBRequest} from "./MutableIDBRequest";
-import {EIDBKeyEncryptor} from "./EIDBKeyEncryptor";
 import {EIDBObjectStoreConfig} from "../config/EIDBObjectStoreConfig";
-import {KeyPathUtil} from "../util";
+import {EIDBEncryptor} from "./EIDBEncryptor";
 
 export class EIDBObjectStore implements IDBObjectStore {
   private readonly _store: IDBObjectStore;
   private readonly _valueMapper: EIDBValueMapper;
-  private readonly _encryptionModule: EncryptionModule;
-  private readonly _keyEncryptor: EIDBKeyEncryptor;
+  private readonly _encryptor: EIDBEncryptor;
   private readonly _config: EIDBObjectStoreConfig;
 
   constructor(store: IDBObjectStore,
               config: EIDBObjectStoreConfig,
-              encryptionModule: EncryptionModule,
-              keyEncryptor: EIDBKeyEncryptor,
+              encryptor: EIDBEncryptor,
               valueMapper: EIDBValueMapper) {
     this._store = store;
     this._config = config;
     this._valueMapper = valueMapper;
-    this._encryptionModule = encryptionModule;
-    this._keyEncryptor = keyEncryptor;
+    this._encryptor = encryptor;
   }
 
   public get autoIncrement(): boolean {
@@ -65,25 +60,25 @@ export class EIDBObjectStore implements IDBObjectStore {
   }
 
   public delete(query: IDBValidKey | IDBKeyRange): IDBRequest<undefined> {
-    const key = this._keyEncryptor.encryptKeyOrRange(query)!;
+    const key = this._encryptor.encryptKeyOrRange(query)!;
     return new EIDBRequest(this._store.delete(key), this._valueMapper);
   }
 
   public get(query: IDBValidKey | IDBKeyRange): IDBRequest {
     const result = new MutableIDBRequest(this, this.transaction);
-    const encryptedQuery = this._keyEncryptor.encryptKeyOrRange(query)!;
+    const encryptedQuery = this._encryptor.encryptKeyOrRange(query)!;
     const getReq = this._store.get(encryptedQuery);
     getReq.onsuccess = () => {
-      const encryptedDoc = <IEncryptedDocument>getReq.result;
+      const encryptedDoc = <IEncryptedObject>getReq.result;
       try {
         if (encryptedDoc) {
-          const v = this._encryptionModule.decrypt(encryptedDoc.value)
+          const v = this._encryptor.decrypt(encryptedDoc);
           result.succeed(v);
         } else {
           result.succeed(encryptedDoc);
         }
       } catch (e) {
-        result.fail(e as DOMException);
+        this._failLater(result, e as DOMException);
       }
     }
 
@@ -93,28 +88,66 @@ export class EIDBObjectStore implements IDBObjectStore {
   public getAll(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<any[]> {
     const result = new MutableIDBRequest<any[]>(this, this.transaction);
 
-    const encryptedQuery = this._keyEncryptor.encryptKeyOrRange(query);
+    const encryptedQuery = this._encryptor.encryptKeyOrRange(query);
 
     const getReq = this._store.getAll(encryptedQuery);
     getReq.onsuccess = () => {
-      const encryptedDocs = <IEncryptedDocument[]>getReq.result;
+      const encryptedDocs = getReq.result as IEncryptedObject[];
       try {
-        const docs = encryptedDocs.map(encryptedDoc => this._decrypt(encryptedDoc))
+        const docs = encryptedDocs.map(encryptedDoc => this._encryptor.decrypt(encryptedDoc))
         result.succeed(docs);
       } catch (e) {
-        result.fail(e as DOMException);
+        this._failLater(result, e as DOMException);
       }
+    }
+
+    getReq.onerror = () => {
+      result.fail(getReq.error!);
     }
 
     return result;
   }
 
   public getAllKeys(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<IDBValidKey[]> {
-    return new EIDBRequest(this._store.getAllKeys(query, count), this._valueMapper);
+    const result = new MutableIDBRequest<any[]>(this, this.transaction);
+    const encryptedQuery = this._encryptor.encryptKeyOrRange(query);
+    const getReq = this._store.getAllKeys(encryptedQuery, count);
+    getReq.onsuccess = () => {
+      const encryptedKeys = getReq.result;
+      try {
+        const keys = encryptedKeys.map(encryptedKey => this._encryptor.decryptKey(encryptedKey));
+        result.succeed(keys);
+      } catch (e) {
+        this._failLater(result, e as DOMException);
+      }
+    }
+
+    getReq.onerror = () => {
+      result.fail(getReq.error!);
+    }
+
+    return result;
   }
 
   public getKey(query: IDBValidKey | IDBKeyRange): IDBRequest<IDBValidKey | undefined> {
-    return new EIDBRequest(this._store.getKey(query), this._valueMapper);
+    const result = new MutableIDBRequest<IDBValidKey | undefined>(this, this.transaction);
+    const encryptedQuery = this._encryptor.encryptKeyOrRange(query);
+    const getReq = this._store.getKey(encryptedQuery!)
+    getReq.onsuccess = () => {
+      const encryptedKey = getReq.result;
+      try {
+        const key = encryptedKey ? this._encryptor.decryptKey(encryptedKey) : undefined;
+        result.succeed(key);
+      } catch (e) {
+        this._failLater(result, e as DOMException);
+      }
+    }
+
+    getReq.onerror = () => {
+      result.fail(getReq.error!);
+    }
+
+    return result;
   }
 
   public createIndex(name: string, keyPath: string | string[], options?: IDBIndexParameters): IDBIndex {
@@ -134,42 +167,31 @@ export class EIDBObjectStore implements IDBObjectStore {
   }
 
   public openCursor(query?: IDBValidKey | IDBKeyRange | null, direction?: IDBCursorDirection): IDBRequest<IDBCursorWithValue | null> {
-    const resultMapper = (c: any) => this._valueMapper.cursorWithValueMapper.mapNullable(c);
-    const request = this._store.openCursor(query, direction);
+    const resultMapper = (c: any) => this._valueMapper.cursorWithValueMapper.mapNullable(c, this._config.getKeyPath());
+    const encryptedQuery = this._encryptor.encryptKeyOrRange(query);
+    const request = this._store.openCursor(encryptedQuery, direction);
     return new EIDBRequest(request, this._valueMapper, resultMapper);
   }
 
   public openKeyCursor(query?: IDBValidKey | IDBKeyRange | null, direction?: IDBCursorDirection): IDBRequest<IDBCursor | null> {
-    const resultMapper = (c: any) => this._valueMapper.cursorMapper.mapNullable(c);
+    const encryptedQuery = this._encryptor.encryptKeyOrRange(query);
+    const resultMapper = (c: any) => this._valueMapper.cursorMapper.mapNullable(c, this._config.getKeyPath());
     return new EIDBRequest(
-        this._store.openKeyCursor(query, direction),
+        this._store.openKeyCursor(encryptedQuery, direction),
         this._valueMapper,
         resultMapper
     );
   }
 
-  private _encrypt(value: any): IEncryptedDocument {
-    const keys = this._extractAndEncryptKeys(value, this._config.getKeyPath());
-    const encryptedValue = this._encryptionModule.encrypt(value);
-    return {
-      keys,
-      indices: [],
-      value: encryptedValue
-    };
-  }
-
-  private _decrypt(value: IEncryptedDocument): any {
-    return this._encryptionModule.decrypt(value.value);
-  }
-
   private _encryptAndStore(value: any, key: IDBValidKey | undefined, storeMethod: (value: any, key?: IDBValidKey) => IDBRequest): IDBRequest<IDBValidKey> {
     const result = new MutableIDBRequest<IDBValidKey>(this, this.transaction);
     try {
-      const v = this._encrypt(value);
+      const v = this._encryptor.encrypt(value);
       const req = storeMethod(v, key);
 
       req.onsuccess = () => {
-        result.succeed(req.result);
+        const key = this._encryptor.decryptKey(req.result);
+        result.succeed(key);
       }
 
       req.onerror = () => {
@@ -178,44 +200,15 @@ export class EIDBObjectStore implements IDBObjectStore {
     } catch (e) {
       // Need to do this async so that the event gets emitted
       // after the caller has a chance to bind to the events.
-      setTimeout(() => {
-        result.fail(e as DOMException);
-      }, 0);
+      this._failLater(result, e as DOMException);
     }
 
     return result;
   }
 
-  private _extractAndEncryptKeys(source: any, path: string | string[] | null): any {
-    if (path === null) {
-      return null;
-    }
-
-    if (!Array.isArray(path)) {
-      path = [path];
-    }
-
-    const target: any = {};
-
-    path.forEach((p, k) => {
-      const pathComponents = p.split(".");
-      let curSourceVal = source;
-
-      for (let i = 0; i < pathComponents.length; i++) {
-        const prop = pathComponents[i];
-        curSourceVal = source[prop];
-
-        if (i === pathComponents.length - 1) {
-          target[KeyPathUtil.getKey(k)] = this._keyEncryptor.encryptKey(curSourceVal);
-          break;
-        }
-
-        if (curSourceVal === undefined || curSourceVal === null) {
-          throw new Error("Unable to extract key from document");
-        }
-      }
-    });
-
-    return target;
+  private _failLater(req: MutableIDBRequest<any>, error: DOMException) {
+    setTimeout(() => {
+      req.fail(error);
+    }, 0);
   }
 }

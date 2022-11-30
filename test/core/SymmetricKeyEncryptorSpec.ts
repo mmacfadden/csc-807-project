@@ -1,6 +1,5 @@
 import {expect} from 'chai';
 import "fake-indexeddb/auto";
-import {Sha512KeyEncryptor} from "../../src/core/Sha512KeyEncryptor";
 import {SymmetricKeyEncryptor} from "../../src/core/SymmetricKeyEncryptor";
 
 describe('SymmetricKeyEncryptor', () => {
