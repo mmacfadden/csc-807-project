@@ -16,6 +16,10 @@ export class EIDBEncryptor {
     this._keyEncryptor = keyEncryptor;
   }
 
+  public encryptKey(query?: IDBValidKey): IDBValidKey | undefined {
+    return query ? this._keyEncryptor.encryptKey(query) : undefined;
+  }
+
   public encryptKeyOrRange(query?: IDBValidKey | IDBKeyRange | null): IDBValidKey | IDBKeyRange | undefined {
     return this._keyEncryptor.encryptKeyOrRange(query);
   }

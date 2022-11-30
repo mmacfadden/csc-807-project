@@ -35,11 +35,14 @@ export class EIDBCursor implements IDBCursor {
   }
 
   continue(key?: IDBValidKey): void {
-    this._cursor.continue(key);
+    const encryptedKey = this._encryptor.encryptKey(key);
+    this._cursor.continue(encryptedKey);
   }
 
   continuePrimaryKey(key: IDBValidKey, primaryKey: IDBValidKey): void {
-    this._cursor.continuePrimaryKey(key, primaryKey);
+    const encryptedKey = this._encryptor.encryptKey(key);
+    const encryptedPrimaryKey = this._encryptor.encryptKey(primaryKey);
+    this._cursor.continuePrimaryKey(encryptedKey!, encryptedPrimaryKey!);
   }
 
   delete(): IDBRequest<undefined> {

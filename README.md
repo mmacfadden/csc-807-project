@@ -9,7 +9,6 @@ This repository hosts Michael MacFadden's Project source code for [Dakota State 
 While this project attempted to follow sound software engineering principles and architectural design best practices, the project was most concerned with achieving the research results rather than providing a general purpose / production software system.  As such, the project has a few limitations that should be noted.
 
   - Indices are not currently supported.  The majority of the Index functionality has been implemented.  However,the method of extracting and encrypting the keys needs to be replicated for indices.  Indices also do not currently decrypt the data.
-  - Cursors are only partially implemented.  There is currently an issue with the events not firing on iteration.
   - Object stores with explicit keys (e.g. no Key Path) are not currently supported.  Key's are currently extracted from the document.  It would be easy enough to encrypt the explicit keys as well. This just has not been done yet.
 
 ### Bundling

@@ -115,6 +115,30 @@ describe('EIDBCursor', () => {
         }
       }).then(() => db.close());
     });
+
+    it("goes to the specified key", async () => {
+      const db = await createDbAndStore();
+      const tx = db.transaction(OBJECT_STORE_NAME, "readwrite");
+      const store = tx.objectStore(OBJECT_STORE_NAME);
+
+      await addValues(tx, store);
+
+      return new Promise((resolve, reject) => {
+        const req = store.openCursor(null, "next");
+        let count = 0;
+        req.onsuccess = () => {
+          if (req.result && count === 0) {
+            expect(req.result.value).to.deep.eq(VALUE_1);
+            count++;
+            req.result.continue(VALUE_3.id);
+          } else if (req.result && count === 1) {
+            expect(req.result.value).to.deep.eq(VALUE_3);
+            resolve(null);
+          }
+        }
+      }).then(() => db.close());
+    });
+
   });
 
   describe('advance', () => {
