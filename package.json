@@ -33,7 +33,7 @@
     "chai-as-promised": "^7.1.1",
     "crypto-js": "4.1.1",
     "egoroof-blowfish": "^2.2.2",
-    "fake-indexeddb": "^4.0.0",
+    "fake-indexeddb": "^4.0.1",
     "fs-extra": "^10.1.0",
     "gm-crypto": "^0.1.8",
     "highcharts": "^10.2.1",

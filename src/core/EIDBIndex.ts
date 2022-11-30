@@ -32,32 +32,39 @@ export class EIDBIndex implements IDBIndex {
   }
 
   count(query?: IDBValidKey | IDBKeyRange): IDBRequest<number> {
-    return new EIDBRequest(this._index.count(query), this._valueMapper);
+    const request = this._index.count(query);
+    return this._valueMapper.requestMapper.map(request);
   }
 
   get(query: IDBValidKey | IDBKeyRange): IDBRequest {
-    return new EIDBRequest(this._index.get(query), this._valueMapper);
+    const request = this._index.get(query);
+    return this._valueMapper.requestMapper.map(request);
   }
 
   getAll(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<any[]> {
-    return new EIDBRequest(this._index.getAll(query, count), this._valueMapper);
+    const request =this._index.getAll(query, count);
+    return this._valueMapper.requestMapper.map(request);
   }
 
   getAllKeys(query?: IDBValidKey | IDBKeyRange | null, count?: number): IDBRequest<IDBValidKey[]> {
-    return new EIDBRequest(this._index.getAllKeys(query, count), this._valueMapper);
+    const request = this._index.getAllKeys(query, count);
+    return this._valueMapper.requestMapper.map(request);
   }
 
   getKey(query: IDBValidKey | IDBKeyRange): IDBRequest<IDBValidKey | undefined> {
-    return new EIDBRequest(this._index.getKey(query), this._valueMapper);
+    const request = this._index.getKey(query);
+    return this._valueMapper.requestMapper.map(request);
   }
 
   openCursor(query?: IDBValidKey | IDBKeyRange | null, direction?: IDBCursorDirection): IDBRequest<IDBCursorWithValue | null> {
     const request = this._index.openCursor(query, direction);
-    return new EIDBRequest(request, this._valueMapper, c => this._valueMapper.cursorWithValueMapper.mapNullable(c));
+    return this._valueMapper.requestMapper
+        .map(request, c => this._valueMapper.cursorWithValueMapper.mapNullable(c));
   }
 
   openKeyCursor(query?: IDBValidKey | IDBKeyRange | null, direction?: IDBCursorDirection): IDBRequest<IDBCursor | null> {
     const request = this._index.openKeyCursor(query, direction);
-    return new EIDBRequest(request, this._valueMapper, c => this._valueMapper.cursorMapper.mapNullable(c));
+    return this._valueMapper.requestMapper
+        .map(request, c => this._valueMapper.cursorMapper.mapNullable(c));
   }
 }

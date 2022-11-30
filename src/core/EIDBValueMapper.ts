@@ -10,6 +10,7 @@ import {EncryptionConfig} from "../config";
 import {DatabaseNameUtil} from "../util/DatabaseNameUtil";
 import {EIDBKeyEncryptor} from "./EIDBKeyEncryptor";
 import {EIDBEncryptor} from "./EIDBEncryptor";
+import {EIDBRequest} from "./EIDBRequest";
 
 export type ValueMapper<S, D> = (source: S) => D;
 
@@ -21,9 +22,11 @@ export class EIDBValueMapper {
   public readonly cursorWithValueMapper: CursorWithValueMapper;
   public readonly indexMapper: IndexMapper;
   public readonly encryptionConfig: EncryptionConfig;
+  public readonly requestMapper: RequestMapper;
 
   // TODO might want to move this to a subclass or intermediate class.
   //  the encryption module is not needed in all of these.
+
   constructor(
       encryptionConfig: EncryptionConfig,
       encryptionModule: EncryptionModule,
@@ -34,6 +37,7 @@ export class EIDBValueMapper {
     this.cursorMapper = new CursorMapper(this, encryptionModule, keyEncryptor, encryptionConfig);
     this.cursorWithValueMapper = new CursorWithValueMapper(this, encryptionModule, keyEncryptor, encryptionConfig);
     this.indexMapper = new IndexMapper(this, encryptionModule, keyEncryptor, encryptionConfig);
+    this.requestMapper = new RequestMapper(this, encryptionModule, keyEncryptor, encryptionConfig);
     this.encryptionConfig = encryptionConfig;
   }
 
@@ -94,6 +98,12 @@ export abstract class CachedValueMapper<From extends object, To, Options = undef
   }
 
   protected abstract _createValue(source: From, parent?: Options): To;
+}
+
+export class RequestMapper extends CachedValueMapper<IDBRequest, EIDBRequest, ValueMapper<any, any>> {
+  protected _createValue(request: IDBRequest, valueMapper: ValueMapper<any, any>): EIDBRequest {
+    return new EIDBRequest(request, this._mapper, valueMapper);
+  }
 }
 
 export class DatabaseMapper extends CachedValueMapper<IDBDatabase, EIDBDatabase> {

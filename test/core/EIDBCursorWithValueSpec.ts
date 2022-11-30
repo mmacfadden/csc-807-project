@@ -1,16 +1,9 @@
 import "fake-indexeddb/auto";
-import {
-  EIDBDatabase,
-  EIDBFactory,
-  EIDBIndex,
-  EIDBObjectStore,
-  EncryptionConfigStorage,
-  ModuleClearText,
-  RequestUtils
-} from "../../src";
+import {EIDBDatabase, EIDBFactory, EncryptionConfigStorage, ModuleClearText, RequestUtils} from "../../src";
 import chai, {expect} from "chai";
-chai.should();
 import chaiAsPromised from "chai-as-promised";
+
+chai.should();
 chai.use(chaiAsPromised);
 
 const OBJECT_STORE_NAME = "store";
@@ -77,41 +70,120 @@ describe('EIDBCursor', () => {
   });
 
   describe('continue', () => {
-    // it("goes to the next value if the next direction is specified", async () => {
-    //   const db = await createDbAndStore();
-    //   const tx = db.transaction(OBJECT_STORE_NAME, "readwrite");
-    //   const store = tx.objectStore(OBJECT_STORE_NAME);
-    //
-    //   await addValues(tx, store);
-    //
-    //   const cursor = await RequestUtils.toPromise(store.openCursor(null, "next"));
-    //   if (!cursor) {
-    //     throw new Error("could not get cursor");
-    //   }
-    //   expect(cursor.value).to.deep.eq(VALUE_1);
-    //   cursor.continue();
-    //   expect(cursor.value).to.deep.eq(VALUE_2);
-    //
-    //   db.close();
-    // });
-    //
-    // it("goes to the prev value if the prev direction is specified", async () => {
-    //   const db = await createDbAndStore();
-    //   const tx = db.transaction(OBJECT_STORE_NAME, "readwrite");
-    //   const store = tx.objectStore(OBJECT_STORE_NAME);
-    //
-    //   await addValues(tx, store);
-    //
-    //   const req = store.openCursor(null, "prev");
-    //   req.onsuccess = () => {
-    //     if(req.result) {
-    //       console.log(req.result.value);
-    //       req.result.continue();
-    //     }
-    //   }
-    //
-    //   db.close();
-    // });
+    it("goes to the next value if the next direction is specified", async () => {
+      const db = await createDbAndStore();
+      const tx = db.transaction(OBJECT_STORE_NAME, "readwrite");
+      const store = tx.objectStore(OBJECT_STORE_NAME);
+
+      await addValues(tx, store);
+
+      return new Promise((resolve, reject) => {
+        const req = store.openCursor(null, "next");
+        let count = 0;
+        req.onsuccess = () => {
+          if (req.result && count === 0) {
+            expect(req.result.value).to.deep.eq(VALUE_1);
+            count++;
+            req.result.continue();
+          } else if (req.result && count === 1) {
+            expect(req.result.value).to.deep.eq(VALUE_2);
+            resolve(null);
+          }
+        }
+      }).then(() => db.close());
+    });
+
+    it("goes to the prev value if the prev direction is specified", async () => {
+      const db = await createDbAndStore();
+      const tx = db.transaction(OBJECT_STORE_NAME, "readwrite");
+      const store = tx.objectStore(OBJECT_STORE_NAME);
+
+      await addValues(tx, store);
+
+      return new Promise((resolve, reject) => {
+        const req = store.openCursor(null, "prev");
+        let count = 0;
+        req.onsuccess = () => {
+          if (req.result && count === 0) {
+            expect(req.result.value).to.deep.eq(VALUE_4);
+            count++;
+            req.result.continue();
+          } else if (req.result && count === 1) {
+            expect(req.result.value).to.deep.eq(VALUE_3);
+            resolve(null);
+          }
+        }
+      }).then(() => db.close());
+    });
+  });
+
+  describe('advance', () => {
+    it("goes to the next value if the next direction is specified", async () => {
+      const db = await createDbAndStore();
+      const tx = db.transaction(OBJECT_STORE_NAME, "readwrite");
+      const store = tx.objectStore(OBJECT_STORE_NAME);
+
+      await addValues(tx, store);
+
+      return new Promise((resolve, reject) => {
+        const req = store.openCursor(null, "next");
+        let count = 0;
+        req.onsuccess = () => {
+          if (req.result && count === 0) {
+            expect(req.result.value).to.deep.eq(VALUE_1);
+            count++;
+            req.result.advance(2);
+          } else if (req.result && count === 1) {
+            expect(req.result.value).to.deep.eq(VALUE_3);
+            resolve(null);
+          }
+        }
+      }).then(() => db.close());
+    });
+
+    it("goes to the prev value if the prev direction is specified", async () => {
+      const db = await createDbAndStore();
+      const tx = db.transaction(OBJECT_STORE_NAME, "readwrite");
+      const store = tx.objectStore(OBJECT_STORE_NAME);
+
+      await addValues(tx, store);
+
+      return new Promise((resolve, reject) => {
+        const req = store.openCursor(null, "prev");
+        let count = 0;
+        req.onsuccess = () => {
+          if (req.result && count === 0) {
+            expect(req.result.value).to.deep.eq(VALUE_4);
+            count++;
+            req.result.advance(2);
+          } else if (req.result && count === 1) {
+            expect(req.result.value).to.deep.eq(VALUE_2);
+            resolve(null);
+          }
+        }
+      }).then(() => db.close());
+    });
+  });
+
+  describe('continuePrimaryKey', () => {
+    // TODO add tests for and Index.
+    it("throws for an object store", async () => {
+      const db = await createDbAndStore();
+      const tx = db.transaction(OBJECT_STORE_NAME, "readwrite");
+      const store = tx.objectStore(OBJECT_STORE_NAME);
+
+      await addValues(tx, store);
+
+      return new Promise((resolve, reject) => {
+        const req = store.openCursor(null, "next");
+        req.onsuccess = () => {
+          if (req.result) {
+            expect(() => req.result!.continuePrimaryKey("3", "3")).to.throw()
+            resolve(null);
+          }
+        }
+      }).then(() => db.close());
+    });
   });
 
   describe('delete', () => {

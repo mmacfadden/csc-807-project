@@ -1,4 +1,3 @@
-import {EIDBRequest} from "./EIDBRequest";
 import {EIDBValueMapper} from "./EIDBValueMapper";
 import {EIDBEncryptor} from "./EIDBEncryptor";
 
@@ -10,10 +9,7 @@ export class EIDBCursor implements IDBCursor {
 
   constructor(cursor: IDBCursor, encryptor: EIDBEncryptor, mapper: EIDBValueMapper) {
     this._cursor = cursor;
-    // FIXME remove the OR when the PR is merged and released:
-    //  https://github.com/dumbmatter/fakeIndexedDB/pull/79
-    const request = cursor.request || (cursor as any)._request;
-    this.request = new EIDBRequest(request, mapper);
+    this.request = mapper.requestMapper.map(cursor.request);
     this._mapper = mapper;
     this._encryptor = encryptor;
   }
@@ -47,11 +43,13 @@ export class EIDBCursor implements IDBCursor {
   }
 
   delete(): IDBRequest<undefined> {
-    return new EIDBRequest(this._cursor.delete(), this._mapper);
+    const request = this._cursor.delete();
+    return this._mapper.requestMapper.map(request);
   }
 
   update(value: any): IDBRequest<IDBValidKey> {
     const encryptedValue = this._encryptor.encrypt(value);
-    return new EIDBRequest(this._cursor.update(encryptedValue), this._mapper);
+    const request = this._cursor.update(encryptedValue);
+    return this._mapper.requestMapper.map(request);
   }
 }

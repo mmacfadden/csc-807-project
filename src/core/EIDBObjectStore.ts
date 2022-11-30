@@ -52,16 +52,19 @@ export class EIDBObjectStore implements IDBObjectStore {
   }
 
   public clear(): IDBRequest<undefined> {
-    return new EIDBRequest(this._store.clear(), this._valueMapper);
+    const request = this._store.clear();
+    return this._valueMapper.requestMapper.map(request);
   }
 
   public count(query?: IDBValidKey | IDBKeyRange): EIDBRequest<number> {
-    return new EIDBRequest(this._store.count(query), this._valueMapper);
+    const request = this._store.count(query);
+    return this._valueMapper.requestMapper.map(request);
   }
 
   public delete(query: IDBValidKey | IDBKeyRange): IDBRequest<undefined> {
-    const key = this._encryptor.encryptKeyOrRange(query)!;
-    return new EIDBRequest(this._store.delete(key), this._valueMapper);
+    const encryptedQuery = this._encryptor.encryptKeyOrRange(query)!;
+    const request = this._store.delete(encryptedQuery);
+    return this._valueMapper.requestMapper.map(request);
   }
 
   public get(query: IDBValidKey | IDBKeyRange): IDBRequest {
@@ -170,17 +173,14 @@ export class EIDBObjectStore implements IDBObjectStore {
     const resultMapper = (c: any) => this._valueMapper.cursorWithValueMapper.mapNullable(c, this._config.getKeyPath());
     const encryptedQuery = this._encryptor.encryptKeyOrRange(query);
     const request = this._store.openCursor(encryptedQuery, direction);
-    return new EIDBRequest(request, this._valueMapper, resultMapper);
+    return this._valueMapper.requestMapper.map(request, resultMapper);
   }
 
   public openKeyCursor(query?: IDBValidKey | IDBKeyRange | null, direction?: IDBCursorDirection): IDBRequest<IDBCursor | null> {
     const encryptedQuery = this._encryptor.encryptKeyOrRange(query);
     const resultMapper = (c: any) => this._valueMapper.cursorMapper.mapNullable(c, this._config.getKeyPath());
-    return new EIDBRequest(
-        this._store.openKeyCursor(encryptedQuery, direction),
-        this._valueMapper,
-        resultMapper
-    );
+    const request = this._store.openKeyCursor(encryptedQuery, direction);
+    return this._valueMapper.requestMapper.map(request, resultMapper);
   }
 
   private _encryptAndStore(value: any, key: IDBValidKey | undefined, storeMethod: (value: any, key?: IDBValidKey) => IDBRequest): IDBRequest<IDBValidKey> {
