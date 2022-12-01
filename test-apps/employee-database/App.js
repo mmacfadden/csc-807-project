@@ -54,8 +54,9 @@ export default  {
         async onLogin() {
             console.log("User Logged In");
             this.user = this.authManager.getLoggedInUserName();
+            const config = this.authManager.getEncryptionConfig();
 
-            this.indexedDb = new EIDBFactory(window.indexedDB, this.authManager.getEncryptionConfig());
+            this.indexedDb = new EIDBFactory(window.indexedDB, config);
 
             const req = this.indexedDb.open("employees", 1);
             req.onupgradeneeded = () => {

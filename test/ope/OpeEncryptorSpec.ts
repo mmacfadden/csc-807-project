@@ -50,6 +50,19 @@ describe('OpeEncryptor', () => {
     });
   });
 
+  describe('encryptBuffer', () => {
+    it('Encrypt and decrypt a string', () => {
+      const key = OpeEncryptor.generateKey();
+      const encryptor = new OpeEncryptor(key);
+      const plainText =  Uint8Array.of(10, 20, 30, 40);
+      const cipherText = encryptor.encryptBuffer(plainText);
+      expect(cipherText).to.not.be.undefined;
+
+      const decrypted = encryptor.decryptBuffer(cipherText);
+      expect(decrypted).to.deep.eq(plainText);
+    });
+  });
+
   describe('encryptNumber', () => {
     it('Encrypt and decrypt a string', () => {
       const key = OpeEncryptor.generateKey();

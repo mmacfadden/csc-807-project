@@ -5,12 +5,20 @@ import {EIDBRequest, EncryptionConfig, EncryptionModule} from "../../src";
 import {EIDBValueMapper, ValueMapper} from "../../src/core/EIDBValueMapper";
 import {EIDBKeyEncryptor} from "../../src/core/EIDBKeyEncryptor";
 
+
 function doneRequest() {
   return {
     readyState: "done",
     error: null,
     result: 10
   }  as IDBRequest;
+}
+
+function mockIDBRequest(): IDBRequest {
+  const result = new EventTarget() as any;
+  result.readyState = "pending";
+  result.error = null;
+  return result as IDBRequest;
 }
 
 function createMockRequest(originalRequest: IDBRequest, resultMapper?: ValueMapper<any, any>) {
@@ -74,6 +82,33 @@ describe('EIDBRequest', () => {
       originalRequest.onerror!(new Event("error"));
 
       expect(onError.calledOnce).to.be.true;
+    });
+  });
+
+  describe('addEventListener', () => {
+    it( "calls the event listener", () => {
+      const originalRequest = mockIDBRequest();
+      const resultMapper = (source: any) => source + 1;
+      const request = createMockRequest(originalRequest, resultMapper);
+
+      const callback = sinon.spy();
+      request.addEventListener("success", callback);
+      request.dispatchEvent(new Event("success"));
+      expect(callback.called).to.be.true;
+    });
+  });
+
+  describe('removeEventListener', () => {
+    it( "calls the event listener", () => {
+      const originalRequest = mockIDBRequest();
+      const resultMapper = (source: any) => source + 1;
+      const request = createMockRequest(originalRequest, resultMapper);
+
+      const callback = sinon.spy();
+      request.addEventListener("success", callback);
+      request.removeEventListener("success", callback);
+      request.dispatchEvent(new Event("success"));
+      expect(callback.called).to.be.false;
     });
   });
 });

@@ -39,7 +39,7 @@ export default {
       totalTestCount: 10,
       testsCompleted: 0,
       testingFinished,
-      documentsCompleted: 0,
+      objectsCompleted: 0,
       loadTester: null,
       results,
       resultsCsv: null,
@@ -55,7 +55,7 @@ export default {
       this.results = [];
       this.resultsCsv = null;
       this.testsCompleted = 0;
-      this.documentsCompleted = 0;
+      this.objectsCompleted = 0;
 
       const hooks = {
         testingStarted: (testConfigs) => {
@@ -66,16 +66,16 @@ export default {
         testStarted: (module, schema) => {
           this.currentModule = module;
           this.currentSchema = schema;
-          this.documentsCompleted = 0;
+          this.objectsCompleted = 0;
         },
-        documentCompleted: (docCompleted) => {
-          this.documentsCompleted = docCompleted;
+        objectCompleted: (objCompleted) => {
+          this.objectsCompleted = objCompleted;
         },
         testFinished: (result) => {
           this.testsCompleted++;
           this.currentModule = null;
           this.results.push(result);
-          this.documentsCompleted = 0;
+          this.objectsCompleted = 0;
         },
         testingFinished: (results) => {
           this.testingFinished = true;
@@ -94,7 +94,7 @@ export default {
       try {
         const encryptionConfigs = [];
         for (let i = 0; i < this.testConfig.selectedModules.length; i++) {
-          const moduleConfig = await EncryptionConfigStorage.generateDefaultConfig(this.testConfig.selectedModules[i], moduleParams);
+          const moduleConfig = await EncryptionConfigStorage.generateDefaultConfigData(this.testConfig.selectedModules[i], moduleParams);
           moduleConfig.keyEncryption = this.testConfig.keyEncryptionScheme;
           encryptionConfigs.push(moduleConfig);
         }
@@ -184,33 +184,33 @@ export default {
         :current-schema="currentSchema"
         :total-tests="totalTestCount"
         :tests-completed="testsCompleted"
-        :documents-completed="documentsCompleted"
+        :documents-completed="objectsCompleted"
         :documents-per-test="testConfig.documentsPerTest"
     />
     <h2>Results</h2>
     <ul class="nav nav-tabs" id="myTab" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active"
-                id="tests-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#tests-tab-pane"
-                type="button"
-                role="tab"
-                aria-controls="tests-tab-pane"
-                aria-selected="true">Tests
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link"
-                id="analysis-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#analysis-tab-pane"
-                type="button"
-                role="tab"
-                aria-controls="analysis-tab-pane"
-                aria-selected="false">Analysis
-        </button>
-      </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active"
+              id="tests-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#tests-tab-pane"
+              type="button"
+              role="tab"
+              aria-controls="tests-tab-pane"
+              aria-selected="true">Tests
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link"
+              id="analysis-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#analysis-tab-pane"
+              type="button"
+              role="tab"
+              aria-controls="analysis-tab-pane"
+              aria-selected="false">Analysis
+      </button>
+    </li>
     </ul>
     <div class="tab-content" id="result-tabs">
     <div class="tab-pane fade show active" id="tests-tab-pane" role="tabpanel" aria-labelledby="tests-tab" tabindex="0">
@@ -240,5 +240,5 @@ export default {
     </div>
     </upload-modal>
     <textarea readonly="readonly" id="results-csv">{{resultsCsv || ""}}</textarea>
-`
+  `
 }

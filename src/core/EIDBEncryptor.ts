@@ -11,6 +11,14 @@ export class EIDBEncryptor {
   constructor(encryptionModule: EncryptionModule,
               keyPath: string | string[] | null,
               keyEncryptor: EIDBKeyEncryptor) {
+    if (!encryptionModule) {
+      throw new Error("encryptionModule must be defined");
+    }
+
+    if (!keyEncryptor) {
+      throw new Error("keyEncryptor must be defined");
+    }
+
     this._encryptionModule = encryptionModule;
     this._keyPath = keyPath;
     this._keyEncryptor = keyEncryptor;
@@ -44,7 +52,7 @@ export class EIDBEncryptor {
 
   private _extractAndEncryptKeys(source: any, path: string | string[] | null): any {
     if (path === null) {
-      return null;
+      return {};
     }
 
     if (!Array.isArray(path)) {
@@ -61,13 +69,13 @@ export class EIDBEncryptor {
         const prop = pathComponents[i];
         curSourceVal = source[prop];
 
+        if (curSourceVal === undefined || curSourceVal === null) {
+          throw new Error("Unable to extract key from document");
+        }
+
         if (i === pathComponents.length - 1) {
           target[KeyPathUtil.getKey(k)] = this._keyEncryptor.encryptKey(curSourceVal);
           break;
-        }
-
-        if (curSourceVal === undefined || curSourceVal === null) {
-          throw new Error("Unable to extract key from document");
         }
       }
     });

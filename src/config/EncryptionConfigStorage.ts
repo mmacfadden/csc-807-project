@@ -181,7 +181,6 @@ export class EncryptionConfigStorage {
           .setItem(EncryptionConfigStorage.SESSION_USERNAME, this._username);
     }
 
-
     this._setConfigFromData(configData);
   }
 

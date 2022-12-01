@@ -46,11 +46,6 @@ export class OpeEncryptor {
     return this._ope.decrypt(cipherText[0]);
   }
 
-  public encryptDate(date: Date): Int32Array {
-    const encrypted: Int32Array = new Int32Array(1);
-    encrypted[0] = this._ope.encrypt(date.getDate());
-    return encrypted;
-  }
 
   public encryptString(str: string): Int32Array {
     const bytes = this._textEncoder.encode(str);

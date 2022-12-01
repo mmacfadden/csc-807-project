@@ -10,6 +10,7 @@ While this project attempted to follow sound software engineering principles and
 
   - Indices are not currently supported.  The majority of the Index functionality has been implemented.  However,the method of extracting and encrypting the keys needs to be replicated for indices.  Indices also do not currently decrypt the data.
   - Object stores with explicit keys (e.g. no Key Path) are not currently supported.  Key's are currently extracted from the document.  It would be easy enough to encrypt the explicit keys as well. This just has not been done yet.
+  - Binary keys and index values have only partial support when using the OPE Encryptor.  We are using MessagePack to serialize the data. (not this might apply to values as well).
 
 ### Bundling
 The project is currently build as a single javascript bundle with all tested encryption modules included.  This means that all of the code for each module, as well as their dependencies are include in the bundle.  This creates a large JavaScript bundle of over 5MB in size.  Ideally the modules would be broken out into separate libraries that can be included individually.  Optimizing this architectural limitation was outside the research scope of this project, but would be useful for a production implementation. 

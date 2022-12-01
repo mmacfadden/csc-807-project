@@ -42,9 +42,8 @@ export class AuthenticationManager {
             );
 
             this._encryptionConfigStorage.open(password,
-                () => EncryptionConfigStorage.generateDefaultConfig(ModuleNodeCryptoAes256.MODULE_ID));
+                () => EncryptionConfigStorage.generateDefaultConfigData(ModuleNodeCryptoAes256.MODULE_ID));
             this._encryptionConfig = this._encryptionConfigStorage.getConfig();
-            console.log(this._encryptionConfig);
             this._loggedInUser = username;
         }
 
