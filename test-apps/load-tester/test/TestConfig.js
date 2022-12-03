@@ -72,11 +72,13 @@ export default {
     setDataFromConfig(config) {
       const {
         serializationScheme,
+        keyEncryptionScheme,
         documentsPerTest,
         selectedModuleMap,
         selectedSchemaMap
       } = this.configToData(config);
       this.serializationScheme = serializationScheme;
+      this.keyEncryptionScheme = keyEncryptionScheme;
       this.documentsPerTest = documentsPerTest;
       this.selectedModuleMap = selectedModuleMap;
       this.selectedSchemaMap = selectedSchemaMap;
@@ -166,9 +168,8 @@ export default {
               <label for="keyEncryption" class="form-label">Key Encryption Scheme</label>
               <select class="form-select" aria-label="Key Encryption Scheme" @change="setKeyEncryption">
                 <option value="none" :selected="keyEncryptionScheme === 'none'">None</option>
-                <option value="ope" :selected="keyEncryptionScheme === 'ope'">OPE</option>
-                <option value="hash" :selected="keyEncryptionScheme === 'hash'">Hash</option>
                 <option value="symmetric" :selected="keyEncryptionScheme === 'symmetric'">Symmetric</option>
+                <option value="ope" :selected="keyEncryptionScheme === 'ope'">OPE</option>
               </select>
             </div>
           </div>

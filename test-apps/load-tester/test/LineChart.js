@@ -4,10 +4,25 @@ export default {
     Highcharts.chart(this.$refs.container, {
       chart: {
         type: 'line',
-        zoomType: 'xy'
+        zoomType: 'xy',
+        height: (5 / 7 * 100) + '%',
       },
+      colors: [
+        "#49402b",
+        "#7f0000",
+        "#008000",
+        "#0000e0",
+        "#ff8c00",
+        "#000000",
+        "#00ff00",
+        "#00ffff",
+        "#9d029d",
+        "#1e90ff",
+        "#eee8aa",
+        "#d73785",
+      ],
       title: {
-        text: this.title
+        text: null
       },
       xAxis: {
         title: {
@@ -34,9 +49,9 @@ export default {
         borderWidth: 1
       },
       plotOptions: {
-        scatter: {
+        line: {
           marker: {
-            radius: 5,
+            radius: 2,
             states: {
               hover: {
                 enabled: true,
@@ -47,21 +62,39 @@ export default {
           states: {
             hover: {
               marker: {
-                enabled: false
+                enabled: true
               }
             }
           },
           tooltip: {
+            pointFormatter() {
+              return `${this.x.toFixed(1)} kB, ${this.y.toFixed(1)} ms`;
+            },
             headerFormat: '<b>{series.name}</b><br>',
-            pointFormat: '{point.x} cm, {point.y} kg'
           }
         }
+      },
+      exporting: {
+        filename: this.title,
+        chartOptions: {
+          chart: {
+            width: 700,
+            height: 500
+          }
+        },
+        scale: 1
+      },
+      credits: {
+        enabled: false
       },
       series: this.series
     });
 
   },
   template: `
+    <div class="line-chart">
+    <div class="chart-title">{{ this.title }}</div>
     <div ref="container"/>
+    </div>
   `
 }

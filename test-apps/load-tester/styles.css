@@ -137,3 +137,11 @@ label.form-label {
     font-size: .875em;
     color: #dc3545;
 }
+
+.line-chart .chart-title {
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px;
+}
+
+

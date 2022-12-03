@@ -1,7 +1,7 @@
 {
   "preEncryptionSerialization": "msgpack",
   "documentsPerTest": 30,
-  "keyEncryptionScheme": "ope",
+  "keyEncryptionScheme": "symmetric",
   "selectedModules": [
     "Clear Text",
     "AES 128 (Crypto JS)",
