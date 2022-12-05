@@ -137,13 +137,18 @@ Currently, the project has over 96% test coverge:
 
 # Load Test Application
 We built a web application to drive the load testing framework from within the browser.  It allows the user to choose which object types and which encryption modules to test, runs the tests, and then presents the results for analysis.  The tool also allows the user to export the results in JSON and CSV formats for further analysis.
-![Load Test Tool](assets/load-test-tool-result.png)
 
-![Load Test Results](assets/load-test-tool-graphs.png)
+<img alt="Load Test Tool" src="assets/load-test-tool-result.png" width="500" />
+
+<br />
+
+<img alt="Load Test Graphs" src="assets/load-test-tool-graphs.png" width="500" />
 
 # Employee Database Demo Application
 We also build a simple demonstration application that shows a example of the Encrypted Indexed DB framework supporting a real-world style application.  It demonstrates multiple users, creating/editing/deleting data, login/logout, and password changes.
 
-![Demo Application Loging](assets/demo-app-login.png)
+<img alt="Demo Application Login" src="assets/demo-app-login.png" width="500" />
 
-![Demo Application Data](assets/demo-app-data.png)
+<br />
+
+<img alt="Demo Application Data" src="assets/demo-app-data.png" width="500" />
