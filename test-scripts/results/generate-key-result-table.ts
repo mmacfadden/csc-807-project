@@ -1,5 +1,5 @@
 import fs from "fs";
-import {createTableBodies, findResultForModule, getModuleLabel, round} from "./ultis";
+import {createTableBodies, findResultForModule, getModuleLabel, round} from "./utils";
 
 
 const testDir = "./testing/key_encryption_testing";

@@ -1,6 +1,6 @@
 import fs from "fs";
 import {ILoadTestResult} from "../../src";
-import {createTableBody, getColumnValue, getModuleLabel} from "./ultis";
+import {createTableBody, getColumnValue, getModuleLabel} from "./utils";
 
 const testDir = "./testing/text_5000_all_modules";
 const schemaName = "Text 5000";
