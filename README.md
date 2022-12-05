@@ -45,14 +45,14 @@ This means that if the user changes their password, only the encryption configur
 ## Multi-User Data Segregation
 The Encrypted IndexedDB system also injects a random, unique, namespace into each users encryption configuration.  This namespace is used to prefix all database operations including creation, opening, and closing the database.  This allows multiple users to use the same IndexedDB instance without colliding with each other.
 
-![Multi-User Data Segregation](assets/multi-user-data-segregation.svg)
+
+<img alt="Multi-User Data Segregation" src="assets/multi-user-data-segregation.svg" width="500" />
+
 
 ## Data Serialization
 Most encryption algorithms process either string or binary data.  JavaScript provides a native serialization format in the JavaScript Object Notation (JSON) format. However, JSON does not support all of the types that IndexedDB can store (Dates, Typed Arrays, etc.).  Thus, we chose to encode the data using the [Message Pack](https://msgpack.org/index.html) serialization implementation for JavaScript.
 
-![Data Serialization](assets/serialization.svg)
-
-![Load Test Tool](assets/load-testing.svg)
+<img alt="Data Serialization" src="assets/serialization.svg" width="500" />
 
 ## Encryption Algorithms
 We implemented encryption modules for 11 popular [symmetric-key encryption](https://en.wikipedia.org/wiki/Symmetric-key_algorithm) ciphers as shown below in the table:
@@ -78,6 +78,8 @@ We also built an automated load testing framework that was able to generate rand
 * Average Read Time (ms)
 * Average Write Throughput (kbps)
 * Average Read Throughput (kbps)
+
+![Load Test Tool](assets/load-testing.svg)
 
 ## Limitations
 While this project attempted to follow sound software engineering principles and architectural design best practices, the project was most concerned with achieving the research results rather than providing a general purpose / production software system.  As such, the project has a few limitations that should be noted.
