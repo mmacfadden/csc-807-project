@@ -3,6 +3,12 @@
 
 This repository hosts Michael MacFadden's Project source code for [Dakota State University's](https://dsu.edu) CSC-807 "Cyber Security Research". This README gives a brief overview of the project and the code implementation.
 
+  * [Introduction](#introduction)
+  * [Architecture](#architecture)
+  * [Development](#development)
+  * [Load Testing Application](#load-test-application)
+  * [Demo Application](#employee-database-demo-application)
+
 # Introduction
 IndexedDB is a native NoSQL Object Store built into modern browsers.  While it is extremely popular, it does have some security challenges that stem from the fact that it does not encrypt data, does not segregate data by user, and only separates data by its Same Origin Policy.
 
